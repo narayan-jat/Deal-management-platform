@@ -1,9 +1,10 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
-import AppLayout from "./components/layout/AppLayout"
-import DealsPage from "./pages/DealsPage"
-import LoginPage from "./pages/LoginPage"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import AppLayout from "./components/layout/AppLayout";
+import DealsPage from "./pages/DealsPage";
+import LoginPage from "./pages/LoginPage";
+import SignUpComponent from "@/components/auth/SignUpComponent"; // adjust path if needed
 
-const isLoggedIn = true
+const isLoggedIn = false; // replace with real auth check later
 
 export default function App() {
   return (
@@ -18,9 +19,13 @@ export default function App() {
             </Route>
           </>
         ) : (
-          <Route path="*" element={<LoginPage />} />
+          <>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignUpComponent />} />
+            <Route path="*" element={<Navigate to="/login" />} />
+          </>
         )}
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
