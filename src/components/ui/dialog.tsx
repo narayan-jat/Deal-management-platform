@@ -5,12 +5,14 @@ import { cn } from "@/lib/utils"
 
 const Dialog = DialogPrimitive.Root
 const DialogTrigger = DialogPrimitive.Trigger
+const DialogPortal = DialogPrimitive.Portal
+const DialogClose = DialogPrimitive.Close
 
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
 >(({ className, children, ...props }, ref) => (
-  <DialogPrimitive.Portal>
+  <DialogPortal>
     <DialogPrimitive.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50" />
     <DialogPrimitive.Content
       ref={ref}
@@ -25,9 +27,9 @@ const DialogContent = React.forwardRef<
         <X className="h-4 w-4" />
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
-  </DialogPrimitive.Portal>
+  </DialogPortal>
 ))
 
 DialogContent.displayName = "DialogContent"
 
-export { Dialog, DialogTrigger, DialogContent }
+export { Dialog, DialogTrigger, DialogContent, DialogClose }
