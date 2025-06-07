@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ShadCN global tokens (e.g., for border radius) */
+@layer base {
+  :root {
+    --radius: 0.5rem;
+
+    /* Optional: feel free to define more tokens */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 210 40% 98%;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
