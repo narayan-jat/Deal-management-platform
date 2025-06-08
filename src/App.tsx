@@ -1,3 +1,5 @@
+import LandingPage from "./pages/landingpage";
+
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import AppLayout from "./components/layout/AppLayout";
 import DealsPage from "./pages/DealsPage";
@@ -10,6 +12,8 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+      <Route path="/" element={<LandingPage />} /> {/* 👈 Public homepage */}
+        
         {isLoggedIn ? (
           <>
             <Route path="/" element={<Navigate to="/deals" />} />
