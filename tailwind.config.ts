@@ -5,11 +5,19 @@ const config: Config = {
   darkMode: "class",
   content: [
     "./index.html",
-    "./src/**/*.{ts,tsx}",
+    "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
+      fontFamily: {
+        lora: ['Lora', 'serif'],
+      },
       colors: {
+      
+          godex: {
+            primary: "#004646",
+            secondary: "#C8B273",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

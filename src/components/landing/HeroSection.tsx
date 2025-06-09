@@ -1,12 +1,12 @@
 export default function HeroSection() {
   return (
-    <section className="grid overflow-hidden relative gap-20 items-center px-16 py-32 mx-auto my-0 bg-emerald-900 grid-cols-[1fr_1fr] max-w-[1488px] text-[white] max-md:gap-10 max-md:px-8 max-md:py-20 max-md:grid-cols-[1fr]">
+    <section className="grid overflow-hidden relative gap-20 items-center px-16 py-32 mx-auto my-0 bg-godex-primary grid-cols-[1fr_1fr] max-w-[1488px] text-[white] max-md:gap-10 max-md:px-8 max-md:py-20 max-md:grid-cols-[1fr]">
       <div className="absolute top-5 right-10 opacity-30 bg-[20px_20px] h-[200px] w-[200px]" />
-      <div className="absolute bottom-10 opacity-40 bg-[15px_15px] h-[150px] left-[60px] w-[150px]" />
-      <div className="relative p-10 rounded-2xl border border-solid backdrop-blur-[10px] border-white border-opacity-10">
-        <div className="p-6 rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.1)]">
-          <div className="flex justify-between items-center pb-4 mb-5 border-b border-solid border-b-zinc-100">
-            <div className="flex gap-3 items-center">
+        <div className="absolute bottom-10 opacity-40 bg-[15px_15px] h-[150px] left-[60px] w-[150px]" />
+         <div className="relative p-10 rounded-2xl border border-solid backdrop-blur-[10px] border-white border-opacity-10 bg-white/10">
+           <div className="p-6 rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] bg-white">
+             <div className="flex justify-between items-center pb-4 mb-5 border-b border-solid border-b-zinc-100">
+               <div className="flex gap-3 items-center">
               <div className="w-8 h-8 text-base font-semibold bg-emerald-600 rounded-lg text-[white] flex items-center justify-center">
                 ▶
               </div>
@@ -84,17 +84,22 @@ export default function HeroSection() {
         </div>
       </div>
       <div>
-        <h1 className="pr-8 mb-8 w-auto text-5xl font-semibold tracking-normal leading-none max-md:text-5xl max-sm:text-4xl">
+        <h1 className="pr-8 mb-8 w-auto text-5xl font-lora tracking-normal leading-none max-md:text-5xl max-sm:text-4xl">
           Try the GoDex Beta
         </h1>
-        <p className="mb-10 text-xl leading-normal max-w-[480px] text-white text-opacity-80">
+        <p className="mb-10 text-xl font-lora max-w-[480px] text-white text-opacity-80">
           A simpler way to manage your deals. Built for borrowers, brokers, and
           lenders who want less friction and more focus.
         </p>
-        <button className="gap-2 px-7 py-3.5 text-base font-medium bg-orange-300 rounded-md transition-all cursor-pointer border-[none] duration-[0.2s] ease-[ease] text-[white] hover:bg-[#006666]">
+        <button className="gap-2 px-7 py-3.5 text-base font-lora bg-orange-300 rounded-md transition-all cursor-pointer border-[none] duration-[0.2s] ease-[ease] text-[white] hover:bg-[#004646]">
           &nbsp;Request Early Access
         </button>
+      
       </div>
     </section>
+  
+  
+  
+  
   );
 }
