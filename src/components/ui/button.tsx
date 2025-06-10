@@ -13,6 +13,7 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "underline-offset-4 hover:underline text-primary",
+        gold: "bg-[#C8B273] text-white hover:bg-[#A69051]",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -33,14 +34,29 @@ export interface ButtonProps
     VariantProps<typeof buttonVariants> {}
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, ...props }, ref) => (
-    <button
-      className={cn(buttonVariants({ variant, size }), className)}
-      ref={ref}
-      {...props}
-    />
-  )
+  ({ className, variant, size, ...props }, ref) => {
+    return (
+      <button
+        className={cn(buttonVariants({ variant, size }), className)}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
 )
+
 Button.displayName = "Button"
 
 export { Button, buttonVariants }
+
+export function GoldButton({ children, className, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <Button
+      variant="gold"
+      className={cn("font-lora px-7 py-3.5 text-base gap-2", className)}
+      {...props}
+    >
+      {children}
+    </Button>
+  )
+}

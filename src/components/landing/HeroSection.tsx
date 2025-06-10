@@ -1,3 +1,4 @@
+import { GoldButton } from "@/components/ui/button"
 export default function HeroSection() {
   return (
     <section className="grid overflow-hidden relative gap-20 items-center px-16 py-32 mx-auto my-0 bg-godex-primary grid-cols-[1fr_1fr] max-w-[1488px] text-[white] max-md:gap-10 max-md:px-8 max-md:py-20 max-md:grid-cols-[1fr]">
@@ -22,39 +23,67 @@ export default function HeroSection() {
           </div>
           <div className="flex justify-center items-center mb-6">
             <div className="relative w-40 h-40">
-              <svg width="160" height="160" viewBox="0 0 160 160">
-                <circle
-                  cx="80"
-                  cy="80"
-                  r="70"
-                  fill="none"
-                  stroke="#f0f0f0"
-                  strokeWidth="12"
-                />
-                <circle
-                  cx="80"
-                  cy="80"
-                  r="70"
-                  fill="none"
-                  stroke="rgb(0, 170, 108)"
-                  strokeWidth="12"
-                  strokeDasharray="308 440"
-                  strokeLinecap="round"
-                  transform="rotate(-90 80 80)"
-                />
-                <circle
-                  cx="80"
-                  cy="80"
-                  r="70"
-                  fill="none"
-                  stroke="rgb(59, 130, 246)"
-                  strokeWidth="12"
-                  strokeDasharray="132 440"
-                  strokeDashoffset="-308"
-                  strokeLinecap="round"
-                  transform="rotate(-90 80 80)"
-                />
-              </svg>
+            <svg width="160" height="160" viewBox="0 0 160 160">
+            <circle
+              cx="80"
+              cy="80"
+              r="70"
+              fill="none"
+              stroke="#f0f0f0"
+              strokeWidth="12"
+            />
+            <circle
+              cx="80"
+              cy="80"
+              r="70"
+              fill="none"
+              stroke="rgb(0, 170, 108)"
+              strokeWidth="12"
+              strokeDasharray="308 440"
+              strokeLinecap="round"
+              transform="rotate(-90 80 80)"
+            />
+            <circle
+              cx="80"
+              cy="80"
+              r="70"
+              fill="none"
+              stroke="rgb(59, 130, 246)"
+              strokeWidth="12"
+              strokeDasharray="132 440"
+              strokeDashoffset="-308"
+              strokeLinecap="round"
+              transform="rotate(-90 80 80)"
+            />
+       
+<text
+  x="10"
+  y="90"
+  textAnchor="middle"
+  alignmentBaseline="middle"
+  fill="rgb(59, 130, 246)"
+  fontSize="14"
+  fontWeight="600"
+>
+  30%
+</text>
+
+
+<text
+  x="123"
+  y="53"
+  textAnchor="middle"
+  alignmentBaseline="middle"
+  fill="rgb(0, 170, 108)"
+  fontSize="14"
+  fontWeight="600"
+>
+  70%
+</text>
+
+
+
+          </svg>
             </div>
           </div>
           <div className="flex gap-5 justify-between">
@@ -91,10 +120,9 @@ export default function HeroSection() {
           A simpler way to manage your deals. Built for borrowers, brokers, and
           lenders who want less friction and more focus.
         </p>
-        <button className="gap-2 px-7 py-3.5 text-base font-lora bg-orange-300 rounded-md transition-all cursor-pointer border-[none] duration-[0.2s] ease-[ease] text-[white] hover:bg-[#004646]">
-          &nbsp;Request Early Access
-        </button>
-      
+           <GoldButton>
+              &nbsp;Request Early Access
+          </GoldButton>
       </div>
     </section>
   
