@@ -15,9 +15,9 @@ export default function Footer({
   submitForm,
 }: FooterProps) {
   return (
-    <footer className="px-16 pt-20 pb-10 bg-emerald-900 text-[white] max-sm:px-8 max-sm:pt-16 max-sm:pb-8">
+    <footer className="px-16 pt-20 pb-10 bg-[#004646] text-[white] max-sm:px-8 max-sm:pt-16 max-sm:pb-8">
       <div className="mx-auto my-0 text-center max-w-[1488px]">
-        <h2 className="mb-6 text-5xl font-light leading-tight text-[white] max-sm:text-4xl">
+        <h2 className="mb-6 text-5xl font-lora leading-tight text-[white] max-sm:text-4xl">
           {" "}
           Got questions? Let's get in touch
         </h2>
@@ -65,7 +65,7 @@ export default function Footer({
             />
           </div>
           <button
-            className="px-8 py-4 text-lg font-medium bg-orange-300 rounded-lg transition-all cursor-pointer border-[none] duration-[0.2s] ease-[ease] text-[white]"
+            className="px-8 py-4 text-lg font-medium bg-[#C8B273] rounded-lg transition-all cursor-pointer border-[none] duration-[0.2s] ease-[ease] text-[white]"
             type="submit"
             onKeyDown={(event) => {
               if (event.key === "Enter" || event.key === " ") {

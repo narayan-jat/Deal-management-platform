@@ -1,3 +1,4 @@
+import { GoldButton } from "@/components/ui/button"
 import { useState } from "react";
 
 interface HeaderProps {
@@ -46,9 +47,10 @@ export default function Header({ isMenuOpen, toggleMenu }: HeaderProps) {
           <a href="#" className="text-base no-underline text-neutral-600">
             Sign in
           </a>
-          <button className="px-6 py-3 text-base font-medium bg-orange-300 rounded-lg transition-all cursor-pointer border-[none] duration-[0.2s] ease-[ease] text-[white]">
-            Learn more
-          </button>
+          <GoldButton>
+  &nbsp;Learn More
+</GoldButton>
+
         </div>
         <button
           className="text-2xl text-gray-800 cursor-pointer border-[none] md:hidden"

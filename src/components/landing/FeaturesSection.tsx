@@ -26,26 +26,19 @@ export default function FeaturesSection({
 }: FeaturesSectionProps) {
   return (
     <div>
-      <div className="box-border flex relative flex-col shrink-0 pt-8 pr-6 pb-6 my-5 -mr-0.5 h-auto bg-emerald-900 border border-hidden">
-        <h2 className="self-stretch pt-1.5 mx-auto mb-6 text-4xl font-light text-gray-800 leading-[72px] max-sm:text-3xl">
-          <p>
-            <span style={{ color: "rgb(255, 255, 255)" }}>
-              {" "}
-              Stop Chasing Emails.{" "}
-            </span>
-          </p>
-          <p>
-            <span style={{ color: "rgb(255, 255, 255)" }}>
-              Start Closing Deals.
-            </span>
-          </p>
-        </h2>
+      <div className="box-border flex relative flex-col shrink-0 pt-8 pr-6 pb-6 my-5 -mr-0.5 h-auto bg-[#004646] border border-hidden">
+     
+      <h2 className="self-stretch pt-1.5 mx-auto mb-6 text-4xl font-light text-white font-lora leading-[72px] max-sm:text-6xl text-center">
+      <p>Stop Chasing Emails.</p>
+      <p>Start Closing Deals.</p>
+    </h2>
+
       </div>
-      <div>
-        <h2 className="pt-0.5 mb-6 text-4xl font-light text-gray-800 max-sm:text-3xl">
+      <div className="mt-20">
+        <h2 className="pt-0.5 mb-6 text-4xl font-lora text-gray-800 max-sm:text-3xl">
           Streamline your private credit workflow
         </h2>
-        <p className="mb-16 text-lg leading-relaxed text-neutral-600">
+        <p className="mb-16 text-lg font-lora leading-relaxed text-neutral-600">
           GoDex is the all-in-one platform for private credit professionals.
           From deal creation to collaboration, we've got you covered{" "}
         </p>
@@ -85,11 +78,11 @@ export default function FeaturesSection({
           </div>
         </div>
         <div className="box-border flex relative flex-col shrink-0 pb-8 mt-5 h-auto">
-          <h2 className="mb-6 text-4xl font-light text-gray-800 max-sm:text-3xl">
+          <h2 className="mb-6 text-4xl font-lora text-gray-800 max-sm:text-3xl">
             {" "}
             Be Among the First to Use GoDex — Join the Beta{" "}
           </h2>
-          <p className="mb-16 text-lg leading-relaxed text-neutral-600">
+          <p className="mb-16 text-lg font-lora leading-relaxed text-neutral-600">
             {" "}
             A simpler way to manage your deals. Built for borrowers, brokers,
             and lenders who want less friction and more focus.{" "}
@@ -249,7 +242,7 @@ export default function FeaturesSection({
               ))}
             </div>
             <button
-              className="p-4 w-full text-base font-medium bg-orange-300 rounded-lg transition-all cursor-pointer border-[none] duration-[0.2s] ease-[ease] text-[white]"
+              className="p-4 w-full text-base font-medium bg-[#C8B273] rounded-lg transition-all cursor-pointer border-[none] duration-[0.2s] ease-[ease] text-[white]"
               type="submit"
             >
               {" "}
