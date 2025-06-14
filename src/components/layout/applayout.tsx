@@ -1,4 +1,4 @@
-import Sidebar from "./Sidebar"
+import Sidebar from "../builder-dashboard/shad-sidebar";
 import { Outlet } from "react-router-dom"
 
 export default function AppLayout() {
