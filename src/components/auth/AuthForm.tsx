@@ -2,7 +2,6 @@ import React from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Link } from "react-router-dom";
 import PasswordInput from "./PasswordInput";
 
@@ -14,8 +13,6 @@ interface AuthFormProps {
   setPassword: (value: string) => void;
   onSubmit: (e: React.FormEvent) => void;
   loading: boolean;
-  error: string;
-  success: string;
   submitLabel: string;
   bottomText: string;
   bottomLinkText: string;
@@ -30,8 +27,6 @@ const AuthForm: React.FC<AuthFormProps> = ({
   setPassword,
   onSubmit,
   loading,
-  error,
-  success,
   submitLabel,
   bottomText,
   bottomLinkText,
@@ -64,24 +59,6 @@ const AuthForm: React.FC<AuthFormProps> = ({
         {loading ? (type === "signup" ? "Creating account..." : "Signing in...") : submitLabel}
       </Button>
 
-      {error && (
-        <div className="mt-6">
-          <Alert variant="destructive">
-            <AlertTitle>{type === "signup" ? "Sign-up failed" : "Sign-in failed"}</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        </div>
-      )}
-
-      {success && (
-        <div className="mt-6">
-          <Alert>
-            <AlertTitle>Success</AlertTitle>
-            <AlertDescription>{success}</AlertDescription>
-          </Alert>
-        </div>
-      )}
-
       <div className="mt-8 text-center text-sm">
         <span className="text-gray-600">{bottomText} </span>
         <Link to={bottomLinkTo} className="text-godex-primary hover:text-godex-primary/80 font-medium">
@@ -92,4 +69,4 @@ const AuthForm: React.FC<AuthFormProps> = ({
   );
 };
 
-export default AuthForm;
+export default AuthForm;  

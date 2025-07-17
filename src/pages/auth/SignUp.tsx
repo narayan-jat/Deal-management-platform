@@ -3,30 +3,28 @@ import { useNavigate } from "react-router-dom";
 import AuthLayout from "@/components/auth/AuthLayout";
 import AuthForm from "@/components/auth/AuthForm";
 import { useAuth } from "@/context/AuthProvider";
+import { Toaster, toast } from 'sonner';
+
 
 const SignUp = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<string>("");
-  const [success, setSuccess] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
   const { signUp } = useAuth();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
     setLoading(true);
 
     if (!email || !password) {
-      setError("All fields are required.");
+      toast.error("All fields are required.");
       setLoading(false);
       return;
     }
 
     if (password.length < 8) {
-      setError("Password must be at least 8 characters long.");
+      toast.error("Password must be at least 8 characters long.");
       setLoading(false);
       return;
     }
@@ -34,9 +32,9 @@ const SignUp = () => {
     const { error: signUpError } = await signUp(email, password);
 
     if (signUpError) {
-      setError(signUpError.message);
+      toast.error(signUpError.message);
     } else {
-      setSuccess("Account created successfully! Please check your email to verify your account.");
+      toast.success("Account created successfully! Please check your email to verify your account before signing in.");
       setTimeout(() => {
         navigate("/signin");
       }, 3000);
@@ -55,13 +53,12 @@ const SignUp = () => {
         setEmail={setEmail}
         setPassword={setPassword}
         loading={loading}
-        error={error}
-        success={success}
         submitLabel="Create Account"
         bottomText="Already have an account?"
         bottomLinkText="Sign in"
         bottomLinkTo="/signin"
       />
+      <Toaster position="top-right" richColors />
     </AuthLayout>
   );
 };
