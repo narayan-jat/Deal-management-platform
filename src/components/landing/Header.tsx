@@ -1,5 +1,6 @@
 import { GoldButton } from "@/components/ui/button"
-import { useState } from "react";
+import { Link } from "react-router-dom";
+import { navigationConfig, NavigationItem } from "@/config/navigation";
 
 interface HeaderProps {
   isMenuOpen: boolean;
@@ -7,101 +8,132 @@ interface HeaderProps {
 }
 
 export default function Header({ isMenuOpen, toggleMenu }: HeaderProps) {
-  return (
-    <header className="sticky top-0 z-50 px-16 py-0 bg-white border-b border-solid border-b-blue-50">
-      <nav className="flex justify-between items-center mx-auto my-0 h-20 max-w-[1627px]">
-        <div className="flex items-center">
-          <span className="ml-3 text-2xl font-bold text-gray-800">GoDex</span>
-        </div>
-        <div className="flex gap-3.5 items-center max-md:hidden">
-          <a
-            href="#"
-            className="text-base font-medium no-underline text-neutral-600"
-          >
-            Home
-          </a>
-          <a
-            href="#"
-            className="text-base font-medium no-underline text-neutral-600"
-          >
-            Sales
-          </a>
-          <a
-            href="#"
-            className="text-base font-medium no-underline text-neutral-600"
-          >
-            Support&nbsp;
-          </a>
-          <a
-            href="#"
-            className="text-base font-medium no-underline text-neutral-600"
-          >
-            Contact
-          </a>
-          <a
-            href="#"
-            className="text-base font-medium no-underline text-neutral-600"
-          />
-        </div>
-        <div className="flex gap-6 items-center max-md:hidden">
-          <a href="#" className="text-base no-underline text-neutral-600">
-            Sign in
-          </a>
-          <GoldButton>
-  &nbsp;Learn More
-</GoldButton>
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
-        </div>
-        <button
-          className="text-2xl text-gray-800 cursor-pointer border-[none] md:hidden"
-          onClick={toggleMenu}
+  const handleNavClick = (item: NavigationItem) => {
+    if (item.type === 'scroll' && item.scrollTarget) {
+      scrollToSection(item.scrollTarget);
+    }
+  };
+
+  const handleMobileNavClick = (item: NavigationItem) => {
+    if (item.type === 'scroll' && item.scrollTarget) {
+      scrollToSection(item.scrollTarget);
+      toggleMenu();
+    }
+  };
+
+  const renderNavItem = (item: NavigationItem, isMobile = false) => {
+    const baseClasses = "text-base font-medium no-underline text-neutral-600 hover:text-godex-primary transition-colors";
+    const mobileClasses = isMobile ? "px-0 py-3 text-center w-full" : "";
+
+    if (item.type === 'route' && item.path) {
+      return (
+        <Link 
+          key={item.title}
+          to={item.path} 
+          className={`${baseClasses} ${mobileClasses}`}
         >
-          ☰
+          {item.title}
+        </Link>
+      );
+    }
+
+    if (item.type === 'scroll') {
+      return (
+        <button
+          key={item.title}
+          onClick={() => isMobile ? handleMobileNavClick(item) : handleNavClick(item)}
+          className={`${baseClasses} ${mobileClasses}`}
+        >
+          {item.title}
         </button>
+      );
+    }
+
+    return null;
+  };
+
+  return (
+    <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+      <nav className="px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center">
+            <Link to="/" className="text-2xl font-bold text-godex-primary font-inter">
+              GoDex
+            </Link>
+          </div>
+          
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            {navigationConfig.mainNav.map(item => renderNavItem(item))}
+          </div>
+          
+          {/* Desktop Auth Navigation */}
+          <div className="hidden md:flex items-center space-x-6">
+            {navigationConfig.authNav.map((item, index) => (
+              <div key={item.title}>
+                {item.title === "Sign Up" ? (
+                  <Link to={item.path!}>
+                    <GoldButton>
+                      {item.title}
+                    </GoldButton>
+                  </Link>
+                ) : (
+                  renderNavItem(item)
+                )}
+              </div>
+            ))}
+          </div>
+          
+          {/* Mobile Menu Button */}
+          <button
+            className="md:hidden p-2 rounded-md text-gray-600 hover:text-godex-primary hover:bg-gray-100 transition-colors"
+            onClick={toggleMenu}
+            aria-label="Open menu"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="4" y="6" width="16" height="2" rx="1" fill="currentColor"/>
+              <rect x="4" y="11" width="16" height="2" rx="1" fill="currentColor"/>
+              <rect x="4" y="16" width="16" height="2" rx="1" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
       </nav>
+      
+      {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="absolute inset-x-0 top-full z-40 px-16 py-5 border-t border-solid bg-[white] border-t-blue-50 shadow-[0_4px_6px_rgba(0,0,0,0.1)] md:hidden">
-          <div className="flex flex-col gap-4">
-            <a
-              href="#"
-              className="px-0 py-2 text-base font-medium no-underline text-neutral-600"
-            >
-              Solutions
-            </a>
-            <a
-              href="#"
-              className="px-0 py-2 text-base font-medium no-underline text-neutral-600"
-            >
-              Platform
-            </a>
-            <a
-              href="#"
-              className="px-0 py-2 text-base font-medium no-underline text-neutral-600"
-            >
-              Clients
-            </a>
-            <a
-              href="#"
-              className="px-0 py-2 text-base font-medium no-underline text-neutral-600"
-            >
-              Resources
-            </a>
-            <a
-              href="#"
-              className="px-0 py-2 text-base font-medium no-underline text-neutral-600"
-            >
-              Company
-            </a>
-            <div className="pt-4 mt-4 border-t border-solid border-t-blue-50">
-              <a
-                href="#"
-                className="mb-4 text-base no-underline text-neutral-600"
-              >
-                Sign in
-              </a>
-              <button className="px-6 py-3 w-full text-base font-medium bg-teal-700 rounded-lg cursor-pointer border-[none] duration-[0.2s] text-[white] transition-[background-color]">
-                Learn more
-              </button>
+        <div className="md:hidden bg-white border-t border-gray-200 shadow-lg">
+          <div className="px-4 py-6 space-y-4">
+            {/* Mobile Main Navigation */}
+            <div className="space-y-2">
+              <div className="flex flex-col items-center space-y-2">
+                {navigationConfig.mainNav.map(item => renderNavItem(item, true))}
+              </div>
+            </div>
+            
+            {/* Mobile Auth Navigation */}
+            <div className="pt-4 border-t border-gray-200 space-y-3">
+              <div className="flex flex-col items-center space-y-3">
+                {navigationConfig.authNav.map((item, index) => (
+                  <div key={item.title} className="w-full">
+                    {item.title === "Sign Up" || item.title === "Sign in" ? (
+                      <Link to={item.path!} className="block">
+                        <button className="w-full px-4 py-3 text-base font-medium bg-godex-secondary text-black rounded-lg hover:bg-godex-secondary/90 transition-colors">
+                          {item.title}
+                        </button>
+                      </Link>
+                    ) : (
+                      renderNavItem(item, true)
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
