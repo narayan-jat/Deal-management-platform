@@ -1,6 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import DealCard from "./DealCard";
+import DealCard from "./Dealcard";
 
 type Props = {
   id: string;
@@ -28,7 +28,7 @@ export default function SortableCardWrapper(props: Props) {
     transition,
     zIndex: isDragging ? 50 : 1,
     opacity: isDragging ? 0.8 : 1,
-    position: isDragging ? "relative" : undefined,
+    position: isDragging ? "relative" as const : undefined,
   };
 
   return (
