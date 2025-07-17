@@ -53,7 +53,7 @@ export function GoldButton({ children, className, ...props }: React.ButtonHTMLAt
   return (
     <Button
       variant="gold"
-      className={cn("font-lora px-7 py-3.5 text-base gap-2", className)}
+      className={cn("font-inter px-7 py-3.5 text-base gap-2", className)}
       {...props}
     >
       {children}

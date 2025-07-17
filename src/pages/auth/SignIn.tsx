@@ -4,7 +4,7 @@ import AuthLayout from "@/components/auth/AuthLayout";
 import AuthForm from "@/components/auth/AuthForm";
 import { useAuth } from "@/context/AuthProvider";
 
-const SignInPage = () => {
+const SignIn = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -66,4 +66,4 @@ const SignInPage = () => {
   );
 };
 
-export default SignInPage;
+export default SignIn;
