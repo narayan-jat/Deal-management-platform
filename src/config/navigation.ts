@@ -1,3 +1,5 @@
+import { ROUTES } from "./routes";
+
 export interface NavigationItem {
   title: string;
   path?: string; // For router navigation
@@ -36,12 +38,12 @@ export const navigationConfig: NavigationConfig = {
   authNav: [
     {
       title: "Sign in",
-      path: "/login",
+      path: ROUTES.SIGNIN, 
       type: "route"
     },
     {
       title: "Sign Up",
-      path: "/signup",
+      path: ROUTES.SIGNUP,
       type: "route"
     }
   ]
