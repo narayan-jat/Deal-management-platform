@@ -1,3 +1,8 @@
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+
 interface FormData {
   email: string;
   message: string;
@@ -15,28 +20,27 @@ export default function Footer({
   submitForm,
 }: FooterProps) {
   return (
-    <footer className="px-16 pt-20 pb-10 bg-[#004646] text-[white] max-sm:px-8 max-sm:pt-16 max-sm:pb-8">
-      <div className="mx-auto my-0 text-center max-w-[1488px]">
-        <h2 className="mb-6 text-5xl font-lora leading-tight text-[white] max-sm:text-4xl">
-          {" "}
+    <footer id="contact" className="bg-godex-primary px-4 py-16 text-white sm:px-6 lg:px-16 lg:py-20">
+      <div className="mx-auto max-w-4xl text-center">
+        <h2 className="mb-8 text-3xl font-inter leading-tight text-white sm:text-4xl lg:text-5xl">
           Got questions? Let's get in touch
         </h2>
         <form
-          className="mx-auto mt-0 mb-16 max-w-[600px]"
+          className="mx-auto mb-12 max-w-2xl"
           onSubmit={(event) => {
             event.preventDefault();
             submitForm();
           }}
         >
           <div className="mb-6">
-            <label
+            <Label
               htmlFor="footer-email"
-              className="block mb-2 text-base font-medium text-left text-[white]"
+              className="mb-2 block text-left text-base font-medium text-white font-inter"
             >
               Email
-            </label>
-            <input
-              className="p-4 w-full text-base rounded-lg border border-solid bg-white bg-opacity-10 border-white border-opacity-30 text-[white] placeholder-white placeholder-opacity-70"
+            </Label>
+            <Input
+              className="w-full border-white/30 bg-white/10 text-white placeholder-white/70 font-inter focus:border-white/50 focus:ring-white/20"
               id="footer-email"
               type="email"
               placeholder="Enter your email"
@@ -46,14 +50,14 @@ export default function Footer({
             />
           </div>
           <div className="mb-8">
-            <label
+            <Label
               htmlFor="footer-message"
-              className="block mb-2 text-base font-medium text-left text-[white]"
+              className="mb-2 block text-left text-base font-medium text-white font-inter"
             >
               Message
-            </label>
-            <textarea
-              className="p-4 w-full text-base rounded-lg border border-solid resize-y bg-white bg-opacity-10 border-white border-opacity-30 min-h-[120px] text-[white] placeholder-white placeholder-opacity-70"
+            </Label>
+            <Textarea
+              className="min-h-[120px] w-full resize-y border-white/30 bg-white/10 text-white placeholder-white/70 font-inter focus:border-white/50 focus:ring-white/20"
               id="footer-message"
               rows={5}
               placeholder="Tell us how we can help you..."
@@ -64,8 +68,8 @@ export default function Footer({
               }
             />
           </div>
-          <button
-            className="px-8 py-4 text-lg font-medium bg-[#C8B273] rounded-lg transition-all cursor-pointer border-[none] duration-[0.2s] ease-[ease] text-[white]"
+          <Button
+            className="w-[80%] mx-auto block bg-godex-secondary text-black hover:bg-godex-secondary/90 font-inter"
             type="submit"
             onKeyDown={(event) => {
               if (event.key === "Enter" || event.key === " ") {
@@ -75,19 +79,19 @@ export default function Footer({
             }}
           >
             Submit
-          </button>
+          </Button>
         </form>
-        <div className="flex flex-wrap gap-5 justify-between items-center pt-10 border-t border-solid border-t-white border-t-opacity-20 max-sm:flex-col max-sm:items-center">
-          <p className="m-0 text-sm text-stone-300">© 2025 GoDex</p>
+        <div className="flex flex-col items-center gap-6 border-t border-white/20 pt-8 sm:flex-row sm:justify-between">
+          <p className="text-sm text-stone-300 font-inter">© 2025 GoDex</p>
           <div className="flex flex-wrap gap-6">
             <a
-              className="text-sm no-underline duration-[0.2s] ease-[ease] text-stone-300 transition-[color] hover:text-white"
+              className="text-sm text-stone-300 transition-colors duration-200 ease-[ease] hover:text-white font-inter"
               href="#"
             >
               Terms of Use
             </a>
             <a
-              className="text-sm no-underline duration-[0.2s] ease-[ease] text-stone-300 transition-[color] hover:text-white"
+              className="text-sm text-stone-300 transition-colors duration-200 ease-[ease] hover:text-white font-inter"
               href="#"
             >
               Privacy Policy

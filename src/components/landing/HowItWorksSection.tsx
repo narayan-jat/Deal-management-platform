@@ -1,52 +1,52 @@
 export default function HowItWorksSection() {
   return (
-    <div className="box-border flex relative flex-col shrink-0 px-0 py-20 mt-5 rounded-2xl bg-zinc-100">
-      <div className="mb-16 text-center">
-        <p className="mb-4 text-sm font-medium tracking-wider text-[#004646] uppercase">
+    <div id="how-it-works" className="rounded-2xl bg-gray-50 px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+      <div className="mb-12 text-center lg:mb-16">
+        <p className="mb-4 text-sm font-medium tracking-wider text-godex-primary uppercase font-inter">
           How It Works
         </p>
-        <h2 className="m-0 text-4xl font-light text-gray-800 max-sm:text-3xl">
+        <h2 className="text-3xl font-inter font-semibold text-black sm:text-4xl lg:text-5xl">
           Start in 3 Easy Steps
         </h2>
       </div>
-      <div className="grid relative gap-10 px-10 py-0 mx-auto my-0 grid-cols-[repeat(auto-fit,minmax(280px,1fr))] max-w-[1000px] max-md:gap-16 max-md:grid-cols-[1fr]">
-      
-      
-        <div className="relative px-8 py-10 text-center rounded-2xl border border-solid transition-all border-[#004646] border-opacity-10 duration-[0.3s] ease-[ease] shadow-[0_10px_30px_rgba(0,70,70,0.08)]">
-          <div className="flex relative justify-center items-center mx-auto mt-0 mb-6 w-20 h-20 bg-emerald-900 bg-center bg-no-repeat bg-cover rounded-full bg-[url(https://encycolorpedia.com/004646)] z-[2]">
-            <span className="text-3xl font-bold text-[white]">1</span>
+      <div className="mx-auto max-w-6xl">
+        <div className="grid gap-8 sm:gap-10 lg:grid-cols-3">
+          <div className="rounded-2xl border border-godex-primary/10 bg-white p-6 text-center shadow-[0_10px_30px_rgba(0,70,70,0.08)] transition-all duration-300 ease-[ease] hover:shadow-[0_15px_40px_rgba(0,70,70,0.12)] sm:p-8">
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-godex-primary sm:h-20 sm:w-20">
+              <span className="text-2xl font-bold text-white sm:text-3xl font-inter">1</span>
+            </div>
+            <h3 className="mb-4 text-xl font-inter font-semibold text-black sm:text-2xl">
+              Create Your Account
+            </h3>
+            <p className="text-sm leading-relaxed text-gray-600 sm:text-base font-inter">
+              Sign up in seconds. Choose your account type and set up your
+              workspace.
+            </p>
           </div>
-          <h3 className="mb-4 text-2xl font-medium text-gray-800">
-            Create Your Account
-          </h3>
-          <p className="m-0 text-base leading-relaxed text-neutral-600">
-            Sign up in seconds. Choose your account type and set up your
-            workspace.
-          </p>
-        </div>
-        <div className="relative px-8 py-10 text-center rounded-2xl border border-solid transition-all border-[#004646] border-opacity-10 duration-[0.3s] ease-[ease] shadow-[0_10px_30px_rgba(0,70,70,0.08)]">
-          <div className="flex relative justify-center items-center mx-auto mt-0 mb-6 w-20 h-20 bg-emerald-900 bg-center bg-no-repeat bg-cover rounded-full bg-[url(https://encycolorpedia.com/004646)] z-[2]">
-            <span className="text-3xl font-bold text-[white]">2</span>
+          <div className="rounded-2xl border border-godex-primary/10 bg-white p-6 text-center shadow-[0_10px_30px_rgba(0,70,70,0.08)] transition-all duration-300 ease-[ease] hover:shadow-[0_15px_40px_rgba(0,70,70,0.12)] sm:p-8">
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-godex-primary sm:h-20 sm:w-20">
+              <span className="text-2xl font-bold text-white sm:text-3xl font-inter">2</span>
+            </div>
+            <h3 className="mb-4 text-xl font-inter font-semibold text-black sm:text-2xl">
+              Start a New Deal
+            </h3>
+            <p className="text-sm leading-relaxed text-gray-600 sm:text-base font-inter">
+              Add key info, upload documents, and share with everyone working on
+              the deal—no more scattered files or email chains.
+            </p>
           </div>
-          <h3 className="mb-4 text-2xl font-medium text-gray-800">
-            Start a New Deal
-          </h3>
-          <p className="m-0 text-base leading-relaxed text-neutral-600">
-            Add key info, upload documents, and share with everyone working on
-            the deal—no more scattered files or email chains.
-          </p>
-        </div>
-        <div className="relative px-8 py-10 text-center rounded-2xl border border-solid transition-all border-[#004646] border-opacity-10 duration-[0.3s] ease-[ease] shadow-[0_10px_30px_rgba(0,70,70,0.08)]">
-          <div className="flex relative justify-center items-center mx-auto mt-0 mb-6 w-20 h-20 bg-emerald-900 bg-center bg-no-repeat bg-cover rounded-full bg-[url(https://encycolorpedia.com/004646)] z-[2]">
-            <span className="text-3xl font-bold text-[white]">3</span>
+          <div className="rounded-2xl border border-godex-primary/10 bg-white p-6 text-center shadow-[0_10px_30px_rgba(0,70,70,0.08)] transition-all duration-300 ease-[ease] hover:shadow-[0_15px_40px_rgba(0,70,70,0.12)] sm:p-8">
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-godex-primary sm:h-20 sm:w-20">
+              <span className="text-2xl font-bold text-white sm:text-3xl font-inter">3</span>
+            </div>
+            <h3 className="mb-4 text-xl font-inter font-semibold text-black sm:text-2xl">
+              Collaborate and Close
+            </h3>
+            <p className="text-sm leading-relaxed text-gray-600 sm:text-base font-inter">
+              Track updates, message collaborators, and keep everything moving.
+              Simple, secure, and organized. Just send a link and get to work.
+            </p>
           </div>
-          <h3 className="mb-4 text-2xl font-medium text-gray-800">
-            Collaborate and Close
-          </h3>
-          <p className="m-0 text-base leading-relaxed text-neutral-600">
-            Track updates, message collaborators, and keep everything moving.
-            Simple, secure, and organized. Just send a link and get to work.
-          </p>
         </div>
       </div>
     </div>

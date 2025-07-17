@@ -5,10 +5,20 @@ import HowItWorksSection from "@/components/landing/HowItWorksSection";
 import FeaturesSection from "@/components/landing/FeaturesSection";
 import Footer from "@/components/landing/Footer";
 
-export default function LandingPage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+interface AccessRequestType {
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  company: string;
+  accountType: string;
+  assetClasses: string[];
+  message: string;
+}
 
-  const [formData, setFormData] = useState({
+export default function Landing() {
+  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const [formData, setFormData] = useState<AccessRequestType>({
     email: "",
     firstName: "",
     lastName: "",
@@ -54,11 +64,11 @@ export default function LandingPage() {
   }
 
   return (
-    <div>
+    <div className="min-h-screen">
       <Header isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} />
       <main>
         <HeroSection />
-        <section className="grid gap-16 px-16 py-32 mx-auto my-0 grid-cols-[1fr] max-w-[1488px] max-sm:px-8 max-sm:py-20">
+        <div className="space-y-16 px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
           <HowItWorksSection />
           <FeaturesSection
             formData={formData}
@@ -66,8 +76,7 @@ export default function LandingPage() {
             toggleAssetClass={toggleAssetClass}
             submitForm={submitForm}
           />
-          <div className="static top-[100px]" />
-        </section>
+        </div>
       </main>
       <Footer
         formData={formData}

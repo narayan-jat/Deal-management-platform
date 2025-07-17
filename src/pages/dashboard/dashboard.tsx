@@ -1,8 +1,8 @@
 import React from "react";
-import StatCard from "../../components/builder-dashboard/stat-card";
-import Sidebar from "../../components/builder-dashboard/shad-sidebar";
-import Header from "../../components/builder-dashboard/header";
-import Layout from "../../components/builder-dashboard/layout";
+import StatCard from "@/components/builder-dashboard/stat-card";
+import Sidebar from "@/components/builder-dashboard/shad-sidebar";
+import Header from "@/components/builder-dashboard/header";
+import Layout from "@/components/builder-dashboard/layout";
 
 const Dashboard = () => {
   return (

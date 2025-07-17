@@ -6,9 +6,11 @@ import {
   Bell,
   Settings,
   Menu,
+  LogOut,
 } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "@/context/AuthProvider";
 
 const links = [
   { label: "Dashboard", href: "/dashboard", icon: <Home className="h-4 w-4" /> },
@@ -22,6 +24,13 @@ const links = [
 export default function Sidebar() {
   const { pathname } = useLocation();
   const [collapsed, setCollapsed] = useState(false);
+  const { signOut, user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/login");
+  };
 
   return (
     <div
@@ -45,8 +54,15 @@ export default function Sidebar() {
         </div>
       )}
 
+      {/* User Info */}
+      {!collapsed && user && (
+        <div className="px-3 py-2 mb-4 text-sm text-gray-600 border-b border-gray-200">
+          <div className="font-medium">{user.email}</div>
+        </div>
+      )}
+
       {/* Navigation */}
-      <nav className="space-y-1">
+      <nav className="space-y-1 flex-1">
         {links.map((link) => {
           const isActive = pathname === link.href;
           return (
@@ -65,6 +81,18 @@ export default function Sidebar() {
           );
         })}
       </nav>
+
+      {/* Logout Button */}
+      <button
+        onClick={handleLogout}
+        className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 transition-all ${
+          collapsed ? "justify-center" : ""
+        }`}
+        title="Logout"
+      >
+        <LogOut className="h-4 w-4" />
+        {!collapsed && <span>Logout</span>}
+      </button>
     </div>
   );
 }
