@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ProfileData, ProfileEditData } from "@/types/Profile";
+import { ProfileData } from "@/types/Profile";
 import { useAuth } from "@/context/AuthProvider";
 import { ProfileService, ProfileStorageService, ErrorService } from "@/services";
 
@@ -63,7 +63,7 @@ export default function useProfile() {
 		}
 	};
 
-	const handleUpdateProfile = async (updatedData: ProfileEditData): Promise<void> => {
+	const handleUpdateProfile = async (updatedData: Partial<ProfileData>): Promise<void> => {
 		if (!user?.id) {
 			throw new Error("User not authenticated");
 		}

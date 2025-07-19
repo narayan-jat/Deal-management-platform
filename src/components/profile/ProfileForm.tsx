@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import ProfileAvatarUploader from "./ProfileAvatarUploader";
-import { ProfileData, ProfileEditData } from "@/types/Profile";
+import { ProfileData } from "@/types/Profile";
 
 
 interface ProfileEditFormProps {
@@ -13,13 +13,12 @@ interface ProfileEditFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   handleUploadProfileImage: (file: File) => Promise<string>;
-  handleUpdateProfile: (updatedData: ProfileEditData) => Promise<void>;
+  handleUpdateProfile: (updatedData: Partial<ProfileData>) => Promise<void>;
   loading: boolean;
 }
 
 export default function ProfileEditForm({ data, open, onOpenChange, handleUploadProfileImage, handleUpdateProfile, loading }: ProfileEditFormProps) {
-  const [form, setForm] = useState<ProfileEditData>({
-    id: data?.id || "",
+  const [form, setForm] = useState<Partial<ProfileData>>({
     full_name: data?.full_name || "",
     title: data?.title || "",
     email: data?.email || "",
@@ -58,7 +57,7 @@ export default function ProfileEditForm({ data, open, onOpenChange, handleUpload
               Update your professional information and profile picture
             </p>
           </div>
-
+          
           <div className="flex justify-center">
             <ProfileAvatarUploader imageUrl={form.profile_photo} handleImageChange={handleImageChange} handleUploadProfileImage={handleUploadProfileImage} />
           </div>

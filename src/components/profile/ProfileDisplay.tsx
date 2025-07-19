@@ -1,5 +1,5 @@
 import { Edit } from "lucide-react";
-import { ProfileData, ProfileEditData } from "@/types/Profile";
+import { ProfileData } from "@/types/Profile";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import ProfileEditForm from "./ProfileForm";
@@ -8,7 +8,7 @@ import defaultProfile from "@/assets/default-profile.png";
 interface ProfileDisplayProps {
   data: ProfileData;
   isOwner: boolean;
-  handleUpdateProfile: (updated: ProfileEditData) => Promise<void>;
+  handleUpdateProfile: (updatedData: Partial<ProfileData>) => Promise<void>;
   handleUploadProfileImage: (file: File) => Promise<string>;
   loading: boolean;
 }
@@ -35,7 +35,7 @@ export default function ProfileDisplay({ data, isOwner, handleUpdateProfile, han
             {data.full_name || "No name provided"}
           </h2>
           <p className="text-lg text-godex-primary font-medium font-inter mb-2">
-            {data.title || "No title provided"}
+            {data.title || "Engineer(default)"} @ {data.organization_tag || "Godex(default)"}
           </p>
           <p className="text-gray-600 font-inter">
             {data.email || "No email provided"}
@@ -53,10 +53,10 @@ export default function ProfileDisplay({ data, isOwner, handleUpdateProfile, han
           <h3 className="text-lg font-semibold text-black font-inter mb-3">About</h3>
           <p className="text-gray-700 leading-relaxed font-inter">
           {data.bio && (
-            <p>{data.bio}</p>
+            <span>{data.bio}</span>
           )}
           {!data.bio && (
-            <p>Please add a professional bio to your profile</p>
+            <span>Please add a professional bio to your profile</span>
           )}
           </p>
         </div>
