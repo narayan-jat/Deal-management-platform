@@ -140,3 +140,4 @@ godex-frontend/
 - ⏳ Finalize minimal public profiles with inter-user visibility
 - ⏳ Write setup instructions, Supabase SQL schema migration, and walkthrough doc
 - ⏳ Confirm all frontend and backend code is modular, documented, and production-grade
+  
