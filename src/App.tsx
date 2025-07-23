@@ -9,7 +9,7 @@ import SignIn from "@/pages/auth/SignIn";
 import SignUp from "@/pages/auth/SignUp";
 
 // Protected pages
-import Dashboard from "@/pages/dashboard/index";
+import Dashboard from "@/pages/dashboard/Dashboard";
 import DealsPage from "@/pages/dealspage";
 import Profile from "@/pages/Profile";
 import AnalyticsPage from "@/pages/dashboard/analytics";
