@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { colors } from "@/config/theme";
 import {
   DndContext,
   closestCenter,
@@ -13,16 +14,13 @@ import {
 } from "@dnd-kit/sortable";
 
 import { v4 as uuidv4 } from "uuid";
-import AddDealModal from "./AddDealModal";
+import CreateEditDealCard from "./CreateEditDealCard";
 import SortableCardWrapper from "./SortableCardWrapper";
 import DroppableColumn from "./DroppableColumn";
-
-const initialDeals = {
-  new: [],
-  proposals: [],
-  negotiation: [],
-  inProgress: [],
-};
+import { useKanbanBoard } from "@/hooks/useKanbanBoard";
+import useCreateEditDeal from "@/hooks/useCreateEditDeal";
+import { DealModel } from "@/types/deal/Deal.model";
+import { DealStatus } from "@/types/deal/Deal.enums";
 
 const columnNames = {
   new: "New",
@@ -31,11 +29,29 @@ const columnNames = {
   inProgress: "In Progress",
 };
 
-export default function KanbanBoard() {
-  const [deals, setDeals] = useState(initialDeals);
-  const [modalOpenFor, setModalOpenFor] = useState<string | null>(null);
+// column key to enum map.
+const columnKeyToEnum = {
+  new: DealStatus.NEW,
+  proposals: DealStatus.COMPLETED,
+  negotiation: DealStatus.NEGOTIATION,
+  inProgress: DealStatus.IN_PROGRESS,
+};
 
+export default function KanbanBoard() {
+  const { initialDeals } = useKanbanBoard();
+  const [initialBaseFormData, setInitialBaseFormData] = useState<Partial<DealModel>>({});
+  const [deals, setDeals] = useState(initialDeals);
+  const { handleCreateDeal, loading: createDealLoading, apiError: createDealError } = useCreateEditDeal(null);
+  const [isCreateEditFormOpen, setIsCreateEditFormOpen] = useState<boolean>(false);
+  const [columnSelected, setColumnSelected] = useState<string>("new");
   const sensors = useSensors(useSensor(PointerSensor));
+
+  useEffect(() => {
+    setInitialBaseFormData({
+      ...initialBaseFormData,
+      status: columnKeyToEnum[columnSelected as keyof typeof columnKeyToEnum],
+    });
+  }, [columnSelected]);
 
   const findColumn = (id: string) => {
     return Object.keys(deals).find((key) =>
@@ -47,8 +63,8 @@ export default function KanbanBoard() {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
   
-    const sourceColumn = findColumn(active.id);
-    const overId = over.id;
+    const sourceColumn = findColumn(active.id as string);
+    const overId = over.id as string;
   
     // If dropped over another card, find the column it's in
     const targetColumn =
@@ -112,7 +128,11 @@ export default function KanbanBoard() {
               </DroppableColumn>
 
               <button
-                onClick={() => setModalOpenFor(key)}
+                onClick={() => {
+                  setColumnSelected(key);
+                  setIsCreateEditFormOpen(true);
+                  
+                }}
                 className="mt-4 w-full text-sm text-teal-700 border border-teal-600 hover:bg-teal-50 py-1.5 rounded"
               >
                 + Add Deal
@@ -122,11 +142,16 @@ export default function KanbanBoard() {
         </div>
       </DndContext>
 
-      {modalOpenFor && (
-        <AddDealModal
-          columnKey={modalOpenFor}
-          onClose={() => setModalOpenFor(null)}
-          onAdd={(deal) => handleAddDeal(modalOpenFor, deal)}
+      {isCreateEditFormOpen && (
+        <CreateEditDealCard
+          isOpen={isCreateEditFormOpen}
+          onClose={() => setIsCreateEditFormOpen(false)}
+          mode="create"
+          initialBaseFormData={{
+            ...initialBaseFormData,
+            status: columnKeyToEnum[columnSelected as keyof typeof columnKeyToEnum],
+          }}
+          onSubmit={handleCreateDeal}
         />
       )}
     </>

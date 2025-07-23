@@ -4,11 +4,12 @@ import DealCard from "./Dealcard";
 
 type Props = {
   id: string;
-  company: string;
-  type: string;
+  title: string;
+  contributors: string;
   amount: string;
   status: string;
-  contact: string;
+  industry: string;
+  dateOfNextMeeting: string;
 };
 
 export default function SortableCardWrapper(props: Props) {

@@ -27,7 +27,7 @@ export class StorageService {
   private static generateUploadPath(userId: string, fileName: string, folder?: string): string {
     const cleanName = this.cleanFileName(fileName);
     const timestamp = Date.now();
-    const basePath = folder ? `${folder}/${userId}` : userId;
+    const basePath = folder ? `${folder}` : userId;
     return `${basePath}/${timestamp}-${cleanName}`;
   }
 
@@ -91,7 +91,9 @@ export class StorageService {
       return {
         path: uploadPath,
         url: uploadPath, // For backward compatibility
-        signedUrl: signedUrl
+        signedUrl: signedUrl,
+        fileName: file.name,
+        mimeType: file.type,
       };
     } catch (error) {
       ErrorService.logError(error, `StorageService.uploadFile(${config.bucket})`);
