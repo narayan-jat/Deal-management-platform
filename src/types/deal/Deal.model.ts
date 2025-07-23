@@ -1,8 +1,6 @@
 // =====================================================
 // DEAL DATABASE MODELS
 // =====================================================
-// Raw table shapes for the deals system (camelCase for frontend)
-// =====================================================
 
 import { DealStatus, DealMemberRole, LogType, SignatureStatus } from './Deal.enums';
 
@@ -19,6 +17,8 @@ export interface DealModel {
   startDate: string; // starte_date
   endDate?: string; // end_date
   nextMeetingDate: string; // next_meeting_date
+  notes: string; // notes
+  location: string; // location
 }
 
 export interface DealMemberModel {

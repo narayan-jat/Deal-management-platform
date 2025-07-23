@@ -3,7 +3,7 @@ import { DealMemberModel } from "@/types/deal";
 import snakecaseKeys from 'snakecase-keys';
 import { ErrorService } from "../ErrorService";
 
-export class DealMembersService {
+export class DealMemberService {
   /**
    * Creates a new deal member in the "deal_members" table.
    * @param dealMember - The deal member to create.
@@ -38,6 +38,11 @@ export class DealMembersService {
     }
   }
 
+  /**
+   * Gets all deal members from the "deal_members" table.
+   * @param dealId - The ID of the deal to get the members for.
+   * @returns The deal members.
+   */
   static async getDealMembers(dealId: string) {
     try {
       const { data, error } = await supabase

@@ -10,4 +10,6 @@ export interface UploadResult {
   path: string;
   url: string;
   signedUrl: string;
+  fileName: string;
+  mimeType: string;
 }

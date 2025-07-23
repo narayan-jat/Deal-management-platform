@@ -3,7 +3,7 @@ import { DealDocumentModel } from "@/types/deal";
 import snakecaseKeys from 'snakecase-keys';
 import { ErrorService } from "../ErrorService";
 
-export class DealDocumentsService {
+export class DealDocumentService {
   /**
    * Creates a new deal document in the "deal_documents" table.
    * @param dealDocument - The deal document to create.

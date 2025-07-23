@@ -1,11 +1,10 @@
 import supabase from "@/lib/supabase";
-import { DealModel, DealMemberModel, DealDocumentModel } from "@/types/deal";
+import { DealModel, DealMemberModel, DealDocumentModel, UploadDocumentForm } from "@/types/deal";
 import { ErrorService } from "../ErrorService";
 import snakecaseKeys from 'snakecase-keys';
-import { DealDocumentsService } from "./DealDocumentsService";
-import { DealMembersService } from "./DealMembersService";
-
-export class DealsService {
+import { DealDocumentService } from "./DealDocumentService";
+import { DealMemberService } from "./DealMemberService";
+export class DealService {
   /**
    * Creates a new deal in the "deals" table.
    * @param dealBasicData - The basic data of the deal.
@@ -31,12 +30,36 @@ export class DealsService {
       }
 
       // Now add the documents to the deal documents table.
-      await DealDocumentsService.createDealDocuments(dealDocuments);
+      await DealDocumentService.createDealDocuments(dealDocuments);
 
       // Now add the members to the deal members table.
-      await DealMembersService.createDealMembers(dealMembers);
+      await DealMemberService.createDealMembers(dealMembers);
     } catch (error) {
       ErrorService.handleApiError(error, "DealsService.createDeal");
+      throw error;
+    }
+  }
+
+  /**
+   * Gets a deal from the "deals" table.
+   * @param dealId - The ID of the deal to get.
+   * @returns The deal.
+   */
+  static async getDeal(dealId: string) {
+    try {
+      const { data, error } = await supabase
+        .from("deals")
+        .select("*")
+        .eq("id", dealId)
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      return data;
+    } catch (error) {
+      ErrorService.handleApiError(error, "DealService.getDeal");
       throw error;
     }
   }

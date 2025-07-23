@@ -13,7 +13,5 @@ export type DealDocument = {
 
 // For upload form
 export type UploadDocumentForm = {
-  filePath: string;
   file: File;
-  description?: string;
 };
