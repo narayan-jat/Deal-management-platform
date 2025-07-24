@@ -11,7 +11,7 @@ export class DealService {
    * @param dealDocuments - The documents of the deal.
    * @param dealMembers - The members of the deal.
    */
-  static async createDeal(dealBasicData: Partial<DealModel>, dealDocuments: Partial<DealDocumentModel>[], dealMembers: Partial<DealMemberModel>[]) {
+  static async createDeal(dealBasicData: Partial<DealModel>, dealDocuments: Partial<DealDocumentModel>[], dealMembers: Partial<DealMemberModel>[]){
     try {
       // Make the dealbasicdata to use snake_case keys.
       const dealBasicDataSnakeCase = snakecaseKeys(dealBasicData, { deep: true });
@@ -34,6 +34,8 @@ export class DealService {
 
       // Now add the members to the deal members table.
       await DealMemberService.createDealMembers(dealMembers);
+
+      return dealData;
     } catch (error) {
       ErrorService.handleApiError(error, "DealsService.createDeal");
       throw error;
@@ -45,7 +47,7 @@ export class DealService {
    * @param dealId - The ID of the deal to get.
    * @returns The deal.
    */
-  static async getDeal(dealId: string) {
+  static async getDeal(dealId: string){
     try {
       const { data, error } = await supabase
         .from("deals")

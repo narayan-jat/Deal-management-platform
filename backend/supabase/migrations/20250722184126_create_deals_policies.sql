@@ -6,6 +6,47 @@
 -- =====================================================
 
 -- =====================================================
+-- DROP EXISTING POLICIES
+-- =====================================================
+
+-- Drop deal_documents policies
+DROP POLICY IF EXISTS "Allow members to delete deal documents for elevated roles" ON deal_documents;
+DROP POLICY IF EXISTS "Allow members to update deal documents for elevated roles" ON deal_documents;
+DROP POLICY IF EXISTS "Allow members to insert deal documents for elevated roles" ON deal_documents;
+DROP POLICY IF EXISTS "Allow members to read deal documents" ON deal_documents;
+
+-- Drop deal_comments policies
+DROP POLICY IF EXISTS "Allow deal members to delete deal comments for elevated roles" ON deal_comments;
+DROP POLICY IF EXISTS "Allow deal members to update deal comments for elevated roles" ON deal_comments;
+DROP POLICY IF EXISTS "Allow deal members to insert deal comments for elevated roles" ON deal_comments;
+DROP POLICY IF EXISTS "Allow deal members to read their own deal comments" ON deal_comments;
+
+-- Drop deal_logs policies
+DROP POLICY IF EXISTS "Allow deal members to insert deal logs for elevated roles" ON deal_logs;
+DROP POLICY IF EXISTS "Allow deal members to read their own deal logs" ON deal_logs;
+
+-- Drop deal_permissions policies
+DROP POLICY IF EXISTS "Allow users to delete permissions for elevated roles" ON deal_permissions;
+DROP POLICY IF EXISTS "Allow users to update permissions for elevated roles" ON deal_permissions;
+DROP POLICY IF EXISTS "Allow users to insert permissions for elevated roles" ON deal_permissions;
+DROP POLICY IF EXISTS "Allow users to read their own permissions" ON deal_permissions;
+
+-- Drop deal_members policies
+DROP POLICY IF EXISTS "Allow delete on deal_members for elevated roles" ON deal_members;
+DROP POLICY IF EXISTS "Allow update on deal_members for elevated roles" ON deal_members;
+DROP POLICY IF EXISTS "Allow insert on deal_members for elevated roles" ON deal_members;
+DROP POLICY IF EXISTS "Allow read access to deal members" ON deal_members;
+
+-- Drop deals policies
+DROP POLICY IF EXISTS "Allow deal members to delete the deal for elevated roles" ON deals;
+DROP POLICY IF EXISTS "Allow deal members to update the deal for elevated roles" ON deals;
+DROP POLICY IF EXISTS "Currently authenticated user can create a deal" ON deals;
+DROP POLICY IF EXISTS "Members can view the deal" ON deals;
+
+-- Drop functions
+DROP FUNCTION IF EXISTS is_deal_member(uuid, uuid) CASCADE;
+DROP FUNCTION IF EXISTS is_elevated_member(uuid, uuid) CASCADE;
+-- =====================================================
 -- DEALS TABLE POLICIES
 -- =====================================================
 
@@ -77,14 +118,26 @@ USING (
 -- DEAL MEMBERS - SELECT POLICY
 -- =====================================================
 -- Create a read policy for the deal_members table
+-- If the member is part of the deal they are allowed to view deal members.
+
+-- Helper function to check the user is member of deal.
+CREATE FUNCTION is_deal_member(p_deal_id uuid, p_member_id uuid)
+RETURNS boolean
+LANGUAGE sql
+SECURITY DEFINER
+AS $$
+  SELECT EXISTS (
+    SELECT 1
+    FROM deal_members
+    WHERE deal_id = p_deal_id AND member_id = p_member_id
+  );
+$$;
+
 CREATE POLICY "Allow read access to deal members"
 ON deal_members
 FOR SELECT
 USING (
-  deal_id IN (
-    SELECT deal_id FROM deal_members
-    WHERE member_id = auth.uid()
-  )
+  is_deal_member(deal_id, auth.uid())
 );
 
 -- =====================================================
@@ -93,14 +146,27 @@ USING (
 -- Create a insert policy for the deal_members table
 -- Note: Only the owner, editor and admin can insert a member to a deal
 -- Note: Also these members can assign any role to the new member.
+
+-- Helper function to check the user is member of deal with elevated roles.
+CREATE FUNCTION is_elevated_member(p_deal_id uuid, p_member_id uuid)
+RETURNS boolean
+LANGUAGE sql
+SECURITY DEFINER
+AS $$
+  SELECT EXISTS (
+    SELECT 1
+    FROM deal_members
+    WHERE deal_id = p_deal_id AND member_id = p_member_id
+    AND role IN ('OWNER', 'ADMIN', 'EDITOR')
+  );
+$$;
+
 CREATE POLICY "Allow insert on deal_members for elevated roles"
 ON deal_members
 FOR INSERT
 WITH CHECK (
-  deal_id IN (
-    SELECT deal_id FROM deal_members
-    WHERE member_id = auth.uid() AND role IN ('OWNER', 'EDITOR', 'ADMIN')
-  )
+    -- Only members with OWNER, EDITOR and ADMIN roles can insert a member to a deal.
+    is_elevated_member(deal_id, auth.uid())
 );
 
 -- =====================================================
@@ -112,16 +178,10 @@ CREATE POLICY "Allow update on deal_members for elevated roles"
 ON deal_members
 FOR UPDATE
 USING (
-  deal_id IN (
-    SELECT deal_id FROM deal_members
-    WHERE member_id = auth.uid() AND role IN ('OWNER', 'EDITOR', 'ADMIN')
-  )
+  is_elevated_member(deal_id, auth.uid())
 )
 WITH CHECK (
-  deal_id IN (
-    SELECT deal_id FROM deal_members
-    WHERE member_id = auth.uid() AND role IN ('OWNER', 'EDITOR', 'ADMIN')
-  )
+  is_elevated_member(deal_id, auth.uid())
 );
 
 -- =====================================================
@@ -134,10 +194,7 @@ CREATE POLICY "Allow delete on deal_members for elevated roles"
 ON deal_members
 FOR DELETE
 USING (
-  deal_id IN (
-    SELECT deal_id FROM deal_members
-    WHERE member_id = auth.uid() AND role IN ('OWNER', 'EDITOR', 'ADMIN')
-  )
+  is_elevated_member(deal_id, auth.uid())
 );
 
 -- Note: Not creating any trigger to log the deal member operations. Since

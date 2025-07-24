@@ -13,3 +13,7 @@ export const formatFileSize = (bytes: number) => {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
+
+export const getDateString = (date: Date) => {
+  return date ? new Date(date).toISOString().split('T')[0] : null;
+};

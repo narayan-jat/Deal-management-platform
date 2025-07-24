@@ -21,20 +21,21 @@ import { useKanbanBoard } from "@/hooks/useKanbanBoard";
 import useCreateEditDeal from "@/hooks/useCreateEditDeal";
 import { DealModel } from "@/types/deal/Deal.model";
 import { DealStatus } from "@/types/deal/Deal.enums";
+import { KanbanBoardColumns } from "@/types/KanbanBoard";
 
 const columnNames = {
   new: "New",
-  proposals: "Proposals",
-  negotiation: "Negotiation",
   inProgress: "In Progress",
+  negotiation: "Negotiation",
+  completed: "Completed",
 };
 
 // column key to enum map.
 const columnKeyToEnum = {
   new: DealStatus.NEW,
-  proposals: DealStatus.COMPLETED,
-  negotiation: DealStatus.NEGOTIATION,
   inProgress: DealStatus.IN_PROGRESS,
+  negotiation: DealStatus.NEGOTIATION,
+  completed: DealStatus.COMPLETED,
 };
 
 export default function KanbanBoard() {
@@ -45,13 +46,6 @@ export default function KanbanBoard() {
   const [isCreateEditFormOpen, setIsCreateEditFormOpen] = useState<boolean>(false);
   const [columnSelected, setColumnSelected] = useState<string>("new");
   const sensors = useSensors(useSensor(PointerSensor));
-
-  useEffect(() => {
-    setInitialBaseFormData({
-      ...initialBaseFormData,
-      status: columnKeyToEnum[columnSelected as keyof typeof columnKeyToEnum],
-    });
-  }, [columnSelected]);
 
   const findColumn = (id: string) => {
     return Object.keys(deals).find((key) =>

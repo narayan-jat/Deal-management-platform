@@ -45,7 +45,6 @@ export default function CreateEditDealCard({
   const [formData, setFormData] = useState<Partial<DealModel>>({
     title: initialBaseFormData?.title || "",
     industry: initialBaseFormData?.industry || "",
-    createdBy: initialBaseFormData?.createdBy || "",
     organizationId: initialBaseFormData?.organizationId || "",
     requestedAmount: initialBaseFormData?.requestedAmount || 0,
     status: initialBaseFormData?.status || DealStatus.NEW,
@@ -461,14 +460,6 @@ export default function CreateEditDealCard({
                   className="min-w-[100px]"
                 >
                   Cancel
-                </Button>
-                {/* Draft button */}
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="min-w-[100px]"
-                >
-                  Draft
                 </Button>
                 <Button
                   type="submit"

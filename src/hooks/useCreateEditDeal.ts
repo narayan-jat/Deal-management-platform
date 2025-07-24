@@ -4,11 +4,11 @@ import { UploadDocumentForm, DealDocument } from '@/types/deal/Deal.documents';
 import { DealService } from '@/services/deals/DealService';
 import { ErrorService } from '@/services/ErrorService';
 import { InviteMemberForm } from '@/types/deal/Deal.members';
-import snakecaseKeys from 'snakecase-keys';
+import camelcaseKeys from 'camelcase-keys';
 import { DocumentStorageService } from '@/services/DocumentStorageService';
 import { useAuth } from '@/context/AuthProvider';
 import { SignatureStatus } from '@/types/deal/Deal.enums';
-
+import { getDateString } from '@/utility/Utility';
 
 export const useCreateEditDeal = (dealId: string) => {
   const [deal, setDeal] = useState<Partial<DealModel>[]>([]);
@@ -25,7 +25,7 @@ export const useCreateEditDeal = (dealId: string) => {
           setLoading(true);
           const deal = await DealService.getDeal(dealId);
           // Before setting the deal, convert the deal to camelCase.
-          const camelCaseDeal = snakecaseKeys(deal, { deep: true });
+          const camelCaseDeal = camelcaseKeys(deal, { deep: true });
           setDeal(camelCaseDeal);
         } catch (error) {
           ErrorService.handleApiError(error, "useCreateEditDeal.fetchDeal");
@@ -40,10 +40,10 @@ export const useCreateEditDeal = (dealId: string) => {
 
   // Create a new deal.
 
-  const handleCreateDeal = async (deal: Partial<DealModel>, documents: UploadDocumentForm[], members: InviteMemberForm[]) => {
+  const handleCreateDeal = async (deal: Partial<DealModel>, documents: UploadDocumentForm[], members: InviteMemberForm[]): Promise<DealModel | null> => {
     if (!user?.id) {
       setApiError("User not authenticated");
-      return;
+      return null;
     }
     try {
       setLoading(true);
@@ -66,7 +66,16 @@ export const useCreateEditDeal = (dealId: string) => {
         addedBy: user.id,
       }));
       try {
-        await DealService.createDeal(deal, dealDocuments, dealMembers);
+        // Add the createdBy field to the deal.
+        deal.createdBy = user.id;
+        // Convert the date fields to correct format if the date is provided. 
+        // Send a string in 'YYYY-MM-DD' format. If no date is provided, do not include the field.
+        deal.startDate = deal.startDate ? getDateString(new Date(deal.startDate)) : null;
+        deal.endDate = deal.endDate ? getDateString(new Date(deal.endDate)) : null;
+        deal.nextMeetingDate = deal.nextMeetingDate ? getDateString(new Date(deal.nextMeetingDate)) : null;
+        const createdDeal = await DealService.createDeal(deal, dealDocuments, dealMembers);
+        // Return the created deal as type of DealModel.
+        return camelcaseKeys(createdDeal, { deep: true }) as DealModel;
       } catch (error) {
         setApiError(error.message);
       }

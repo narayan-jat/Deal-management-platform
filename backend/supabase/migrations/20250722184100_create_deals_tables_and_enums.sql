@@ -6,11 +6,29 @@
 -- =====================================================
 
 -- =====================================================
+-- DROP EXISTING TABLES (in reverse dependency order)
+-- =====================================================
+DROP TABLE IF EXISTS deal_documents CASCADE;
+DROP TABLE IF EXISTS deal_comments CASCADE;
+DROP TABLE IF EXISTS deal_logs CASCADE;
+DROP TABLE IF EXISTS deal_permissions CASCADE;
+DROP TABLE IF EXISTS deal_members CASCADE;
+DROP TABLE IF EXISTS deals CASCADE;
+
+-- =====================================================
+-- DROP EXISTING ENUMS
+-- =====================================================
+DROP TYPE IF EXISTS signature_status CASCADE;
+DROP TYPE IF EXISTS log_type CASCADE;
+DROP TYPE IF EXISTS deal_member_role CASCADE;
+DROP TYPE IF EXISTS deal_status CASCADE;
+
+-- =====================================================
 -- ENUM DEFINITIONS
 -- =====================================================
 
 -- Deal status enum - represents the current state of a deal
-CREATE TYPE deal_status AS ENUM ('NEW', 'IN_PROGRESS', 'NEGOTIATION', 'COMPLETED', 'REJECTED', 'DRAFT');
+CREATE TYPE deal_status AS ENUM ('NEW', 'IN_PROGRESS', 'NEGOTIATION', 'COMPLETED', 'REJECTED');
 
 -- Deal member role enum - represents the role of a member in a deal
 CREATE TYPE deal_member_role AS ENUM ('OWNER', 'EDITOR', 'VIEWER', 'ADMIN', 'COMMENTER');
@@ -46,13 +64,15 @@ CREATE TABLE deals (
     status deal_status NOT NULL,
     created_by uuid REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
     industry TEXT NOT NULL,
-    organization_id uuid NULL,
+    organization_id TEXT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     requested_amount NUMERIC DEFAULT 0,
-    starte_date DATE NOT NULL,
+    start_date DATE NOT NULL,
     end_date DATE,
-    next_meeting_date DATE NOT NULL
+    next_meeting_date DATE NOT NULL,
+    location TEXT DEFAULT NULL,
+    notes TEXT DEFAULT NULL
 );
 
 -- =====================================================
@@ -67,7 +87,8 @@ CREATE TABLE deal_members (
   added_by uuid REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
   role deal_member_role NOT NULL,
   added_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (deal_id, member_id) -- ✅ Enforce no duplicate entries
 );
 
 -- =====================================================
@@ -84,7 +105,8 @@ CREATE TABLE deal_permissions (
   can_view BOOLEAN NOT NULL DEFAULT FALSE,
   can_move_deal BOOLEAN NOT NULL DEFAULT FALSE,
   granted_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (deal_id, member_id) -- ✅ Enforce no duplicate entries
 );
 
 -- =====================================================

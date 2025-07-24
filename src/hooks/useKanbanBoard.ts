@@ -6,9 +6,9 @@ import { KanbanBoardColumns } from '@/types/KanbanBoard';
 export const useKanbanBoard = () => {
   const [initialDeals, setInitialDeals] = useState<KanbanBoardColumns>({
     new: [],
-    proposals: [],
-    negotiation: [],
     inProgress: [],
+    negotiation: [],
+    completed: [],
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
