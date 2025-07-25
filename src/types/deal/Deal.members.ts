@@ -15,7 +15,7 @@ export type DealMemberWithProfile = DealMember & {
   profile: {
     name: string;
     email: string;
-    avatarUrl?: string; // avatar_url
+    profilePhoto: string;
   };
 };
 

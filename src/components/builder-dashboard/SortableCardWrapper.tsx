@@ -1,28 +1,28 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import DealCard from "./Dealcard";
+import { DealCardType } from "@/types/deal/DealCard";
 
 type Props = {
-  id: string;
-  title: string;
-  contributors: string;
-  amount: string;
-  status: string;
-  industry: string;
-  dateOfNextMeeting: string;
+  isDragging?: boolean;
+  deal: DealCardType;
+  onEdit: () => void;
 };
 
 export default function SortableCardWrapper(props: Props) {
+  const { isDragging: externalIsDragging, deal, onEdit } = props;
   const {
     attributes,
     listeners,
     setNodeRef,
     transform,
     transition,
-    isDragging,
+    isDragging: internalIsDragging,
   } = useSortable({
-    id: props.id,
+    id: deal.id,
   });
+
+  const isDragging = externalIsDragging || internalIsDragging;
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -33,8 +33,15 @@ export default function SortableCardWrapper(props: Props) {
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <DealCard {...props} />
+    <div className={`${isDragging ? 'rotate-2 shadow-xl' : ''} transition-all duration-200`}>
+      <DealCard 
+        deal={deal} 
+        refProps={setNodeRef}
+        styles={style}
+        listeners={listeners}
+        attributes={attributes}
+        onEdit={onEdit}
+      />
     </div>
   );
 }

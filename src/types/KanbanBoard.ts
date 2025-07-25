@@ -1,8 +1,8 @@
-import { DealModel } from "./deal";
+import { DealCardType } from "./deal/DealCard";
 
 export interface KanbanBoardColumns {
-  new: DealModel[];
-  inProgress: DealModel[];
-  negotiation: DealModel[];
-  completed: DealModel[];
+  new: DealCardType[];
+  inProgress: DealCardType[];
+  negotiation: DealCardType[];
+  completed: DealCardType[];
 }

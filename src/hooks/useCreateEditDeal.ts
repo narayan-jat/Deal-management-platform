@@ -9,37 +9,15 @@ import { DocumentStorageService } from '@/services/DocumentStorageService';
 import { useAuth } from '@/context/AuthProvider';
 import { SignatureStatus } from '@/types/deal/Deal.enums';
 import { getDateString } from '@/utility/Utility';
+import { DealDocumentService } from '@/services/deals/DealDocumentService';
+import { DealMemberService } from '@/services/deals/DealMemberService';
 
-export const useCreateEditDeal = (dealId: string) => {
-  const [deal, setDeal] = useState<Partial<DealModel>[]>([]);
+export const useCreateEditDeal = () => {
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState<string | null>(null);
   const { user } = useAuth();
 
-
-  // If the dealId is provided, then we are editing a deal. fetch the deal.
-  useEffect(() => {
-    if (dealId && user?.id) {
-      const fetchDeal = async () => {
-        try {
-          setLoading(true);
-          const deal = await DealService.getDeal(dealId);
-          // Before setting the deal, convert the deal to camelCase.
-          const camelCaseDeal = camelcaseKeys(deal, { deep: true });
-          setDeal(camelCaseDeal);
-        } catch (error) {
-          ErrorService.handleApiError(error, "useCreateEditDeal.fetchDeal");
-          setApiError(error.message);
-        } finally {
-          setLoading(false);
-        }
-      }
-      fetchDeal();
-    }
-  }, [dealId]);
-
-  // Create a new deal.
-
+  // Create a new deal
   const handleCreateDeal = async (deal: Partial<DealModel>, documents: UploadDocumentForm[], members: InviteMemberForm[]): Promise<DealModel | null> => {
     if (!user?.id) {
       setApiError("User not authenticated");
@@ -47,24 +25,6 @@ export const useCreateEditDeal = (dealId: string) => {
     }
     try {
       setLoading(true);
-      // Need to convert the documents and members to the correct format.
-      const uploadResults = await handleUploadDocuments(dealId, documents);
-      const dealDocuments: Partial<DealDocument>[] = uploadResults.map((result) => ({
-        dealId: dealId,
-        uploadedBy: user.id,
-        signatureStatus: SignatureStatus.UNSIGNED,
-        filePath: result.path,
-        fileName: result.fileName,
-        mimeType: result.mimeType,
-      }));
-
-      // Need to convert the members to the correct format.
-      const dealMembers: Partial<DealMemberModel>[] = members.map((member) => ({
-        dealId: dealId,
-        memberId: member.memberId,
-        role: member.role,
-        addedBy: user.id,
-      }));
       try {
         // Add the createdBy field to the deal.
         deal.createdBy = user.id;
@@ -73,9 +33,38 @@ export const useCreateEditDeal = (dealId: string) => {
         deal.startDate = deal.startDate ? getDateString(new Date(deal.startDate)) : null;
         deal.endDate = deal.endDate ? getDateString(new Date(deal.endDate)) : null;
         deal.nextMeetingDate = deal.nextMeetingDate ? getDateString(new Date(deal.nextMeetingDate)) : null;
-        const createdDeal = await DealService.createDeal(deal, dealDocuments, dealMembers);
-        // Return the created deal as type of DealModel.
-        return camelcaseKeys(createdDeal, { deep: true }) as DealModel;
+        const createdDeal = await DealService.createDeal(deal);
+        const camelCaseDeal = camelcaseKeys(createdDeal, { deep: true }) as DealModel;
+
+        // Upload the documents on the storage.
+        const uploadResults = await handleUploadDocuments(camelCaseDeal.id, documents);
+        // Need to convert the documents and members to the correct format.
+        const dealDocuments: Partial<DealDocument>[] = uploadResults.map((result) => ({
+          dealId: camelCaseDeal.id,
+          uploadedBy: user.id,
+          signatureStatus: SignatureStatus.UNSIGNED,
+          filePath: result.path,
+          fileName: result.fileName,
+          mimeType: result.mimeType,
+        }));
+        // Need to convert the members to the correct format.
+        const dealMembers: Partial<DealMemberModel>[] = members.map((member) => ({
+          dealId: camelCaseDeal.id,
+          memberId: member.memberId,
+          role: member.role,
+          addedBy: user.id,
+        }));
+        
+        // add the documents to the deal documents table.
+        if (dealDocuments.length > 0) {
+          await DealDocumentService.createDealDocuments(dealDocuments);
+        }
+        // add the members to the deal members table.
+        if (dealMembers.length > 0) {
+          await DealMemberService.createDealMembers(dealMembers);
+        }
+        // return the created deal.
+        return camelCaseDeal;
       } catch (error) {
         setApiError(error.message);
       }
@@ -100,7 +89,24 @@ export const useCreateEditDeal = (dealId: string) => {
       setApiError(error.message);
     }
   }
-  return { deal, loading, apiError, handleCreateDeal };
+
+  const handleEditDeal = async (dealId: string, deal: Partial<DealModel>) => {
+    if (dealId && user?.id) {
+        try {
+          const deal = await DealService.getDeals([dealId]);
+          // Before setting the deal, convert the deal to camelCase.
+          const camelCaseDeal = camelcaseKeys(deal[0], { deep: true });
+          return camelCaseDeal;
+        } catch (error) {
+          ErrorService.handleApiError(error, "useCreateEditDeal.fetchDeal");
+          setApiError(error.message);
+        } finally {
+          setLoading(false);
+        }
+    }
+  }
+
+  return { loading, apiError, handleCreateDeal, handleEditDeal };
 }
 
 export default useCreateEditDeal;
