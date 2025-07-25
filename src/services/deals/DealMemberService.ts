@@ -60,4 +60,27 @@ export class DealMemberService {
       throw error;
     }
   }
+
+  /**
+   * Gets all deal IDs of which a member is a part of.
+   * @param memberId - The ID of the member to get the deal IDs for.
+   * @returns The deal IDs.
+   */
+  static async getDealIdsOfMember(memberId: string): Promise<string[] | null> {
+    try {
+      const { data, error } = await supabase
+        .from("deal_members")
+        .select("deal_id")
+        .eq("member_id", memberId);
+
+      if (error) {
+        throw error;
+      }
+
+      return data.map((deal) => deal.deal_id);
+    } catch (error) {
+      ErrorService.handleApiError(error, "DealMembersService.getDealIdsOfMember");
+      throw error;
+    }
+  }
 }

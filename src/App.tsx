@@ -12,10 +12,6 @@ import SignUp from "@/pages/auth/SignUp";
 import Dashboard from "@/pages/dashboard/Dashboard";
 import DealsPage from "@/pages/dealspage";
 import Profile from "@/pages/Profile";
-import AnalyticsPage from "@/pages/dashboard/analytics";
-import ContactPage from "@/pages/dashboard/contact";
-import MessagesPage from "@/pages/dashboard/messages";
-import NotificationsPage from "@/pages/dashboard/notifications";
 
 // Layouts
 import AppLayout from "@/components/layout/AppLayout";
@@ -90,11 +86,11 @@ export default function App() {
           }
         >
           <Route index element={<Dashboard />} />
-          <Route path="analytics" element={<AnalyticsPage />} />
-          <Route path="contact" element={<ContactPage />} />
-          <Route path="messages" element={<MessagesPage />} />
-          <Route path="notifications" element={<NotificationsPage />} />
-          <Route path="settings" element={<Dashboard />} />
+          <Route path="analytics" element={<Landing />} />
+          <Route path="contact" element={<Landing />} />
+          <Route path="messages" element={<Landing />} />
+          <Route path="notifications" element={<Landing />} />
+          <Route path="settings" element={<Landing />} />
           <Route path="profile" element={<Profile />} />
         </Route>
         

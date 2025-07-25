@@ -11,13 +11,13 @@ import {
 } from "@/components/ui/select";
 import { DealMemberRole } from "@/types/deal/Deal.enums";
 import { toast } from "sonner";
-interface CollaboratorModalProps {
+interface AddCollaboratorsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onInvite: (emails: string[], role: DealMemberRole) => void;
 }
 
-function CollaboratorModal({ isOpen, onClose, onInvite }: CollaboratorModalProps) {
+function AddCollaboratorsModal({ isOpen, onClose, onInvite }: AddCollaboratorsModalProps) {
   const [emails, setEmails] = useState<string>("");
   const [role, setRole] = useState<DealMemberRole>(DealMemberRole.VIEWER);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -145,4 +145,4 @@ function CollaboratorModal({ isOpen, onClose, onInvite }: CollaboratorModalProps
   );
 }
 
-export default CollaboratorModal;
+export default AddCollaboratorsModal;

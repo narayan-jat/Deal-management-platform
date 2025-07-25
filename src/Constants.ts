@@ -1,3 +1,5 @@
+import { DealStatus } from "./types/deal";
+
 // Industry Options
 export const INDUSTRY_OPTIONS = [
   { value: 'Technology', label: 'Technology' },
@@ -11,3 +13,10 @@ export const INDUSTRY_OPTIONS = [
   { value: 'Marketing', label: 'Marketing' },
   { value: 'Other', label: 'Other' }
 ] as const;
+
+export const columnKeyToEnum = {
+  new: DealStatus.NEW,
+  inProgress: DealStatus.IN_PROGRESS,
+  negotiation: DealStatus.NEGOTIATION,
+  completed: DealStatus.COMPLETED,
+};

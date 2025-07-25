@@ -16,7 +16,7 @@ import { DealModel } from "@/types/deal/Deal.model";
 import { INDUSTRY_OPTIONS } from "@/Constants";
 import { UploadDocumentForm } from "@/types/deal/Deal.documents";
 import { InviteMemberForm } from "@/types/deal/Deal.members";
-import CollaboratorModal from "./CollaboratorModal";
+import AddCollaboratorsModal from "./AddCollaboratorsModal";
 import { formatFileSize } from "@/utility/Utility";
 import { toast } from "sonner";
 
@@ -45,7 +45,6 @@ export default function CreateEditDealCard({
   const [formData, setFormData] = useState<Partial<DealModel>>({
     title: initialBaseFormData?.title || "",
     industry: initialBaseFormData?.industry || "",
-    createdBy: initialBaseFormData?.createdBy || "",
     organizationId: initialBaseFormData?.organizationId || "",
     requestedAmount: initialBaseFormData?.requestedAmount || 0,
     status: initialBaseFormData?.status || DealStatus.NEW,
@@ -60,7 +59,7 @@ export default function CreateEditDealCard({
   // here not allowing to modify and see earlier members will show in other features.
   const [members, setMembers] = useState<InviteMemberForm[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isCollaboratorModalOpen, setIsCollaboratorModalOpen] = useState(false);
+  const [isAddCollaboratorsModalOpen, setIsAddCollaboratorsModalOpen] = useState(false);
   const stages = Object.values(DealStatus);
   const industries = INDUSTRY_OPTIONS;
 
@@ -77,8 +76,8 @@ export default function CreateEditDealCard({
     setDocuments(prev => [...prev, ...newDocuments]);
   };
 
-  const handleCloseCollaboratorModal = () => {
-    setIsCollaboratorModalOpen(false);
+  const handleCloseAddCollaboratorsModal = () => {
+    setIsAddCollaboratorsModalOpen(false);
   };
 
   const handleInviteCollaborators = (emails: string[], role: DealMemberRole) => {
@@ -318,7 +317,7 @@ export default function CreateEditDealCard({
                   <Input
                     id="nextMeetingDate"
                     name="nextMeetingDate"
-                    type="datetime-local"
+                    type="date"
                     value={formData.nextMeetingDate}
                     onChange={(e) => handleInputChange({ field: "nextMeetingDate", value: e.target.value })}
                     className="w-full pl-10"
@@ -396,7 +395,7 @@ export default function CreateEditDealCard({
                 </label>
                 <Button
                   type="button"
-                  onClick={() => setIsCollaboratorModalOpen(true)}
+                  onClick={() => setIsAddCollaboratorsModalOpen(true)}
                   variant="outline"
                   className="w-full flex items-center gap-2"
                 >
@@ -462,14 +461,6 @@ export default function CreateEditDealCard({
                 >
                   Cancel
                 </Button>
-                {/* Draft button */}
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="min-w-[100px]"
-                >
-                  Draft
-                </Button>
                 <Button
                   type="submit"
                   disabled={isSubmitting || !isFormValid}
@@ -484,9 +475,9 @@ export default function CreateEditDealCard({
       </div>
 
       {/* Collaborator Modal */}
-      <CollaboratorModal
-        isOpen={isCollaboratorModalOpen}
-        onClose={handleCloseCollaboratorModal}
+      <AddCollaboratorsModal
+        isOpen={isAddCollaboratorsModalOpen}
+        onClose={handleCloseAddCollaboratorsModal}
         onInvite={handleInviteCollaborators}
       />
     </>

@@ -11,7 +11,6 @@ export enum DealStatus {
   NEGOTIATION = 'NEGOTIATION',
   COMPLETED = 'COMPLETED',
   REJECTED = 'REJECTED',
-  DRAFT = 'DRAFT'
 }
 
 // Deal Member Role Enum
