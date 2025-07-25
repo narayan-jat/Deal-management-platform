@@ -65,6 +65,7 @@ CREATE POLICY "Members can view the deal"
 ON deals
 FOR SELECT
 USING (
+    created_by = auth.uid() OR
     id IN (
         SELECT deal_id FROM deal_members WHERE member_id = auth.uid()
     )
@@ -87,11 +88,13 @@ CREATE POLICY "Allow deal members to update the deal for elevated roles"
 ON deals
 FOR UPDATE
 USING (
+    created_by = auth.uid() OR
     id IN (
         SELECT deal_id FROM deal_members WHERE member_id = auth.uid() AND role IN ('EDITOR', 'OWNER', 'ADMIN')
     )
 )
 WITH CHECK (
+    created_by = auth.uid() OR
     id IN (
         SELECT deal_id FROM deal_members WHERE member_id = auth.uid() AND role IN ('EDITOR', 'OWNER', 'ADMIN')
     )
@@ -105,6 +108,7 @@ CREATE POLICY "Allow deal members to delete the deal for elevated roles"
 ON deals
 FOR DELETE
 USING (
+    created_by = auth.uid() OR
     id IN (
         SELECT deal_id FROM deal_members WHERE member_id = auth.uid() AND role IN ('EDITOR', 'OWNER', 'ADMIN')
     )
