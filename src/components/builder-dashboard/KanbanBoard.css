@@ -1,0 +1,38 @@
+/* Drag and Drop Styles */
+.dnd-kit-sortable {
+  cursor: grab;
+}
+
+.dnd-kit-sortable:active {
+  cursor: grabbing;
+}
+
+/* Prevent text selection during drag */
+.dnd-kit-sortable * {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Ensure cards are properly positioned */
+.dnd-kit-sortable-item {
+  position: relative;
+}
+
+/* Visual feedback for dragging */
+.dnd-kit-sortable-item[data-dragging="true"] {
+  z-index: 1000;
+  transform: rotate(2deg);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Drop zone styling */
+.dnd-kit-droppable {
+  min-height: 100px;
+}
+
+/* Disable dragging for specific elements */
+[data-dnd-kit-disabled-draggable] {
+  cursor: default !important;
+}

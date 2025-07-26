@@ -19,12 +19,14 @@ import { InviteMemberForm } from "@/types/deal/Deal.members";
 import AddCollaboratorsModal from "./AddCollaboratorsModal";
 import { formatFileSize } from "@/utility/Utility";
 import { toast } from "sonner";
+import { DealCardForm } from "@/types/deal/DealCard";
+
 
 interface CreateEditDealCardProps {
   isOpen: boolean;
   onClose: () => void;
   mode: "create" | "edit";
-  initialBaseFormData?: Partial<DealModel>;
+  initialBaseFormData?: DealCardForm;
   onSubmit: (deal: Partial<DealModel>, documents: UploadDocumentForm[], members: InviteMemberForm[]) => Promise<DealModel | null>;
 }
 
@@ -53,11 +55,13 @@ export default function CreateEditDealCard({
     nextMeetingDate: initialBaseFormData?.nextMeetingDate || "",
     location: initialBaseFormData?.location || "",
     notes: initialBaseFormData?.notes || "",
+    id: initialBaseFormData?.id || "", // Make sure ID is included
   });
   // Initialize documents with data when editing/creating
-  const [documents, setDocuments] = useState<UploadDocumentForm[]>([]);
+  const [documents, setDocuments] = useState<UploadDocumentForm[]>(initialBaseFormData?.documents || []);
+  console.log("documents in create edit deal card", documents);
   // here not allowing to modify and see earlier members will show in other features.
-  const [members, setMembers] = useState<InviteMemberForm[]>([]);
+  const [members, setMembers] = useState<InviteMemberForm[]>(initialBaseFormData?.members || []);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAddCollaboratorsModalOpen, setIsAddCollaboratorsModalOpen] = useState(false);
   const stages = Object.values(DealStatus);
@@ -85,9 +89,25 @@ export default function CreateEditDealCard({
     setMembers(prev => [...prev, ...emails.map(email => ({ email, role }))]);
   };
 
+  const handleRemoveMember = (index: number) => {
+    const memberId = members[index]?.id;
+    if (memberId) {
+      // remove member from supabase more complex logic come back.
+      setMembers(prev => prev.filter((_, i) => i !== index));
+    }else{
+      setMembers(prev => prev.filter((_, i) => i !== index));
+    }
+  };
+
 
   const handleRemoveDocument = (index: number) => {
-    setDocuments(prev => prev.filter((_, i) => i !== index));
+    const documentId = documents[index]?.id;
+    if (documentId) {
+      // remove document from supabase more complex logic come back.
+      setDocuments(prev => prev.filter((_, i) => i !== index));
+    }else{
+      setDocuments(prev => prev.filter((_, i) => i !== index));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -97,16 +117,28 @@ export default function CreateEditDealCard({
       toast.error("Please fill in all required fields", {style: {zIndex: 10001}});
       return;
     }
+    
+    // Ensure deal ID is included when editing
+    if (mode === 'edit' && !formData.id) {
+      console.error('Deal ID is missing for edit mode');
+      toast.error("Deal ID is missing for editing", {style: {zIndex: 10001}});
+      return;
+    }
+    
     setIsSubmitting(true);
 
     try {
       const deal = await onSubmit(formData, documents, members);
       if (deal) {
-        toast.success("Deal created successfully");
+        toast.success(`Deal ${mode === 'create' ? 'created' : 'updated'} successfully`);
         onClose();
+      } else {
+        console.error('onSubmit returned null/undefined');
+        toast.error(`Failed to ${mode === 'create' ? 'create' : 'update'} deal`);
       }
     } catch (error) {
       console.error(`Error ${mode === 'create' ? 'creating' : 'updating'} deal:`, error);
+      toast.error(`Error ${mode === 'create' ? 'creating' : 'updating'} deal: ${error.message}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -197,7 +229,6 @@ export default function CreateEditDealCard({
                     value={formData.requestedAmount}
                     onChange={(e) => handleInputChange({ field: "requestedAmount", value: parseFloat(e.target.value) || 0 })}
                     className="w-full pl-8"
-                    min="0"
                     step="0.01"
                   />
                 </div>
@@ -366,10 +397,7 @@ export default function CreateEditDealCard({
                             <FileText className="h-4 w-4 text-gray-400 flex-shrink-0" />
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium text-gray-900 truncate">
-                                {document.file.name}
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                {formatFileSize(document.file.size)}
+                                {document.file?.name || document.fileName}
                               </p>
                             </div>
                           </div>
@@ -377,7 +405,7 @@ export default function CreateEditDealCard({
                             type="button"
                             onClick={() => handleRemoveDocument(index)}
                             className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors flex-shrink-0"
-                            aria-label={`Remove document ${document.file.name}`}
+                            aria-label={`Remove document ${document.file?.name || document.id}`}
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -411,20 +439,15 @@ export default function CreateEditDealCard({
                   <div className="flex flex-wrap gap-2">
                     {members.map((member, idx) => (
                       <span
-                        key={member.email}
+                        key={member?.id || member?.email}
                         className="flex items-center bg-blue-100 text-blue-800 rounded-full px-3 py-1 text-xs font-medium"
                       >
-                        {member?.email || member?.memberId}
+                        {member?.name || member?.email}
                         <button
                           type="button"
                           className="ml-2 text-blue-400 hover:text-blue-700 focus:outline-none"
-                          aria-label={`Remove ${member?.email || member?.memberId}`}
-                          onClick={() => {
-                            // Remove email from textarea
-                            const membersArr = members
-                              .filter(m => m?.email !== member?.email || m?.memberId !== member?.memberId);
-                            setMembers(membersArr);
-                          }}
+                          aria-label={`Remove ${member?.email || member?.id}`}
+                          onClick={() => handleRemoveMember(idx)}
                         >
                           <X className="h-3 w-3" />
                         </button>

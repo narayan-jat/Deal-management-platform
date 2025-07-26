@@ -8,12 +8,13 @@ import camelcaseKeys from 'camelcase-keys';
 import { DocumentStorageService } from '@/services/DocumentStorageService';
 import { useAuth } from '@/context/AuthProvider';
 import { SignatureStatus } from '@/types/deal/Deal.enums';
+import { DealMemberRole } from '@/types/deal/Deal.enums';
 import { getDateString } from '@/utility/Utility';
 import { DealDocumentService } from '@/services/deals/DealDocumentService';
 import { DealMemberService } from '@/services/deals/DealMemberService';
 
 export const useCreateEditDeal = () => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const { user } = useAuth();
 
@@ -33,6 +34,8 @@ export const useCreateEditDeal = () => {
         deal.startDate = deal.startDate ? getDateString(new Date(deal.startDate)) : null;
         deal.endDate = deal.endDate ? getDateString(new Date(deal.endDate)) : null;
         deal.nextMeetingDate = deal.nextMeetingDate ? getDateString(new Date(deal.nextMeetingDate)) : null;
+        // remove the id field from the deal.
+        delete deal.id;
         const createdDeal = await DealService.createDeal(deal);
         const camelCaseDeal = camelcaseKeys(createdDeal, { deep: true }) as DealModel;
 
@@ -47,14 +50,15 @@ export const useCreateEditDeal = () => {
           fileName: result.fileName,
           mimeType: result.mimeType,
         }));
+        
         // Need to convert the members to the correct format.
         const dealMembers: Partial<DealMemberModel>[] = members.map((member) => ({
           dealId: camelCaseDeal.id,
-          memberId: member.memberId,
-          role: member.role,
+          memberId: member.id, // Grey area
+          role: member.role as DealMemberRole,
           addedBy: user.id,
         }));
-        
+
         // add the documents to the deal documents table.
         if (dealDocuments.length > 0) {
           await DealDocumentService.createDealDocuments(dealDocuments);
@@ -90,19 +94,67 @@ export const useCreateEditDeal = () => {
     }
   }
 
-  const handleEditDeal = async (dealId: string, deal: Partial<DealModel>) => {
-    if (dealId && user?.id) {
-        try {
-          const deal = await DealService.getDeals([dealId]);
-          // Before setting the deal, convert the deal to camelCase.
-          const camelCaseDeal = camelcaseKeys(deal[0], { deep: true });
-          return camelCaseDeal;
-        } catch (error) {
-          ErrorService.handleApiError(error, "useCreateEditDeal.fetchDeal");
-          setApiError(error.message);
-        } finally {
-          setLoading(false);
+  const handleEditDeal = async (deal: Partial<DealModel>, documents: UploadDocumentForm[], members: InviteMemberForm[]): Promise<DealModel | null> => {
+    console.log('handleEditDeal called with:', { deal, documents, members });
+    
+    if (!deal.id) {
+      console.error('Deal ID is missing for edit operation');
+      setApiError('Deal ID is required for editing');
+      return null;
+    }
+    
+    if (!user?.id) {
+      console.error('User not authenticated for edit operation');
+      setApiError('User not authenticated');
+      return null;
+    }
+    
+    try {
+      setLoading(true);
+      console.log("Updating deal:", deal);
+      
+      // Add the updatedAt field to the deal.
+      deal.updatedAt = getDateString(new Date());
+      
+      // Convert the date fields to correct format if the date is provided. 
+      // Send a string in 'YYYY-MM-DD' format. If no date is provided, do not include the field.
+      deal.startDate = deal.startDate ? getDateString(new Date(deal.startDate)) : null;
+      deal.endDate = deal.endDate ? getDateString(new Date(deal.endDate)) : null;
+      deal.nextMeetingDate = deal.nextMeetingDate ? getDateString(new Date(deal.nextMeetingDate)) : null;
+      
+      const updatedDeal = await DealService.updateDeal(deal);
+      const camelCaseDeal = camelcaseKeys(updatedDeal, { deep: true }) as DealModel;
+
+      // Upload the documents on the storage.
+      // filter out those documents which are already uploaded. this means
+      // having a filePath.
+      const documentsToUpload = documents.filter((document) => !document.filePath);
+      if (documentsToUpload.length > 0) {
+        const uploadResults = await handleUploadDocuments(camelCaseDeal.id, documentsToUpload);
+        // Need to convert the documents and members to the correct format.
+        const dealDocuments: Partial<DealDocument>[] = uploadResults.map((result) => ({
+          dealId: camelCaseDeal.id,
+          uploadedBy: user.id,
+          signatureStatus: SignatureStatus.UNSIGNED,
+          filePath: result.path,
+          fileName: result.fileName,
+          mimeType: result.mimeType,
+        }));
+
+        // add the documents to the deal documents table.
+        if (dealDocuments.length > 0) {
+          await DealDocumentService.createDealDocuments(dealDocuments);
         }
+      }
+      
+      console.log('Deal updated successfully:', camelCaseDeal);
+      return camelCaseDeal;
+    } catch (error) {
+      console.error('Error updating deal:', error);
+      setApiError(error.message);
+      return null;
+    } finally {
+      setLoading(false);
     }
   }
 

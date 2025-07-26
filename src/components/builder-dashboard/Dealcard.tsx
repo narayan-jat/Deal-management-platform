@@ -1,7 +1,10 @@
-import { Calendar, Users, DollarSign, Building2, Edit } from "lucide-react";
-import { useState } from "react";
+import { Calendar, Users, DollarSign, Building2, Edit, Eye } from "lucide-react";
+import { useEffect, useState } from "react";
 import CollaboratorsModal from "./CollaboratorsModal";
 import { DealCardType } from "@/types/deal/DealCard";
+import { DealMemberRole } from "@/types/deal/Deal.enums";
+import { useAuth } from "@/context/AuthProvider";
+import { editAccessRoles } from "@/Constants";
 
 type DealCardProps = {
   deal: DealCardType;
@@ -15,6 +18,19 @@ type DealCardProps = {
 export default function DealCard(props: DealCardProps) {
   const { deal, refProps, styles, listeners, attributes, onEdit } = props;
   const [isCollaboratorsModalOpen, setIsCollaboratorsModalOpen] = useState(false);
+  const [role, setRole] = useState<DealMemberRole | null>(null);
+  const { user } = useAuth();
+
+  
+  useEffect(() => {
+    if (deal.contributors) {
+      const member = deal.contributors.find((contributor) => contributor.id === user?.id);
+      setRole(member?.role as DealMemberRole);
+    }
+  }, [deal.contributors]);
+
+  // Check if card is being dragged based on styles
+  const isDragging = styles?.opacity === 0.8;
 
   // Format the requested amount as currency
   const formatCurrency = (amount: number) => {
@@ -87,38 +103,66 @@ export default function DealCard(props: DealCardProps) {
     onEdit();
   };
 
+  const handleViewClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("View deal");
+    // onView();
+  };
   return (
     <>
-      <div className="block bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-4 space-y-3 cursor-pointer group relative">
-        {/* Edit Button - Top Right in separate row */}
+      {/* Main card container with drag and drop attributes */}
+      <div 
+        className={`block bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-4 space-y-3 group relative dnd-kit-sortable ${
+          isDragging ? 'rotate-2 shadow-xl scale-105' : ''
+        }`}
+        ref={refProps}
+        style={styles}
+        {...attributes}
+        {...listeners}
+      >
+        {/* Edit Button - Top Right */}
         <div className="flex justify-end">
-          <button
-            onClick={handleEditClick}
-            className="absolute top-0 right-3 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
-            title="Edit deal"
-            data-dnd-kit-disabled-draggable
-          >
-            <Edit className="h-4 w-4" />
-          </button>
+          {/* Show edit button only if the role is in editAccessRoles, otherwise show view button at that place. If both, show both. Always visible, not on hover */}
+          {editAccessRoles.includes(role) ? (
+            <>
+              <button
+                onClick={handleViewClick}
+                className="absolute top-0 right-10 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
+                title="View deal"
+                data-dnd-kit-disabled-draggable
+              >
+                <Eye className="h-4 w-4" />
+              </button>
+              <button
+                onClick={handleEditClick}
+                className="absolute top-0 right-3 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
+                title="Edit deal"
+                data-dnd-kit-disabled-draggable
+              >
+                <Edit className="h-4 w-4" />
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={handleViewClick}
+              className="absolute top-0 right-3 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
+              title="View deal"
+              data-dnd-kit-disabled-draggable
+            >
+              <Eye className="h-4 w-4" />
+            </button>
+          )}
         </div>
 
-        {/* apply sortable card logic here*/}
-        <div 
-          className="flex flex-col gap-2"
-          ref={refProps}
-          style={styles}
-          {...attributes}
-          {...listeners}
-        >
-          {/* Header with title and status - full width */}
-          <div className="flex justify-between items-start gap-2">
-            <h3 className="text-sm font-semibold text-gray-900 leading-tight flex-1 group-hover:text-blue-600 transition-colors">
-              {deal.title}
-            </h3>
-            <span className={`text-xs px-2 py-1 rounded-full font-medium flex-shrink-0 ${getStatusColor(deal.status)}`}>
-              {deal.status}
-            </span>
-          </div>
+        {/* Header with title and status */}
+        <div className="flex justify-between items-start gap-2">
+          <h3 className="text-sm font-semibold text-gray-900 leading-tight flex-1 group-hover:text-blue-600 transition-colors">
+            {deal.title}
+          </h3>
+          <span className={`text-xs px-2 py-1 rounded-full font-medium flex-shrink-0 ${getStatusColor(deal.status)}`}>
+            {deal.status}
+          </span>
         </div>
 
         {/* Industry */}

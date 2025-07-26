@@ -4,7 +4,7 @@ import { StorageConfig, UploadResult } from "@/types/Storage";
 
 export class DocumentStorageService {
   private static readonly CONFIG: StorageConfig = {
-    bucket: "deal_documents",
+    bucket: "deal-documents",
     allowedFileTypes: ["application/pdf", "application/doc", "application/docx", "text/plain", "image/jpeg", "image/png", "image/gif"],
     maxFileSize: 1024 * 1024 * 1024, // 1GB
     folder: "", // Will be set dynamically based on deal_id

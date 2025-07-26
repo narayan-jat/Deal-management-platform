@@ -19,9 +19,16 @@ export type DealMemberWithProfile = DealMember & {
   };
 };
 
+export type Contributor = {
+  id: string;
+  name: string;
+  email: string;
+  title: string;
+  profilePhoto: string;
+  role: string;
+}
+
 // For invite form
-export type InviteMemberForm = {
-  memberId?: string; // member_id
+export type InviteMemberForm = Partial<Contributor> & {
   email?: string;
-  role: DealMemberRole;
 };

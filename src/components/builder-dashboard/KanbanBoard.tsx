@@ -5,6 +5,8 @@ import {
   useSensor,
   useSensors,
   PointerSensor,
+  KeyboardSensor,
+  TouchSensor,
   DragEndEvent,
   DragStartEvent,
   DragOverEvent,
@@ -24,6 +26,9 @@ import { DealModel } from "@/types/deal/Deal.model";
 import { columnKeyToEnum } from "@/Constants";
 import { DealCardType } from "@/types/deal/DealCard";
 import DotLoader from "../ui/loader";
+import { DealStatus } from "@/types/deal/Deal.enums";
+import { UploadDocumentForm } from "@/types/deal/Deal.documents";
+import { InviteMemberForm } from "@/types/deal/Deal.members";
 
 const columnNames = {
   new: "New",
@@ -33,15 +38,30 @@ const columnNames = {
 };
 
 export default function KanbanBoard() {
-  const { initialDeals: deals, loading, apiError: getDealsError, handleUpdateDeals } = useKanbanBoard();
+  const { initialDeals: deals, loading, apiError: getDealsError, handleUpdateDeals, handleUpdateDealStatus } = useKanbanBoard();
   const [dealId, setDealId] = useState<string | null>(null);
-  const { handleCreateDeal, handleEditDeal, apiError: createDealError } = useCreateEditDeal();
+  const { handleCreateDeal, handleEditDeal, apiError: createDealError} = useCreateEditDeal();
   const [isCreateEditFormOpen, setIsCreateEditFormOpen] = useState<boolean>(false);
   const [columnSelected, setColumnSelected] = useState<string>("new");
   const [activeId, setActiveId] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
   const [mode, setMode] = useState<"create" | "edit">("create");
-  const sensors = useSensors(useSensor(PointerSensor));
+  
+  // Configure sensors with proper activation constraints
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // 8px movement required to start dragging
+      },
+    }),
+    useSensor(KeyboardSensor),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250, // 250ms delay for touch devices
+        tolerance: 5, // 5px tolerance for touch movement
+      },
+    })
+  );
 
   const findColumn = (id: string) => {
     return Object.keys(deals).find((key) =>
@@ -50,10 +70,12 @@ export default function KanbanBoard() {
   };
 
   const handleDragStart = (event: DragStartEvent) => {
+    console.log('Drag start:', event.active.id);
     setActiveId(event.active.id as string);
   };
 
   const handleDragOver = (event: DragOverEvent) => {
+    console.log('Drag over:', event.over?.id);
     setOverId(event.over?.id as string || null);
   };
 
@@ -64,22 +86,48 @@ export default function KanbanBoard() {
         .flat()
         .find((deal) => deal.id === dealId);
       if (deal) {
-        return deal;
+        return {
+          ...deal,
+          members: deal.contributors || []
+        }
       }
     }
     else {
+      console.log('Creating new deal with status:', columnKeyToEnum[columnSelected as keyof typeof columnKeyToEnum]);
       return {
-        status: columnKeyToEnum[columnSelected as keyof typeof columnKeyToEnum]
+        status: columnKeyToEnum[columnSelected as keyof typeof columnKeyToEnum],
+        documents: [],
+        members: []
       }
     }
   };
 
+  const handleOnSubmit = async (deal: Partial<DealModel>, documents: UploadDocumentForm[], members: InviteMemberForm[]) => {
+    if (mode === "create") {
+      const createdDeal = await handleCreateDeal(deal, documents, members);
+      if (createdDeal) {
+        handleUpdateDeals(null);
+      }
+      return createdDeal;
+    } else {
+      const updatedDeal = await handleEditDeal(deal, documents, members);
+      if (updatedDeal) {
+        handleUpdateDeals(null);
+      }
+      return updatedDeal;
+    }
+  }
+
   const handleDragEnd = (event: DragEndEvent) => {
+    console.log('Drag end:', event.active.id, '->', event.over?.id);
     const { active, over } = event;
     setActiveId(null);
     setOverId(null);
 
-    if (!over || active.id === over.id) return;
+    if (!over || active.id === over.id) {
+      console.log('No valid drop target or same item');
+      return;
+    }
 
     const sourceColumn = findColumn(active.id as string);
     const overId = over.id as string;
@@ -90,20 +138,33 @@ export default function KanbanBoard() {
         ? overId // it's a column
         : findColumn(overId as string); // it's a card — find its column
 
-    if (!sourceColumn || !targetColumn || sourceColumn === targetColumn) return;
+    if (!sourceColumn || !targetColumn || sourceColumn === targetColumn) {
+      console.log('Invalid column mapping:', { sourceColumn, targetColumn });
+      return;
+    }
 
     const sourceItems = [...deals[sourceColumn]];
     const draggedItem = sourceItems.find((item) => item.id === active.id);
-    if (!draggedItem) return;
+    if (!draggedItem) {
+      console.log('Dragged item not found');
+      return;
+    }
 
     const updatedSource = sourceItems.filter((item) => item.id !== active.id);
-    const updatedTarget = [...deals[targetColumn as keyof typeof deals], draggedItem];
+    const updatedTarget = [...deals[targetColumn as keyof typeof deals], {...draggedItem, status: columnKeyToEnum[targetColumn as keyof typeof columnKeyToEnum]}];
 
+    console.log('Updating deals:', { sourceColumn, targetColumn, draggedItem: draggedItem.title });
+
+    // also update the deal status for the dragged item in kanban board.
+    // Update the deals
     handleUpdateDeals({
       ...deals,
       [sourceColumn]: updatedSource,
       [targetColumn]: updatedTarget,
     });
+
+    // Update the deal status
+    handleUpdateDealStatus(draggedItem.id, targetColumn as keyof typeof columnNames);
 
     // Show success toast
     toast.success(
@@ -153,18 +214,22 @@ export default function KanbanBoard() {
                 isActive={activeId !== null}
               >
                 <SortableContext items={cards.map((c: DealCardType) => c.id)} strategy={verticalListSortingStrategy}>
-                  {cards.map((card: DealCardType) => (
-                    <SortableCardWrapper
-                      key={card.id}
-                      deal={card}
-                      isDragging={activeId === card.id}
-                      onEdit={() => {
-                        setDealId(card.id);
-                        setMode("edit");
-                        setIsCreateEditFormOpen(true);
-                      }}
-                    />
-                  ))}
+                  {(() => {
+                    const itemIds = cards.map((c: DealCardType) => c.id);
+                    console.log(`SortableContext for ${key}:`, itemIds);
+                    return cards.map((card: DealCardType) => (
+                      <SortableCardWrapper
+                        key={card.id}
+                        deal={card}
+                        isDragging={activeId === card.id}
+                        onEdit={() => {
+                          setDealId(card.id);
+                          setMode("edit");
+                          setIsCreateEditFormOpen(true);
+                        }}
+                      />
+                    ));
+                  })()}
                 </SortableContext>
                 {cards.length === 0 && (
                   <div className="text-sm italic text-gray-400 text-center py-8">
@@ -198,7 +263,7 @@ export default function KanbanBoard() {
           onClose={() => setIsCreateEditFormOpen(false)}
           mode={mode}
           initialBaseFormData={handleCreatedEditForm(dealId)}
-          onSubmit={handleCreateDeal}
+          onSubmit={handleOnSubmit}
         />
       )}
     </>
