@@ -1,10 +1,11 @@
 import { Calendar, Users, DollarSign, Building2, Edit, Eye } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import CollaboratorsModal from "./CollaboratorsModal";
 import { DealCardType } from "@/types/deal/DealCard";
-import { DealMemberRole } from "@/types/deal/Deal.enums";
 import { useAuth } from "@/context/AuthProvider";
+import { DealMemberRole } from "@/types/deal/Deal.enums";
 import { editAccessRoles } from "@/Constants";
+import { formatCurrency, getStatusInfo } from "@/utility/Utility";
 
 type DealCardProps = {
   deal: DealCardType;
@@ -13,10 +14,11 @@ type DealCardProps = {
   listeners?: any;
   attributes?: any;
   onEdit: () => void;
+  onView?: () => void;
 }
 
 export default function DealCard(props: DealCardProps) {
-  const { deal, refProps, styles, listeners, attributes, onEdit } = props;
+  const { deal, refProps, styles, listeners, attributes, onEdit, onView } = props;
   const [isCollaboratorsModalOpen, setIsCollaboratorsModalOpen] = useState(false);
   const [role, setRole] = useState<DealMemberRole | null>(null);
   const { user } = useAuth();
@@ -31,16 +33,6 @@ export default function DealCard(props: DealCardProps) {
 
   // Check if card is being dragged based on styles
   const isDragging = styles?.opacity === 0.8;
-
-  // Format the requested amount as currency
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
 
   // Format the next meeting date
   const formatMeetingDate = (dateString: string) => {
@@ -72,21 +64,8 @@ export default function DealCard(props: DealCardProps) {
     }
   };
 
-  // Get status color
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'new':
-        return 'bg-blue-100 text-blue-800';
-      case 'in progress':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'negotiation':
-        return 'bg-purple-100 text-purple-800';
-      case 'completed':
-        return 'bg-green-100 text-green-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
+  // Get status color using utility function
+  const statusInfo = getStatusInfo(deal.status);
 
   // Handle collaborators click
   const handleCollaboratorsClick = (e: React.MouseEvent) => {
@@ -103,11 +82,13 @@ export default function DealCard(props: DealCardProps) {
     onEdit();
   };
 
+  // Handle view click
   const handleViewClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log("View deal");
-    // onView();
+    if (onView) {
+      onView();
+    }
   };
   return (
     <>
@@ -160,7 +141,7 @@ export default function DealCard(props: DealCardProps) {
           <h3 className="text-sm font-semibold text-gray-900 leading-tight flex-1 group-hover:text-blue-600 transition-colors">
             {deal.title}
           </h3>
-          <span className={`text-xs px-2 py-1 rounded-full font-medium flex-shrink-0 ${getStatusColor(deal.status)}`}>
+          <span className={`text-xs px-2 py-1 rounded-full font-medium flex-shrink-0 ${statusInfo.color}`}>
             {deal.status}
           </span>
         </div>

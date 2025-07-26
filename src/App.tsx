@@ -11,6 +11,7 @@ import SignUp from "@/pages/auth/SignUp";
 // Protected pages
 import Dashboard from "@/pages/dashboard/Dashboard";
 import DealsPage from "@/pages/dealspage";
+import ViewDealPage from "@/pages/deals/ViewDealPage";
 import Profile from "@/pages/Profile";
 
 // Layouts
@@ -103,6 +104,7 @@ export default function App() {
           }
         >
           <Route index element={<DealsPage />} />
+          <Route path=":dealId" element={<ViewDealPage />} />
         </Route>
         
         <Route

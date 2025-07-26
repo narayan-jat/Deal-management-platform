@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   DndContext,
   closestCenter,
@@ -29,7 +30,8 @@ import DotLoader from "../ui/loader";
 import { DealStatus } from "@/types/deal/Deal.enums";
 import { UploadDocumentForm } from "@/types/deal/Deal.documents";
 import { InviteMemberForm } from "@/types/deal/Deal.members";
-
+import { DollarSign } from "lucide-react";
+import { ROUTES } from "@/config/routes";
 const columnNames = {
   new: "New",
   inProgress: "In Progress",
@@ -46,6 +48,7 @@ export default function KanbanBoard() {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
   const [mode, setMode] = useState<"create" | "edit">("create");
+  const navigate = useNavigate();
   
   // Configure sensors with proper activation constraints
   const sensors = useSensors(
@@ -117,6 +120,12 @@ export default function KanbanBoard() {
       return updatedDeal;
     }
   }
+
+  const handleViewDeal = (deal: DealCardType) => {
+    // Store the deal data temporarily so ViewDealPage can access it
+    sessionStorage.setItem('viewDealData', JSON.stringify(deal));
+    navigate(`${ROUTES.DEALS}/${deal.id}`);
+  };
 
   const handleDragEnd = (event: DragEndEvent) => {
     console.log('Drag end:', event.active.id, '->', event.over?.id);
@@ -203,11 +212,10 @@ export default function KanbanBoard() {
             >
               <h3 className="text-lg font-semibold mb-3">
                 {columnNames[key as keyof typeof columnNames]}
-                <span className="ml-2 text-sm text-gray-500 font-normal">
-                  ({cards.length})
-                </span>
               </h3>
-
+              <span className="ml-2 text-sm text-gray-500 font-normal">
+                  {cards.length} deals-<DollarSign className="inline-block h-3 w-3" /> {(cards.reduce((acc, card) => acc + card.requestedAmount, 0)).toFixed(2)}
+                </span>
               <DroppableColumn
                 id={key}
                 isOver={overId === key}
@@ -227,6 +235,7 @@ export default function KanbanBoard() {
                           setMode("edit");
                           setIsCreateEditFormOpen(true);
                         }}
+                        onView={() => handleViewDeal(card)}
                       />
                     ));
                   })()}

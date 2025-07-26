@@ -7,10 +7,11 @@ type Props = {
   isDragging?: boolean;
   deal: DealCardType;
   onEdit: () => void;
+  onView?: () => void;
 };
 
 export default function SortableCardWrapper(props: Props) {
-  const { isDragging: externalIsDragging, deal, onEdit } = props;
+  const { isDragging: externalIsDragging, deal, onEdit, onView } = props;
   const {
     attributes,
     listeners,
@@ -40,6 +41,7 @@ export default function SortableCardWrapper(props: Props) {
       listeners={listeners}
       attributes={attributes}
       onEdit={onEdit}
+      onView={onView}
     />
   );
 }
