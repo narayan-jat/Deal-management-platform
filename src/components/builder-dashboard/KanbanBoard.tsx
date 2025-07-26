@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   DndContext,
@@ -49,7 +49,17 @@ export default function KanbanBoard() {
   const [overId, setOverId] = useState<string | null>(null);
   const [mode, setMode] = useState<"create" | "edit">("create");
   const navigate = useNavigate();
+  const [dragTimeout, setDragTimeout] = useState<NodeJS.Timeout | null>(null);
   
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (dragTimeout) {
+        clearTimeout(dragTimeout);
+      }
+    };
+  }, [dragTimeout]);
+
   // Configure sensors with proper activation constraints
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -60,8 +70,8 @@ export default function KanbanBoard() {
     useSensor(KeyboardSensor),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 250, // 250ms delay for touch devices
-        tolerance: 5, // 5px tolerance for touch movement
+        delay: 100, // Reduced delay for better mobile responsiveness
+        tolerance: 8, // Increased tolerance for touch movement
       },
     })
   );
@@ -75,6 +85,20 @@ export default function KanbanBoard() {
   const handleDragStart = (event: DragStartEvent) => {
     console.log('Drag start:', event.active.id);
     setActiveId(event.active.id as string);
+    
+    // Clear any existing timeout
+    if (dragTimeout) {
+      clearTimeout(dragTimeout);
+    }
+    
+    // Set a timeout to reset drag state if not completed within 10 seconds
+    const timeout = setTimeout(() => {
+      console.log('Drag timeout - resetting state');
+      setActiveId(null);
+      setOverId(null);
+    }, 5000); // 5 seconds
+    
+    setDragTimeout(timeout);
   };
 
   const handleDragOver = (event: DragOverEvent) => {
@@ -130,6 +154,13 @@ export default function KanbanBoard() {
   const handleDragEnd = (event: DragEndEvent) => {
     console.log('Drag end:', event.active.id, '->', event.over?.id);
     const { active, over } = event;
+    
+    // Clear the drag timeout
+    if (dragTimeout) {
+      clearTimeout(dragTimeout);
+      setDragTimeout(null);
+    }
+    
     setActiveId(null);
     setOverId(null);
 

@@ -14,7 +14,6 @@ import {
   LogOut,
   User
 } from 'lucide-react';
-import { useAuth } from '@/context/AuthProvider';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -49,7 +48,6 @@ const navigationItems: NavItem[] = [
 export default function Sidebar({ isOpen, isCollapsed, onToggle }: SidebarProps) {
   const { pathname } = useLocation();
   const [expandedItems, setExpandedItems] = useState<string[]>(['investors']);
-  const { user, signOut } = useAuth();
 
   const toggleExpanded = (label: string) => {
     setExpandedItems(prev => 
@@ -144,24 +142,6 @@ export default function Sidebar({ isOpen, isCollapsed, onToggle }: SidebarProps)
             </nav>
           </div>
         </div>
-
-        {/* Logout button */}
-        {!isCollapsed && user && (
-          <div className="p-4 border-t border-gray-200">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                <button onClick={signOut} className="text-red-500 text-sm font-medium">
-                  <LogOut className="h-4 w-4 text-red-500" />
-                </button>
-              </div>
-              <div className="flex-1 min-w-0">
-                <button onClick={signOut} className="text-sm font-medium text-red-600 truncate">
-                  Logout
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </aside>
     </>
   );

@@ -95,6 +95,7 @@ export default function DealCard(props: DealCardProps) {
         {...(hasEditAccess ? attributes : {})}
         {...(hasEditAccess ? listeners : {})}
         title={!hasEditAccess ? "You don't have permission to move this deal" : undefined}
+        data-touch-action={hasEditAccess ? "none" : "auto"}
       >
         {/* Edit Button - Top Right */}
         <div className="flex justify-end">
