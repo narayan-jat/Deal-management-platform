@@ -2,8 +2,7 @@ import { Calendar, Users, DollarSign, Building2, Edit, Eye } from "lucide-react"
 import { useState, useEffect } from "react";
 import CollaboratorsModal from "./CollaboratorsModal";
 import { DealCardType } from "@/types/deal/DealCard";
-import { useAuth } from "@/context/AuthProvider";
-import { DealMemberRole } from "@/types/deal/Deal.enums";
+
 import { editAccessRoles } from "@/Constants";
 import { formatCurrency, getStatusInfo } from "@/utility/Utility";
 
@@ -15,21 +14,13 @@ type DealCardProps = {
   attributes?: any;
   onEdit: () => void;
   onView?: () => void;
+  hasEditAccess: boolean;
 }
 
 export default function DealCard(props: DealCardProps) {
-  const { deal, refProps, styles, listeners, attributes, onEdit, onView } = props;
+  const { deal, refProps, styles, listeners, attributes, onEdit, onView, hasEditAccess } = props;
   const [isCollaboratorsModalOpen, setIsCollaboratorsModalOpen] = useState(false);
-  const [role, setRole] = useState<DealMemberRole | null>(null);
-  const { user } = useAuth();
 
-  
-  useEffect(() => {
-    if (deal.contributors) {
-      const member = deal.contributors.find((contributor) => contributor.id === user?.id);
-      setRole(member?.role as DealMemberRole);
-    }
-  }, [deal.contributors]);
 
   // Check if card is being dragged based on styles
   const isDragging = styles?.opacity === 0.8;
@@ -94,18 +85,21 @@ export default function DealCard(props: DealCardProps) {
     <>
       {/* Main card container with drag and drop attributes */}
       <div 
-        className={`block bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-4 space-y-3 group relative dnd-kit-sortable ${
+        className={`block bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-4 space-y-3 group relative ${
+          hasEditAccess ? 'dnd-kit-sortable' : 'cursor-default'
+        } ${
           isDragging ? 'rotate-2 shadow-xl scale-105' : ''
-        }`}
-        ref={refProps}
-        style={styles}
-        {...attributes}
-        {...listeners}
+        } ${!hasEditAccess ? 'opacity-90' : ''}`}
+        ref={hasEditAccess ? refProps : undefined}
+        style={hasEditAccess ? styles : undefined}
+        {...(hasEditAccess ? attributes : {})}
+        {...(hasEditAccess ? listeners : {})}
+        title={!hasEditAccess ? "You don't have permission to move this deal" : undefined}
       >
         {/* Edit Button - Top Right */}
         <div className="flex justify-end">
           {/* Show edit button only if the role is in editAccessRoles, otherwise show view button at that place. If both, show both. Always visible, not on hover */}
-          {editAccessRoles.includes(role) ? (
+          {hasEditAccess ? (
             <>
               <button
                 onClick={handleViewClick}

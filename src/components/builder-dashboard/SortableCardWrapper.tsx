@@ -2,6 +2,10 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import DealCard from "./Dealcard";
 import { DealCardType } from "@/types/deal/DealCard";
+import { useAuth } from "@/context/AuthProvider";
+import { DealMemberRole } from "@/types/deal/Deal.enums";
+import { editAccessRoles } from "@/Constants";
+import { useState, useEffect } from "react";
 
 type Props = {
   isDragging?: boolean;
@@ -12,6 +16,19 @@ type Props = {
 
 export default function SortableCardWrapper(props: Props) {
   const { isDragging: externalIsDragging, deal, onEdit, onView } = props;
+  const [role, setRole] = useState<DealMemberRole | null>(null);
+  const { user } = useAuth();
+
+  // Check if user has edit access
+  const hasEditAccess = editAccessRoles.includes(role);
+
+  useEffect(() => {
+    if (deal.contributors) {
+      const member = deal.contributors.find((contributor) => contributor.id === user?.id);
+      setRole(member?.role as DealMemberRole);
+    }
+  }, [deal.contributors, user?.id]);
+
   const {
     attributes,
     listeners,
@@ -21,6 +38,7 @@ export default function SortableCardWrapper(props: Props) {
     isDragging: internalIsDragging,
   } = useSortable({
     id: deal.id,
+    disabled: !hasEditAccess, // Disable sorting if user doesn't have edit access
   });
 
   const isDragging = externalIsDragging || internalIsDragging;
@@ -42,6 +60,7 @@ export default function SortableCardWrapper(props: Props) {
       attributes={attributes}
       onEdit={onEdit}
       onView={onView}
+      hasEditAccess={hasEditAccess}
     />
   );
 }

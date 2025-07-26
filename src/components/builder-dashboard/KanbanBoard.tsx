@@ -30,7 +30,7 @@ import DotLoader from "../ui/loader";
 import { DealStatus } from "@/types/deal/Deal.enums";
 import { UploadDocumentForm } from "@/types/deal/Deal.documents";
 import { InviteMemberForm } from "@/types/deal/Deal.members";
-import { DollarSign } from "lucide-react";
+import { DollarSign, Lock } from "lucide-react";
 import { ROUTES } from "@/config/routes";
 const columnNames = {
   new: "New",
@@ -212,10 +212,10 @@ export default function KanbanBoard() {
             >
               <h3 className="text-lg font-semibold mb-3">
                 {columnNames[key as keyof typeof columnNames]}
-              </h3>
-              <span className="ml-2 text-sm text-gray-500 font-normal">
+                <span className="ml-2 text-sm text-gray-500 font-normal">
                   {cards.length} deals-<DollarSign className="inline-block h-3 w-3" /> {(cards.reduce((acc, card) => acc + card.requestedAmount, 0)).toFixed(2)}
                 </span>
+              </h3>
               <DroppableColumn
                 id={key}
                 isOver={overId === key}
