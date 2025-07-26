@@ -79,18 +79,18 @@ export default function ViewDeal({ deal, onEdit, onClose }: ViewDealProps) {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Deal Details */}
           <div className="lg:col-span-2 space-y-6">
             {/* Deal Overview Card */}
-            <Card className="bg-white">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
+            <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h3 className="text-lg font-semibold flex items-center space-x-2">
                   <Tag className="w-5 h-5" />
                   <span>Deal Overview</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
+                </h3>
+              </div>
+              <div className="p-6 space-y-6">
                 {/* Status and Amount Row */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex items-center space-x-3">
@@ -177,59 +177,56 @@ export default function ViewDeal({ deal, onEdit, onClose }: ViewDealProps) {
                     <p className="text-gray-700 whitespace-pre-wrap">{deal.notes}</p>
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Documents Section */}
-            <Card className="bg-white">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
+            <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h3 className="text-lg font-semibold flex items-center space-x-2">
                   <FileText className="w-5 h-5" />
                   <span>Documents</span>
                   <Badge variant="secondary" className="ml-2">
                     {deal.documents?.length || 0}
                   </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+                </h3>
+              </div>
+              <div className="p-6">
                 {deal.documents && deal.documents.length > 0 ? (
                   <div className="space-y-3">
                     {deal.documents.map((document, index) => (
                       <div
                         key={document.id || index}
-                        className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                        className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors group"
                       >
-                        <div className="flex items-center space-x-3 flex-1 min-w-0">
-                          <div className="p-2 bg-blue-100 rounded-lg">
+                        <div 
+                          className="flex items-center space-x-3 flex-1 min-w-0 cursor-pointer"
+                          onClick={() => handleDocumentPreview(document)}
+                        >
+                          <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0 group-hover:bg-blue-200 transition-colors">
                             <FileText className="w-4 h-4 text-blue-600" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="font-medium text-gray-900 truncate">
+                            <p className="font-medium text-gray-900 truncate text-sm sm:text-base group-hover:text-blue-600 transition-colors">
                               {document.fileName}
                             </p>
-                            <p className="text-sm text-gray-500">
+                            <p className="text-xs text-gray-500 hidden sm:block">
                               {document.mimeType} • {formatDate(document.uploadedAt)}
                             </p>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-2 flex-shrink-0 ml-2">
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleDocumentPreview(document)}
-                            className="flex items-center space-x-1"
-                          >
-                            <Eye className="w-4 h-4" />
-                            <span>Preview</span>
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDocumentDownload(document)}
-                            className="flex items-center space-x-1"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDocumentDownload(document);
+                            }}
+                            className="p-2 h-8 w-8 hover:bg-blue-50 hover:border-blue-200"
+                            title="Download document"
                           >
                             <Download className="w-4 h-4" />
-                            <span>Download</span>
                           </Button>
                         </div>
                       </div>
@@ -242,30 +239,30 @@ export default function ViewDeal({ deal, onEdit, onClose }: ViewDealProps) {
                     <p className="text-sm text-gray-400">Documents will appear here once uploaded</p>
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
 
           {/* Right Column - Collaborators */}
           <div className="space-y-6">
             {/* Collaborators Card */}
-            <Card className="bg-white">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
+            <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h3 className="text-lg font-semibold flex items-center space-x-2">
                   <Users className="w-5 h-5" />
                   <span>Collaborators</span>
                   <Badge variant="secondary" className="ml-2">
                     {deal.contributors?.length || 0}
                   </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+                </h3>
+              </div>
+              <div className="p-6">
                 {deal.contributors && deal.contributors.length > 0 ? (
                   <div className="space-y-4">
                     {deal.contributors.map((contributor, index) => (
                       <div
                         key={contributor.id || index}
-                        className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                        className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                       >
                         <div className="flex-shrink-0">
                           {contributor.profilePhoto ? (
@@ -301,15 +298,15 @@ export default function ViewDeal({ deal, onEdit, onClose }: ViewDealProps) {
                     <p className="text-sm text-gray-400">Team members will appear here once added</p>
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Deal Metadata */}
-            <Card className="bg-white">
-              <CardHeader>
-                <CardTitle className="text-lg">Deal Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h3 className="text-lg font-semibold">Deal Information</h3>
+              </div>
+              <div className="p-6 space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-500">Created</span>
                   <span className="text-sm font-medium text-gray-900">
@@ -323,15 +320,15 @@ export default function ViewDeal({ deal, onEdit, onClose }: ViewDealProps) {
                     {formatDate(deal.updatedAt)}
                   </span>
                 </div>
-                {/* <Separator />
+                <Separator />
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-500">Deal ID</span>
                   <span className="text-sm font-mono text-gray-900">
                     {deal.id}
                   </span>
-                </div> */}
-              </CardContent>
-            </Card>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { 
-  Menu, 
-  Search, 
-  Plus, 
-  Bell, 
-  Heart, 
+import {
+  Menu,
+  Search,
+  Plus,
+  Bell,
+  Heart,
   User,
   Lock,
   X,
-  ChevronDown
+  ChevronDown,
+  LogOut
 } from 'lucide-react';
+import { useAuth } from '@/context/AuthProvider';
 
 interface AppBarProps {
   onMenuClick: () => void;
@@ -20,6 +22,7 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const { user, signOut } = useAuth();
 
   const handleSearchToggle = () => {
     setIsSearchActive(!isSearchActive);
@@ -73,7 +76,7 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
         >
           <Menu className="h-5 w-5 text-gray-600" />
         </button>
-        
+
         <div className="flex items-center gap-2">
           <span className="font-semibold text-gray-900 hidden sm:block">Godex</span>
         </div>
@@ -98,7 +101,7 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
           <button className="p-2 rounded-md hover:bg-gray-100 transition-colors">
             <Plus className="h-5 w-5 text-gray-600" />
           </button>
-          
+
           <button className="p-2 rounded-md hover:bg-gray-100 transition-colors relative">
             <Bell className="h-5 w-5 text-gray-600" />
             <Lock className="h-3 w-3 text-gray-400 absolute -top-1 -right-1" />
@@ -106,14 +109,23 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
               <span className="text-white text-xs font-medium">1</span>
             </div>
           </button>
-          
-          <button className="p-2 rounded-md hover:bg-gray-100 transition-colors">
-            <Heart className="h-5 w-5 text-gray-600" />
-          </button>
+
+          {/* Logout button */}
+          {user && (
+            <div className="p-4 border-t border-gray-200">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                  <button onClick={signOut} className="text-red-500 text-sm font-medium">
+                    <LogOut className="h-4 w-4 text-red-500" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Mobile search icon */}
-        <button 
+        <button
           onClick={handleSearchToggle}
           className="lg:hidden p-2 rounded-md hover:bg-gray-100 transition-colors"
         >
@@ -143,10 +155,23 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
                   <span>Notifications</span>
                   <div className="ml-auto w-3 h-3 bg-red-500 rounded-full"></div>
                 </button>
-                <button className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3">
-                  <Heart className="h-4 w-4" />
-                  <span>Favorites</span>
-                </button>
+                {/* Logout button */}
+                {user && (
+                  <div className="p-4 border-t border-gray-200">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                        <button onClick={signOut} className="text-red-500 text-sm font-medium">
+                          <LogOut className="h-4 w-4 text-red-500" />
+                        </button>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <button onClick={signOut} className="text-sm font-medium text-red-600 truncate">
+                          Logout
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <div className="border-t border-gray-200 my-1"></div>
                 <button className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3">
                   <User className="h-4 w-4" />
@@ -160,7 +185,7 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
 
       {/* Backdrop for mobile dropdown */}
       {isProfileOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 lg:hidden"
           onClick={() => setIsProfileOpen(false)}
         />
