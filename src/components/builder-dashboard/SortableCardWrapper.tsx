@@ -33,15 +33,13 @@ export default function SortableCardWrapper(props: Props) {
   };
 
   return (
-    <div className={`${isDragging ? 'rotate-2 shadow-xl' : ''} transition-all duration-200`}>
-      <DealCard 
-        deal={deal} 
-        refProps={setNodeRef}
-        styles={style}
-        listeners={listeners}
-        attributes={attributes}
-        onEdit={onEdit}
-      />
-    </div>
+    <DealCard 
+      deal={deal} 
+      refProps={setNodeRef}
+      styles={style}
+      listeners={listeners}
+      attributes={attributes}
+      onEdit={onEdit}
+    />
   );
 }

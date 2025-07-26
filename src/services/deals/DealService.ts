@@ -57,5 +57,56 @@ export class DealService {
       throw error;
     }
   }
+
+  /**
+   * Updates a deal in the "deals" table.
+   * @param deal - The deal to update.
+   * @returns The updated deal.
+   */
+  static async updateDeal(deal: Partial<DealModel>) {
+    try {
+      // convert the deal to snake_case keys. 
+      const dealSnakeCase = snakecaseKeys(deal, { deep: true });
+      const { data, error } = await supabase
+        .from("deals")
+        .update(dealSnakeCase)
+        .eq("id", deal.id)
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
+      }
+      // Later I need to consider adding this deal update to deal log table.
+      return data;
+    } catch (error) {
+      ErrorService.handleApiError(error, "DealService.updateDeal");
+      throw error;
+    }
+
+  }
+
+  /**
+   * Deletes a deal from the "deals" table.
+   * @param dealId - The ID of the deal to delete.
+   * @returns The deleted deal.
+   */
+  static async deleteDeal(dealId: string) {
+    try {
+      const { data, error } = await supabase
+        .from("deals")
+        .delete()
+        .eq("id", dealId);
+
+      if (error) {
+        throw error;
+      }
+
+      return data;
+    } catch (error) {
+      ErrorService.handleApiError(error, "DealService.deleteDeal");
+      throw error;
+    }
+  }
 }
 

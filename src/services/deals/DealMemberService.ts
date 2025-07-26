@@ -9,10 +9,10 @@ export class DealMemberService {
    * @param dealMember - The deal member to create.
    * @returns The created deal member.
    */
-  static async createDealMembers(dealMember: Partial<DealMemberModel>[]) {
+  static async createDealMembers(dealMembers: Partial<DealMemberModel>[]) {
     try {
       // Make the data to use snake_case keys.
-      const dealMembersSnakeCase = dealMember.map(member => snakecaseKeys(member, { deep: true }));
+      const dealMembersSnakeCase = dealMembers.map(member => snakecaseKeys(member, { deep: true }));
       const dealId = dealMembersSnakeCase[0].deal_id;
       // Check if the people are already in the deal members table.
       const existingDealMembers = await this.getDealMembers(dealId);

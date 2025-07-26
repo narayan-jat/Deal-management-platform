@@ -12,6 +12,6 @@ export type DealDocument = {
 };
 
 // For upload form
-export type UploadDocumentForm = {
-  file: File;
+export type UploadDocumentForm = Partial<DealDocument> & {
+  file?: File;
 };

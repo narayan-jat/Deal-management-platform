@@ -1,5 +1,5 @@
 import { DealStatus } from "./types/deal";
-
+import { DealMemberRole } from "./types/deal/Deal.enums";
 // Industry Options
 export const INDUSTRY_OPTIONS = [
   { value: 'Technology', label: 'Technology' },
@@ -20,3 +20,9 @@ export const columnKeyToEnum = {
   negotiation: DealStatus.NEGOTIATION,
   completed: DealStatus.COMPLETED,
 };
+
+export const editAccessRoles = [
+  DealMemberRole.OWNER,
+  DealMemberRole.EDITOR,
+  DealMemberRole.ADMIN,
+];
