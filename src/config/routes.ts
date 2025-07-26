@@ -8,6 +8,7 @@ export const ROUTES = {
   // Protected routes
   DASHBOARD: '/dashboard',
   DEALS: '/deals',
+  VIEW_DEAL: '/deals/:dealId',
   PROFILE: '/profile',
   ANALYTICS: '/dashboard/analytics',
   CONTACT: '/dashboard/contact',
@@ -26,6 +27,7 @@ export const PUBLIC_ROUTES = {
 export const PROTECTED_ROUTES = {
   DASHBOARD: ROUTES.DASHBOARD,
   DEALS: ROUTES.DEALS,
+  VIEW_DEAL: ROUTES.VIEW_DEAL,
   PROFILE: ROUTES.PROFILE,
   ANALYTICS: ROUTES.ANALYTICS,
   CONTACT: ROUTES.CONTACT,
@@ -59,6 +61,11 @@ export const ROUTE_METADATA = {
   [ROUTES.DEALS]: {
     title: 'Deals',
     description: 'Manage your deals',
+    requiresAuth: true,
+  },
+  [ROUTES.VIEW_DEAL]: {
+    title: 'Deal Details',
+    description: 'View details for a specific deal',
     requiresAuth: true,
   },
   [ROUTES.PROFILE]: {
