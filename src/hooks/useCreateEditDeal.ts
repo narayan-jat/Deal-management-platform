@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react';
-import { DealModel, DealMemberModel } from '../types/deal/Deal.model';
+import { DealModel, DealMemberModel, DealDocumentModel } from '../types/deal/Deal.model';
 import { UploadDocumentForm, DealDocument } from '@/types/deal/Deal.documents';
 import { DealService } from '@/services/deals/DealService';
 import { ErrorService } from '@/services/ErrorService';
-import { InviteMemberForm } from '@/types/deal/Deal.members';
+import { DealMember, InviteMemberForm } from '@/types/deal/Deal.members';
 import camelcaseKeys from 'camelcase-keys';
 import { DocumentStorageService } from '@/services/DocumentStorageService';
 import { useAuth } from '@/context/AuthProvider';
-import { SignatureStatus } from '@/types/deal/Deal.enums';
+import { LogType, SignatureStatus } from '@/types/deal/Deal.enums';
 import { DealMemberRole } from '@/types/deal/Deal.enums';
 import { getDateString } from '@/utility/Utility';
 import { DealDocumentService } from '@/services/deals/DealDocumentService';
 import { DealMemberService } from '@/services/deals/DealMemberService';
+import { updateDealLogs } from './utils';
 
 export const useCreateEditDeal = () => {
   const [loading, setLoading] = useState(false);
@@ -109,12 +110,13 @@ export const useCreateEditDeal = () => {
       return null;
     }
     
+    const logMetaData = {}
     try {
       setLoading(true);
       console.log("Updating deal:", deal);
       
       // Add the updatedAt field to the deal.
-      deal.updatedAt = getDateString(new Date());
+      deal.updatedAt = new Date().toISOString();
       
       // Convert the date fields to correct format if the date is provided. 
       // Send a string in 'YYYY-MM-DD' format. If no date is provided, do not include the field.
@@ -143,9 +145,25 @@ export const useCreateEditDeal = () => {
 
         // add the documents to the deal documents table.
         if (dealDocuments.length > 0) {
-          await DealDocumentService.createDealDocuments(dealDocuments);
+          const createdDocuments = await DealDocumentService.createDealDocuments(dealDocuments);
+          logMetaData['documents'] = createdDocuments.map((document) => ({
+            id: document.id,
+            isUploaded: true,
+          }));
         }
       }
+
+      // will add the members later.
+      // update the deal logs.
+      logMetaData['deal'] = {
+        status: camelCaseDeal.status,
+        nextMeetingDate: camelCaseDeal.nextMeetingDate,
+        title: camelCaseDeal.title,
+        requestedAmount: camelCaseDeal.requestedAmount,
+        endDate: camelCaseDeal.endDate,
+        startDate: camelCaseDeal.startDate,
+      };
+      await updateDealLogs(user.id, camelCaseDeal.id, logMetaData);
       
       console.log('Deal updated successfully:', camelCaseDeal);
       return camelCaseDeal;

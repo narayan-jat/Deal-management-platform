@@ -12,7 +12,7 @@ import { ProfileStorageService } from '@/services/ProfileStorageService';
 import { DealDocumentService } from '@/services/deals/DealDocumentService';
 import { DealCardType } from '@/types/deal/DealCard';
 import { useSearch } from '@/context/SearchProvider';
-
+import { updateDealLogs } from './utils';
 const getSignedProfileImageUrl = async (profilePhoto: string) => {
   if (!profilePhoto) return null;
   const signedUrl = await ProfileStorageService.getProfileImageSignedUrl(profilePhoto);
@@ -39,7 +39,7 @@ export const useDashboard = () => {
 
       // Get the deals from the deal IDs.
       const deals = await DealService.getDeals(dealIds);
-      
+
       // Get the members of the deals to show on the card.
       await Promise.all(deals.map(async (deal) => {
         const dealMembers = await DealMemberService.getDealMembers(deal.id);
@@ -93,7 +93,7 @@ export const useDashboard = () => {
 
   // Fetch the deals when component is mounted
   useEffect(() => {
-    
+
     if (user?.id) {
       handleConvertToKanbanBoardColumns();
     }
@@ -116,23 +116,23 @@ export const useDashboard = () => {
         negotiation: [],
         completed: [],
       };
-      
+
       if (deals && deals.length > 0) {
-        deals.forEach((deal) => {            
+        deals.forEach((deal) => {
           // Find the correct column for this deal
           const columnKey = Object.keys(columnKeyToEnum).find(
             key => columnKeyToEnum[key as keyof typeof columnKeyToEnum] === deal.status
           );
-          
+
           if (columnKey && dealCards[columnKey as keyof KanbanBoardColumns]) {
             dealCards[columnKey as keyof KanbanBoardColumns].push(deal);
           }
         });
       }
-      
+
       // Update search context with all deals
       setAllDeals(deals || []);
-      
+
       console.log('Kanban board columns:', dealCards);
       setInitialDeals(dealCards);
     } catch (error) {
@@ -151,7 +151,14 @@ export const useDashboard = () => {
 
   const handleUpdateDealStatus = async (dealId: string, status: keyof typeof columnKeyToEnum) => {
     try {
-      const updatedDeal = await DealService.updateDeal({ id: dealId, status: columnKeyToEnum[status] });
+      const updatedDeal = await DealService.updateDeal({ id: dealId, status: columnKeyToEnum[status], updatedAt: new Date().toISOString() });
+      const camelCaseDeal = camelcaseKeys(updatedDeal, { deep: true }) as DealModel;
+      // update the deal logs.
+      await updateDealLogs(user.id, camelCaseDeal.id, {
+        deal: {
+          status: camelCaseDeal.status,
+        },
+      });
       return updatedDeal;
     } catch (error) {
       ErrorService.handleApiError(error, "useDashboard");
