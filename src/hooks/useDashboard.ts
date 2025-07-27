@@ -19,7 +19,7 @@ const getSignedProfileImageUrl = async (profilePhoto: string) => {
   return signedUrl;
 }
 
-export const useKanbanBoard = () => {
+export const useDashboard = () => {
   const [initialDeals, setInitialDeals] = useState<KanbanBoardColumns>({
     new: [],
     inProgress: [],
@@ -57,7 +57,7 @@ export const useKanbanBoard = () => {
                 role: member.role,
               };
             } catch (error) {
-              ErrorService.handleApiError(error, "useKanbanBoard");
+              ErrorService.handleApiError(error, "useDashboard");
               return null;
             }
           })
@@ -84,7 +84,7 @@ export const useKanbanBoard = () => {
       const camelCaseDeals = camelcaseKeys(deals, { deep: true });
       return camelCaseDeals;
     } catch (error) {
-      ErrorService.handleApiError(error, "useKanbanBoard");
+      ErrorService.handleApiError(error, "useDashboard");
       setApiError('Failed to fetch deals');
     } finally {
       setLoading(false);
@@ -136,7 +136,7 @@ export const useKanbanBoard = () => {
       console.log('Kanban board columns:', dealCards);
       setInitialDeals(dealCards);
     } catch (error) {
-      ErrorService.handleApiError(error, "useKanbanBoard");
+      ErrorService.handleApiError(error, "useDashboard");
       setApiError('Failed to convert to kanban board columns');
       // Set empty state on error
       setInitialDeals({
@@ -154,10 +154,10 @@ export const useKanbanBoard = () => {
       const updatedDeal = await DealService.updateDeal({ id: dealId, status: columnKeyToEnum[status] });
       return updatedDeal;
     } catch (error) {
-      ErrorService.handleApiError(error, "useKanbanBoard");
+      ErrorService.handleApiError(error, "useDashboard");
       setApiError('Failed to update deal status');
     }
   }
 
   return { loading, apiError, initialDeals, handleUpdateDeals, fetchDeals, handleConvertToKanbanBoardColumns, handleUpdateDealStatus };
-};
+}; 
