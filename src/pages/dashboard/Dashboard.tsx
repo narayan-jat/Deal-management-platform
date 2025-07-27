@@ -65,7 +65,6 @@ export default function Dashboard() {
   };
 
   const handleDragStart = (event: DragStartEvent) => {
-    console.log('Drag start:', event.active.id);
     setActiveId(event.active.id as string);
     
     // Clear any existing timeout
@@ -75,7 +74,6 @@ export default function Dashboard() {
     
     // Set a timeout to reset drag state if not completed within 5 seconds
     const timeout = setTimeout(() => {
-      console.log('Drag timeout - resetting state');
       setActiveId(null);
       setOverId(null);
     }, 5000); // 5 seconds
@@ -84,7 +82,6 @@ export default function Dashboard() {
   };
 
   const handleDragOver = (event: DragOverEvent) => {
-    console.log('Drag over:', event.over?.id);
     setOverId(event.over?.id as string || null);
   };
 
@@ -102,7 +99,6 @@ export default function Dashboard() {
       }
     }
     else {
-      console.log('Creating new deal with status:', columnKeyToEnum[columnSelected as keyof typeof columnKeyToEnum]);
       return {
         status: columnKeyToEnum[columnSelected as keyof typeof columnKeyToEnum],
         documents: [],
@@ -134,7 +130,6 @@ export default function Dashboard() {
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
-    console.log('Drag end:', event.active.id, '->', event.over?.id);
     const { active, over } = event;
     
     // Clear the drag timeout
@@ -147,7 +142,6 @@ export default function Dashboard() {
     setOverId(null);
 
     if (!over || active.id === over.id) {
-      console.log('No valid drop target or same item');
       return;
     }
 
@@ -161,21 +155,17 @@ export default function Dashboard() {
         : findColumn(overId as string); // it's a card — find its column
 
     if (!sourceColumn || !targetColumn || sourceColumn === targetColumn) {
-      console.log('Invalid column mapping:', { sourceColumn, targetColumn });
       return;
     }
 
     const sourceItems = [...deals[sourceColumn]];
     const draggedItem = sourceItems.find((item) => item.id === active.id);
     if (!draggedItem) {
-      console.log('Dragged item not found');
       return;
     }
 
     const updatedSource = sourceItems.filter((item) => item.id !== active.id);
     const updatedTarget = [...deals[targetColumn as keyof typeof deals], {...draggedItem, status: columnKeyToEnum[targetColumn as keyof typeof columnKeyToEnum]}];
-
-    console.log('Updating deals:', { sourceColumn, targetColumn, draggedItem: draggedItem.title });
 
     // also update the deal status for the dragged item in kanban board.
     // Update the deals

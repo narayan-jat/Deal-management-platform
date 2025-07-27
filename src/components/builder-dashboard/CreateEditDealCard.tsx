@@ -61,7 +61,6 @@ export default function CreateEditDealCard({
   });
   // Initialize documents with data when editing/creating
   const [documents, setDocuments] = useState<UploadDocumentForm[]>(initialBaseFormData?.documents || []);
-  console.log("documents in create edit deal card", documents);
   // here not allowing to modify and see earlier members will show in other features.
   const [members, setMembers] = useState<InviteMemberForm[]>(initialBaseFormData?.members || []);
   const [isSubmitting, setIsSubmitting] = useState(false);

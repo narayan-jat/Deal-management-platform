@@ -140,7 +140,6 @@ export const useDashboard = () => {
       // Update search context with all deals
       setAllDeals(deals || []);
 
-      console.log('Kanban board columns:', dealCards);
       setInitialDeals(dealCards);
     } catch (error) {
       ErrorService.handleApiError(error, "useDashboard");

@@ -96,14 +96,13 @@ export const useCreateEditDeal = () => {
   }
 
   const handleEditDeal = async (deal: Partial<DealModel>, documents: UploadDocumentForm[], members: InviteMemberForm[]): Promise<DealModel | null> => {
-    console.log('handleEditDeal called with:', { deal, documents, members });
     
     if (!deal.id) {
       console.error('Deal ID is missing for edit operation');
       setApiError('Deal ID is required for editing');
       return null;
     }
-    
+
     if (!user?.id) {
       console.error('User not authenticated for edit operation');
       setApiError('User not authenticated');
@@ -113,11 +112,10 @@ export const useCreateEditDeal = () => {
     const logMetaData = {}
     try {
       setLoading(true);
-      console.log("Updating deal:", deal);
       
       // Add the updatedAt field to the deal.
       deal.updatedAt = new Date().toISOString();
-      
+
       // Convert the date fields to correct format if the date is provided. 
       // Send a string in 'YYYY-MM-DD' format. If no date is provided, do not include the field.
       deal.startDate = deal.startDate ? getDateString(new Date(deal.startDate)) : null;
@@ -125,6 +123,8 @@ export const useCreateEditDeal = () => {
       deal.nextMeetingDate = deal.nextMeetingDate ? getDateString(new Date(deal.nextMeetingDate)) : null;
       
       const updatedDeal = await DealService.updateDeal(deal);
+
+      // Convert to camelCase for consistency
       const camelCaseDeal = camelcaseKeys(updatedDeal, { deep: true }) as DealModel;
 
       // Upload the documents on the storage.
@@ -165,7 +165,6 @@ export const useCreateEditDeal = () => {
       };
       await createDealLogs(user.id, camelCaseDeal.id, logMetaData, LogType.UPDATED);
       
-      console.log('Deal updated successfully:', camelCaseDeal);
       return camelCaseDeal;
     } catch (error) {
       console.error('Error updating deal:', error);

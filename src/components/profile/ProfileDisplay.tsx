@@ -1,15 +1,15 @@
 import { Edit } from "lucide-react";
-import { ProfileData } from "@/types/Profile";
+import { ProfileEditFormType } from "@/types/Profile";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import ProfileEditForm from "./ProfileForm";
 import defaultProfile from "@/assets/default-profile.png";
 
 interface ProfileDisplayProps {
-  data: ProfileData;
+  data: ProfileEditFormType;
   isOwner: boolean;
-  handleUpdateProfile: (updatedData: Partial<ProfileData>) => Promise<void>;
-  handleUploadProfileImage: (file: File) => Promise<string>;
+  handleUpdateProfile: (updatedData: Partial<ProfileEditFormType>) => Promise<void>;
+  handleUploadProfileImage: (originalProfileFilePath: string, file: File) => Promise<string>;
   loading: boolean;
 }
 
@@ -25,17 +25,17 @@ export default function ProfileDisplay({ data, isOwner, handleUpdateProfile, han
       <div className="flex flex-col sm:flex-row sm:items-start sm:space-x-6 items-center text-center sm:text-left relative">
         <div className="relative">
           <img
-            src={data.profile_photo || defaultProfile}
+            src={data.profileUrl || defaultProfile}
             alt="Profile Avatar"
             className="w-24 h-24 rounded-full object-cover border-4 border-gray-100 shadow-lg"
           />
         </div>
         <div className="mt-4 sm:mt-0 flex-1">
           <h2 className="text-2xl font-bold text-black font-inter mb-1">
-            {data.full_name || "No name provided"}
+            {data.fullName || "No name provided"}
           </h2>
           <p className="text-lg text-godex-primary font-medium font-inter mb-2">
-            {data.title || "Engineer(default)"} @ {data.organization_tag || "Godex(default)"}
+            {data.title || "Engineer(default)"} @ {data.organizationTag || "Godex(default)"}
           </p>
           <p className="text-gray-600 font-inter">
             {data.email || "No email provided"}

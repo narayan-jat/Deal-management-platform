@@ -6,6 +6,7 @@ import useProfile from "@/hooks/useProfile";
 export default function Profile() {
   const { profile, isOwner, loading, handleUpdateProfile, handleUploadProfileImage } = useProfile();
 
+  console.log("profile", profile);
   if (loading) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -14,7 +15,6 @@ export default function Profile() {
     );
   }
 
-  console.log("profile", profile);
   return (
     <div className="max-w-2xl mx-auto mt-8">
       <h1 className="text-2xl font-bold mb-6">My Profile</h1>

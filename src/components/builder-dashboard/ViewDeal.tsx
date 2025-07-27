@@ -39,13 +39,11 @@ export default function ViewDeal({ deal, onEdit, onClose }: ViewDealProps) {
   // Handle document download
   const handleDocumentDownload = (document: any) => {
     // TODO: Implement document download logic
-    console.log('Downloading document:', document.fileName);
   };
 
   // Handle document preview
   const handleDocumentPreview = (document: any) => {
     // TODO: Implement document preview logic
-    console.log('Previewing document:', document.fileName);
   };
 
   return (

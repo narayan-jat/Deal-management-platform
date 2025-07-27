@@ -100,7 +100,6 @@ export default function KanbanBoard({
               <SortableContext items={cards.map((c: DealCardType) => c.id)} strategy={verticalListSortingStrategy}>
                 {(() => {
                   const itemIds = cards.map((c: DealCardType) => c.id);
-                  console.log(`SortableContext for ${key}:`, itemIds);
                   return cards.map((card: DealCardType) => (
                     <SortableCardWrapper
                       key={card.id}

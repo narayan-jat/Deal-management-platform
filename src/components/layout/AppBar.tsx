@@ -38,7 +38,6 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Search is handled automatically by the context
-    console.log('Searching for:', searchQuery);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {

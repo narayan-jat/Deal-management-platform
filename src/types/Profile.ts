@@ -1,10 +1,16 @@
+import DealCard from "@/components/builder-dashboard/Dealcard";
+
 export interface ProfileData {
   id: string;
-  full_name: string;
+  fullName: string;
   title: string;
   email: string;
-  profile_photo: string;
+  profilePhoto: string;
   bio: string;
-  organization_tag: string;
-  created_at: string;
+  organizationTag: string;
+  createdAt: string;
 }
+
+export type ProfileEditFormType = Partial<ProfileData> & {
+  profileUrl?: string;
+};
