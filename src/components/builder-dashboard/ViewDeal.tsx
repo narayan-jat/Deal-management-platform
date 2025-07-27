@@ -320,13 +320,6 @@ export default function ViewDeal({ deal, onEdit, onClose }: ViewDealProps) {
                     {formatDate(deal.updatedAt)}
                   </span>
                 </div>
-                <Separator />
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-500">Deal ID</span>
-                  <span className="text-sm font-mono text-gray-900">
-                    {deal.id}
-                  </span>
-                </div>
               </div>
             </div>
           </div>

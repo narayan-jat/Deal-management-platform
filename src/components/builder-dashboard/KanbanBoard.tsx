@@ -32,6 +32,8 @@ import { UploadDocumentForm } from "@/types/deal/Deal.documents";
 import { InviteMemberForm } from "@/types/deal/Deal.members";
 import { DollarSign, Lock } from "lucide-react";
 import { ROUTES } from "@/config/routes";
+import { useSearch } from "@/context/SearchProvider";
+
 const columnNames = {
   new: "New",
   inProgress: "In Progress",
@@ -40,7 +42,8 @@ const columnNames = {
 };
 
 export default function KanbanBoard() {
-  const { initialDeals: deals, loading, apiError: getDealsError, handleUpdateDeals, handleUpdateDealStatus } = useKanbanBoard();
+  const { initialDeals: originalDeals, loading, apiError: getDealsError, handleUpdateDeals, handleUpdateDealStatus } = useKanbanBoard();
+  const { filteredDeals, searchQuery, clearSearch } = useSearch();
   const [dealId, setDealId] = useState<string | null>(null);
   const { handleCreateDeal, handleEditDeal, apiError: createDealError} = useCreateEditDeal();
   const [isCreateEditFormOpen, setIsCreateEditFormOpen] = useState<boolean>(false);
@@ -59,6 +62,16 @@ export default function KanbanBoard() {
       }
     };
   }, [dragTimeout]);
+
+  // Use filtered deals when search is active, otherwise use original deals
+  const deals = searchQuery.trim() ? 
+    Object.keys(originalDeals).reduce((acc, key) => {
+      acc[key as keyof typeof originalDeals] = originalDeals[key as keyof typeof originalDeals].filter(deal =>
+        filteredDeals.some(filteredDeal => filteredDeal.id === deal.id)
+      );
+      return acc;
+    }, {} as typeof originalDeals) : 
+    originalDeals;
 
   // Configure sensors with proper activation constraints
   const sensors = useSensors(
@@ -225,6 +238,30 @@ export default function KanbanBoard() {
 
   return (
     <>
+      {/* Search Results Indicator */}
+      {searchQuery.trim() && (
+        <div className="bg-blue-50 border-b border-blue-200 px-4 py-3">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-blue-700">
+                Search results for "{searchQuery}"
+              </span>
+              <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
+                {filteredDeals.length} deal{filteredDeals.length !== 1 ? 's' : ''} found
+              </span>
+            </div>
+            <button
+              onClick={() => {
+                clearSearch();
+              }}
+              className="text-sm text-blue-600 hover:text-blue-800 underline"
+            >
+              Clear search
+            </button>
+          </div>
+        </div>
+      )}
+
       <DndContext
         collisionDetection={closestCenter}
         sensors={sensors}

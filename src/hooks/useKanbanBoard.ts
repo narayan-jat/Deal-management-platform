@@ -11,6 +11,7 @@ import { ProfileService } from '@/services/ProfileService';
 import { ProfileStorageService } from '@/services/ProfileStorageService';
 import { DealDocumentService } from '@/services/deals/DealDocumentService';
 import { DealCardType } from '@/types/deal/DealCard';
+import { useSearch } from '@/context/SearchProvider';
 
 const getSignedProfileImageUrl = async (profilePhoto: string) => {
   if (!profilePhoto) return null;
@@ -28,6 +29,7 @@ export const useKanbanBoard = () => {
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState<string | null>(null);
   const { user } = useAuth();
+  const { setAllDeals } = useSearch();
 
   const fetchDeals = async () => {
     try {
@@ -128,6 +130,9 @@ export const useKanbanBoard = () => {
         });
       }
       
+      // Update search context with all deals
+      setAllDeals(deals || []);
+      
       console.log('Kanban board columns:', dealCards);
       setInitialDeals(dealCards);
     } catch (error) {
@@ -140,6 +145,7 @@ export const useKanbanBoard = () => {
         negotiation: [],
         completed: [],
       });
+      setAllDeals([]);
     }
   }
 
