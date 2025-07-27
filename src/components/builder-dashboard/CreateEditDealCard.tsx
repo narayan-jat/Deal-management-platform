@@ -28,6 +28,7 @@ interface CreateEditDealCardProps {
   mode: "create" | "edit";
   initialBaseFormData?: DealCardForm;
   onSubmit: (deal: Partial<DealModel>, documents: UploadDocumentForm[], members: InviteMemberForm[]) => Promise<DealModel | null>;
+  handleDeleteDocument: (dealId: string, documentId: string, filePath: string) => Promise<void>;
 }
 
 interface handleInputChangeProps {
@@ -42,6 +43,7 @@ export default function CreateEditDealCard({
   mode,
   initialBaseFormData,
   onSubmit,
+  handleDeleteDocument,
 }: CreateEditDealCardProps) {
   // Initialize base form with data when editing/creating
   const [formData, setFormData] = useState<Partial<DealModel>>({
@@ -100,10 +102,11 @@ export default function CreateEditDealCard({
   };
 
 
-  const handleRemoveDocument = (index: number) => {
+  const handleRemoveDocument = async (index: number) => {
     const documentId = documents[index]?.id;
     if (documentId) {
       // remove document from supabase more complex logic come back.
+      await handleDeleteDocument(formData.id, documentId, documents[index]?.filePath);
       setDocuments(prev => prev.filter((_, i) => i !== index));
     }else{
       setDocuments(prev => prev.filter((_, i) => i !== index));

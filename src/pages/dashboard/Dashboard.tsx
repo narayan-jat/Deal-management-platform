@@ -30,7 +30,7 @@ export default function Dashboard() {
   const { initialDeals: originalDeals, loading, apiError: getDealsError, handleUpdateDeals, handleUpdateDealStatus } = useDashboard();
   const { filteredDeals, searchQuery, clearSearch } = useSearch();
   const [dealId, setDealId] = useState<string | null>(null);
-  const { handleCreateDeal, handleEditDeal, apiError: createDealError} = useCreateEditDeal();
+  const { handleCreateDeal, handleEditDeal, handleDeleteDocument, apiError: createDealError} = useCreateEditDeal();
   const [isCreateEditFormOpen, setIsCreateEditFormOpen] = useState<boolean>(false);
   const [columnSelected, setColumnSelected] = useState<string>("new");
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -259,6 +259,7 @@ export default function Dashboard() {
           mode={mode}
           initialBaseFormData={handleCreatedEditForm(dealId)}
           onSubmit={handleOnSubmit}
+          handleDeleteDocument={handleDeleteDocument}
         />
       )}
     </div>

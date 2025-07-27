@@ -12,7 +12,14 @@ import { ProfileStorageService } from '@/services/ProfileStorageService';
 import { DealDocumentService } from '@/services/deals/DealDocumentService';
 import { DealCardType } from '@/types/deal/DealCard';
 import { useSearch } from '@/context/SearchProvider';
-import { updateDealLogs } from './utils';
+import { createDealLogs } from './utils';
+import { LogType } from '@/types/deal/Deal.enums';
+
+/**
+ * Get the signed URL for the profile image.
+ * @param profilePhoto - The profile photo to get the signed URL for.
+ * @returns The signed URL for the profile image.
+ */
 const getSignedProfileImageUrl = async (profilePhoto: string) => {
   if (!profilePhoto) return null;
   const signedUrl = await ProfileStorageService.getProfileImageSignedUrl(profilePhoto);
@@ -154,11 +161,11 @@ export const useDashboard = () => {
       const updatedDeal = await DealService.updateDeal({ id: dealId, status: columnKeyToEnum[status], updatedAt: new Date().toISOString() });
       const camelCaseDeal = camelcaseKeys(updatedDeal, { deep: true }) as DealModel;
       // update the deal logs.
-      await updateDealLogs(user.id, camelCaseDeal.id, {
+      await createDealLogs(user.id, camelCaseDeal.id, {
         deal: {
           status: camelCaseDeal.status,
         },
-      });
+      }, LogType.UPDATED);
       return updatedDeal;
     } catch (error) {
       ErrorService.handleApiError(error, "useDashboard");

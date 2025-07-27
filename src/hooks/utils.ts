@@ -3,7 +3,7 @@ import { DealLogService } from "@/services/deals/DealLogService";
 import { ErrorService } from "@/services/ErrorService";
 import { LogType } from "@/types/deal/Deal.enums";
 
-export const updateDealLogs = async (userId: string, dealId: string, logMetaData: any) => {
+export const createDealLogs = async (userId: string, dealId: string, logMetaData: any, logType: LogType) => {
   try {
     // For the deal only track changes to the following fields:
     // - status, nextMeetingDate, title, requested amount, enddate and startdate.
@@ -13,7 +13,7 @@ export const updateDealLogs = async (userId: string, dealId: string, logMetaData
     await DealLogService.createDealLog({
       dealId: dealId,
       memberId: userId,
-      logType: LogType.UPDATED,
+      logType: logType,
       logData: logMetaData,
     });
   } catch (error) {

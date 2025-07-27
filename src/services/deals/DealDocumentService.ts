@@ -16,8 +16,7 @@ export class DealDocumentService {
       const { data, error } = await supabase
         .from("deal_documents")
         .insert(dealDocumentsSnakeCase)
-        .select()
-        .single();
+        .select();
 
       if (error) {
         throw error;

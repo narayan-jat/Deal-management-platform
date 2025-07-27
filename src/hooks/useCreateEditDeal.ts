@@ -12,7 +12,7 @@ import { DealMemberRole } from '@/types/deal/Deal.enums';
 import { getDateString } from '@/utility/Utility';
 import { DealDocumentService } from '@/services/deals/DealDocumentService';
 import { DealMemberService } from '@/services/deals/DealMemberService';
-import { updateDealLogs } from './utils';
+import { createDealLogs } from './utils';
 
 export const useCreateEditDeal = () => {
   const [loading, setLoading] = useState(false);
@@ -163,7 +163,7 @@ export const useCreateEditDeal = () => {
         endDate: camelCaseDeal.endDate,
         startDate: camelCaseDeal.startDate,
       };
-      await updateDealLogs(user.id, camelCaseDeal.id, logMetaData);
+      await createDealLogs(user.id, camelCaseDeal.id, logMetaData, LogType.UPDATED);
       
       console.log('Deal updated successfully:', camelCaseDeal);
       return camelCaseDeal;
@@ -176,7 +176,25 @@ export const useCreateEditDeal = () => {
     }
   }
 
-  return { loading, apiError, handleCreateDeal, handleEditDeal };
+  const handleDeleteDocument = async (dealId: string, documentId: string, filePath: string) => {
+    try {
+      // First remove the document from the storage.
+      await DocumentStorageService.deleteDocument(filePath);
+      // Then remove the document from the deal documents table.
+      await DealDocumentService.deleteDealDocument([documentId]);
+      // update the deal logs.
+      await createDealLogs(user.id, dealId, {
+        documents: {
+          id: documentId,
+          isDeleted: true,
+        },
+      }, LogType.DELETED);
+    } catch (error) {
+      setApiError(error.message);
+    }
+  }
+
+  return { loading, apiError, handleCreateDeal, handleEditDeal, handleDeleteDocument };
 }
 
 export default useCreateEditDeal;
