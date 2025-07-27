@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Menu,
   Search,
@@ -12,6 +12,7 @@ import {
   LogOut
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthProvider';
+import { useSearch } from '@/context/SearchProvider';
 
 interface AppBarProps {
   onMenuClick: () => void;
@@ -19,10 +20,13 @@ interface AppBarProps {
 }
 
 export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
-  const [isSearchActive, setIsSearchActive] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const { user, signOut } = useAuth();
+  const { 
+    searchQuery, 
+    setSearchQuery, 
+    isSearchActive, 
+    setIsSearchActive 
+  } = useSearch();
 
   const handleSearchToggle = () => {
     setIsSearchActive(!isSearchActive);
@@ -33,10 +37,11 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle search logic here
-    console.log('Searching for:', searchQuery);
-    setIsSearchActive(false);
-    setSearchQuery('');
+    // Search is handled automatically by the context
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
 
   // Mobile search view
@@ -48,7 +53,7 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
           <input
             type="text"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={handleSearchChange}
             placeholder="Search for deals"
             className="flex-1 border-none outline-none text-gray-900"
             autoFocus
@@ -88,6 +93,8 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input
             type="text"
+            value={searchQuery}
+            onChange={handleSearchChange}
             placeholder="Search for deals"
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
@@ -135,7 +142,7 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
         {/* Profile dropdown */}
         <div className="relative">
           <button
-            onClick={() => setIsProfileOpen(!isProfileOpen)}
+            onClick={() => setIsSearchActive(false)}
             className="p-2 rounded-md hover:bg-gray-100 transition-colors flex items-center gap-1"
           >
             <User className="h-5 w-5 text-gray-600" />
@@ -143,7 +150,7 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
           </button>
 
           {/* Mobile dropdown menu */}
-          {isProfileOpen && (
+          {false && (
             <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 lg:hidden">
               <div className="py-2">
                 <button className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3">
@@ -184,10 +191,10 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
       </div>
 
       {/* Backdrop for mobile dropdown */}
-      {isProfileOpen && (
+      {false && (
         <div
           className="fixed inset-0 z-40 lg:hidden"
-          onClick={() => setIsProfileOpen(false)}
+          onClick={() => setIsSearchActive(false)}
         />
       )}
     </header>

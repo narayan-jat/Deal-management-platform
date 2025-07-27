@@ -5,12 +5,13 @@ import defaultProfile from "@/assets/default-profile.png";
 import { ProfileStorageService } from "@/services";
 
 interface Props {
+  originalProfileFilePath: string;
   imageUrl: string;
   handleImageChange: (filePath: string) => void;
-  handleUploadProfileImage: (file: File) => Promise<string>;
+  handleUploadProfileImage: (originalProfileFilePath: string, file: File) => Promise<string>;
 }
 
-export default function ProfileAvatarUploader({ imageUrl, handleImageChange, handleUploadProfileImage }: Props) {
+export default function ProfileAvatarUploader({ originalProfileFilePath, imageUrl, handleImageChange, handleUploadProfileImage }: Props) {
   const [preview, setPreview] = useState<string | null>(imageUrl);
   const [isUploading, setIsUploading] = useState<boolean>(false);
 
@@ -19,7 +20,7 @@ export default function ProfileAvatarUploader({ imageUrl, handleImageChange, han
       // handle upload profile image
       try {
         setIsUploading(true);
-        const filePath = await handleUploadProfileImage(e.target.files[0]);
+        const filePath = await handleUploadProfileImage(originalProfileFilePath, e.target.files[0]);
         try {
           const signedUrl = await ProfileStorageService.getProfileImageSignedUrl(filePath);
           setPreview(signedUrl);

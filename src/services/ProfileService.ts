@@ -1,14 +1,14 @@
 import supabase from "@/lib/supabase";
-import { ProfileData } from "@/types/Profile";
+import { ProfileEditFormType } from "@/types/Profile";
 import { ErrorService } from "./ErrorService";
-
+import snakecaseKeys from "snakecase-keys";
 export class ProfileService {
   /**
    * Fetches a user profile from the "profiles" table using the given user ID.
    * @param userId - The unique ID of the user.
    * @returns The user's profile data or null if not found.
    */
-  static async getProfile(userId: string): Promise<ProfileData | null> {
+  static async getProfile(userId: string) {
     try {
       // Get User social details from the profiles table
       const { data, error } = await supabase
@@ -34,11 +34,13 @@ export class ProfileService {
    * @param profileData - The updated profile data.
    * @returns The updated profile data.
    */
-  static async updateProfile(userId: string, profileData: Partial<ProfileData>): Promise<ProfileData> {
+  static async updateProfile(userId: string, profileData: Partial<ProfileEditFormType>) {
     try {
+      // convert the data to camelcase
+      const snakeCaseProfileData = snakecaseKeys(profileData, { deep: true });
       const { data, error } = await supabase
         .from("profiles")
-        .update(profileData)
+        .update(snakeCaseProfileData)
         .eq("id", userId)
         .select()
         .single();
@@ -59,11 +61,13 @@ export class ProfileService {
    * @param profileData - The profile data to create.
    * @returns The created profile data.
    */
-  static async createProfile(userId: string, profileData: Partial<ProfileData>): Promise<ProfileData> {
+  static async createProfile(userId: string, profileData: Partial<ProfileEditFormType>) {
     try {
+      // convert the data to snakecase
+      const snakeCaseProfileData = snakecaseKeys(profileData, { deep: true });
       const { data, error } = await supabase
         .from("profiles")
-        .insert({ id: userId, ...profileData })
+        .insert({ id: userId, ...snakeCaseProfileData })
         .select()
         .single();
 
@@ -82,7 +86,7 @@ export class ProfileService {
    * Deletes a user's profile from the "profiles" table.
    * @param userId - The unique ID of the user.
    */
-  static async deleteProfile(userId: string): Promise<void> {
+  static async deleteProfile(userId: string) {
     try {
       const { error } = await supabase
         .from("profiles")

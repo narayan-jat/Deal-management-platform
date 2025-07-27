@@ -22,13 +22,12 @@ export default function ViewDealPage() {
   const [deal, setDeal] = useState<DealCardType | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const { handleEditDeal } = useCreateEditDeal();
+  const { handleEditDeal, handleDeleteDocument } = useCreateEditDeal();
 
   useEffect(() => {
     if (dealId) {
       // Try to get deal data from sessionStorage first
       const storedDealData = sessionStorage.getItem('viewDealData');
-      console.log('storedDealData', storedDealData);
       if (storedDealData) {
         try {
           const dealData = JSON.parse(storedDealData);
@@ -172,6 +171,7 @@ export default function ViewDealPage() {
       
       {isEditModalOpen && (
         <CreateEditDealCard
+          handleDeleteDocument={handleDeleteDocument}
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
           mode="edit"

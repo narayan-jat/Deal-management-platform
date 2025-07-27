@@ -11,14 +11,22 @@ import { ProfileService } from '@/services/ProfileService';
 import { ProfileStorageService } from '@/services/ProfileStorageService';
 import { DealDocumentService } from '@/services/deals/DealDocumentService';
 import { DealCardType } from '@/types/deal/DealCard';
+import { useSearch } from '@/context/SearchProvider';
+import { createDealLogs } from './utils';
+import { LogType } from '@/types/deal/Deal.enums';
 
+/**
+ * Get the signed URL for the profile image.
+ * @param profilePhoto - The profile photo to get the signed URL for.
+ * @returns The signed URL for the profile image.
+ */
 const getSignedProfileImageUrl = async (profilePhoto: string) => {
   if (!profilePhoto) return null;
   const signedUrl = await ProfileStorageService.getProfileImageSignedUrl(profilePhoto);
   return signedUrl;
 }
 
-export const useKanbanBoard = () => {
+export const useDashboard = () => {
   const [initialDeals, setInitialDeals] = useState<KanbanBoardColumns>({
     new: [],
     inProgress: [],
@@ -28,6 +36,7 @@ export const useKanbanBoard = () => {
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState<string | null>(null);
   const { user } = useAuth();
+  const { setAllDeals } = useSearch();
 
   const fetchDeals = async () => {
     try {
@@ -37,7 +46,7 @@ export const useKanbanBoard = () => {
 
       // Get the deals from the deal IDs.
       const deals = await DealService.getDeals(dealIds);
-      
+
       // Get the members of the deals to show on the card.
       await Promise.all(deals.map(async (deal) => {
         const dealMembers = await DealMemberService.getDealMembers(deal.id);
@@ -55,7 +64,7 @@ export const useKanbanBoard = () => {
                 role: member.role,
               };
             } catch (error) {
-              ErrorService.handleApiError(error, "useKanbanBoard");
+              ErrorService.handleApiError(error, "useDashboard");
               return null;
             }
           })
@@ -82,7 +91,7 @@ export const useKanbanBoard = () => {
       const camelCaseDeals = camelcaseKeys(deals, { deep: true });
       return camelCaseDeals;
     } catch (error) {
-      ErrorService.handleApiError(error, "useKanbanBoard");
+      ErrorService.handleApiError(error, "useDashboard");
       setApiError('Failed to fetch deals');
     } finally {
       setLoading(false);
@@ -91,7 +100,7 @@ export const useKanbanBoard = () => {
 
   // Fetch the deals when component is mounted
   useEffect(() => {
-    
+
     if (user?.id) {
       handleConvertToKanbanBoardColumns();
     }
@@ -114,24 +123,26 @@ export const useKanbanBoard = () => {
         negotiation: [],
         completed: [],
       };
-      
+
       if (deals && deals.length > 0) {
-        deals.forEach((deal) => {            
+        deals.forEach((deal) => {
           // Find the correct column for this deal
           const columnKey = Object.keys(columnKeyToEnum).find(
             key => columnKeyToEnum[key as keyof typeof columnKeyToEnum] === deal.status
           );
-          
+
           if (columnKey && dealCards[columnKey as keyof KanbanBoardColumns]) {
             dealCards[columnKey as keyof KanbanBoardColumns].push(deal);
           }
         });
       }
-      
-      console.log('Kanban board columns:', dealCards);
+
+      // Update search context with all deals
+      setAllDeals(deals || []);
+
       setInitialDeals(dealCards);
     } catch (error) {
-      ErrorService.handleApiError(error, "useKanbanBoard");
+      ErrorService.handleApiError(error, "useDashboard");
       setApiError('Failed to convert to kanban board columns');
       // Set empty state on error
       setInitialDeals({
@@ -140,18 +151,26 @@ export const useKanbanBoard = () => {
         negotiation: [],
         completed: [],
       });
+      setAllDeals([]);
     }
   }
 
   const handleUpdateDealStatus = async (dealId: string, status: keyof typeof columnKeyToEnum) => {
     try {
-      const updatedDeal = await DealService.updateDeal({ id: dealId, status: columnKeyToEnum[status] });
+      const updatedDeal = await DealService.updateDeal({ id: dealId, status: columnKeyToEnum[status], updatedAt: new Date().toISOString() });
+      const camelCaseDeal = camelcaseKeys(updatedDeal, { deep: true }) as DealModel;
+      // update the deal logs.
+      await createDealLogs(user.id, camelCaseDeal.id, {
+        deal: {
+          status: camelCaseDeal.status,
+        },
+      }, LogType.UPDATED);
       return updatedDeal;
     } catch (error) {
-      ErrorService.handleApiError(error, "useKanbanBoard");
+      ErrorService.handleApiError(error, "useDashboard");
       setApiError('Failed to update deal status');
     }
   }
 
   return { loading, apiError, initialDeals, handleUpdateDeals, fetchDeals, handleConvertToKanbanBoardColumns, handleUpdateDealStatus };
-};
+}; 

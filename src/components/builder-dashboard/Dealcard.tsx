@@ -69,7 +69,6 @@ export default function DealCard(props: DealCardProps) {
   const handleEditClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log("Edit deal");
     onEdit();
   };
 

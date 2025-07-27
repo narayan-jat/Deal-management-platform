@@ -58,10 +58,9 @@ export default function Landing() {
     });
   }
 
-  function submitForm() {
-    console.log("Form submitted:", formData);
-    // Handle form submission
-  }
+  const handleSubmit = () => {
+    // Handle form submission logic here
+  };
 
   return (
     <div className="min-h-screen">
@@ -74,14 +73,14 @@ export default function Landing() {
             formData={formData}
             updateFormField={updateFormField}
             toggleAssetClass={toggleAssetClass}
-            submitForm={submitForm}
+            submitForm={handleSubmit}
           />
         </div>
       </main>
       <Footer
         formData={formData}
         updateFormField={updateFormField}
-        submitForm={submitForm}
+        submitForm={handleSubmit}
       />
     </div>
   );

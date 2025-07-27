@@ -39,13 +39,11 @@ export default function ViewDeal({ deal, onEdit, onClose }: ViewDealProps) {
   // Handle document download
   const handleDocumentDownload = (document: any) => {
     // TODO: Implement document download logic
-    console.log('Downloading document:', document.fileName);
   };
 
   // Handle document preview
   const handleDocumentPreview = (document: any) => {
     // TODO: Implement document preview logic
-    console.log('Previewing document:', document.fileName);
   };
 
   return (
@@ -318,13 +316,6 @@ export default function ViewDeal({ deal, onEdit, onClose }: ViewDealProps) {
                   <span className="text-sm text-gray-500">Last Updated</span>
                   <span className="text-sm font-medium text-gray-900">
                     {formatDate(deal.updatedAt)}
-                  </span>
-                </div>
-                <Separator />
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-500">Deal ID</span>
-                  <span className="text-sm font-mono text-gray-900">
-                    {deal.id}
                   </span>
                 </div>
               </div>

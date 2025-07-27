@@ -5,26 +5,27 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import ProfileAvatarUploader from "./ProfileAvatarUploader";
-import { ProfileData } from "@/types/Profile";
+import { ProfileEditFormType } from "@/types/Profile";
 
 
 interface ProfileEditFormProps {
-  data: ProfileData;
+  data: ProfileEditFormType;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  handleUploadProfileImage: (file: File) => Promise<string>;
-  handleUpdateProfile: (updatedData: Partial<ProfileData>) => Promise<void>;
+  handleUploadProfileImage: (originalProfileFilePath: string, file: File) => Promise<string>;
+  handleUpdateProfile: (updatedData: ProfileEditFormType) => Promise<void>;
   loading: boolean;
 }
 
 export default function ProfileEditForm({ data, open, onOpenChange, handleUploadProfileImage, handleUpdateProfile, loading }: ProfileEditFormProps) {
-  const [form, setForm] = useState<Partial<ProfileData>>({
-    full_name: data?.full_name || "",
+  const [form, setForm] = useState<ProfileEditFormType>({
+    fullName: data?.fullName || "",
     title: data?.title || "",
     email: data?.email || "",
-    profile_photo: data?.profile_photo || "",
+    profileUrl: data?.profileUrl || "",
     bio: data?.bio || "",
-    organization_tag: data?.organization_tag || "",
+    organizationTag: data?.organizationTag || "",
+    profilePhoto: data?.profilePhoto,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -32,7 +33,7 @@ export default function ProfileEditForm({ data, open, onOpenChange, handleUpload
   };
 
   const handleImageChange = (filePath: string) => {
-    setForm({ ...form, profile_photo: filePath });
+    setForm({ ...form, profilePhoto: filePath });
   };
 
   const handleSubmit = async () => {
@@ -59,7 +60,7 @@ export default function ProfileEditForm({ data, open, onOpenChange, handleUpload
           </div>
           
           <div className="flex justify-center">
-            <ProfileAvatarUploader imageUrl={form.profile_photo} handleImageChange={handleImageChange} handleUploadProfileImage={handleUploadProfileImage} />
+            <ProfileAvatarUploader originalProfileFilePath={form.profilePhoto} imageUrl={form.profileUrl} handleImageChange={handleImageChange} handleUploadProfileImage={handleUploadProfileImage} />
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2">
@@ -71,7 +72,7 @@ export default function ProfileEditForm({ data, open, onOpenChange, handleUpload
                 id="full_name"
                 type="text"
                 name="full_name"
-                value={form.full_name || ""}
+                value={form.fullName || ""}
                 onChange={handleChange}
                 placeholder="Enter your full name"
                 className="border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20 font-inter"
@@ -103,7 +104,7 @@ export default function ProfileEditForm({ data, open, onOpenChange, handleUpload
               id="organization_tag"
               type="text"
               name="organization_tag"
-              value={form.organization_tag || ""}
+              value={form.organizationTag || ""}
               onChange={handleChange}
               placeholder="Your organisation or company"
               className="border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20 font-inter"
