@@ -2,6 +2,7 @@ import { DealDocumentModel, DealMemberModel, DealModel } from "@/types/deal/Deal
 import { DealLogService } from "@/services/deals/DealLogService";
 import { ErrorService } from "@/services/ErrorService";
 import { LogType } from "@/types/deal/Deal.enums";
+import { OrganizationService } from "@/services/organization/OrganizationService";
 
 export const createDealLogs = async (userId: string, dealId: string, logMetaData: any, logType: LogType) => {
   try {
@@ -18,6 +19,23 @@ export const createDealLogs = async (userId: string, dealId: string, logMetaData
     });
   } catch (error) {
     ErrorService.handleApiError(error, "useCreateEditDeal");
+    throw error;
+  }
+}
+
+export const getUniqueOrgCode = async () => {
+  // Generate a random code of 6 characters. The code should be alphanumeric and unique.
+  // If ever the app stuck in an infinite loop, it means that the code is not unique.
+  // Fix here. But chances are very low.
+  try {
+    const code = Math.random().toString(36).substring(2, 8);
+    const organization = await OrganizationService.getOrganizationByCode(code);
+    if (organization) {
+      return getUniqueOrgCode();
+    }
+    return code;
+  } catch (error) {
+    ErrorService.handleApiError(error, "getUniqueOrgCode");
     throw error;
   }
 }
