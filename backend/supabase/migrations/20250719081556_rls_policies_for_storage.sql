@@ -1,4 +1,6 @@
 -- Drop existing policies if they exist
+-- Note: Dropping of tables, types, and policies is only done because in
+-- development, phase things changes but please remove these in production.
 drop policy if exists "Anyone can read profile images" on storage.objects;
 drop policy if exists "Owner can upload" on storage.objects;
 drop policy if exists "Owner can update" on storage.objects;
