@@ -9,6 +9,8 @@
 -- DROP EXISTING TRIGGERS AND FUNCTIONS
 -- =====================================================
 
+-- Note: Dropping of tables, types, and policies is only done because in
+-- development, phase things changes but please remove these in production.
 -- Drop triggers first (in reverse order)
 DROP TRIGGER IF EXISTS log_deal_deletion ON deals;
 DROP TRIGGER IF EXISTS insert_deal_related_data ON deals;

@@ -9,6 +9,8 @@
 -- DROP EXISTING POLICIES
 -- =====================================================
 
+-- Note: Dropping of tables, types, and policies is only done because in
+-- development, phase things changes but please remove these in production.
 -- Drop deal_documents policies
 DROP POLICY IF EXISTS "Allow members to delete deal documents for elevated roles" ON deal_documents;
 DROP POLICY IF EXISTS "Allow members to update deal documents for elevated roles" ON deal_documents;

@@ -8,6 +8,9 @@
 -- =====================================================
 -- DROP EXISTING TABLES (in reverse dependency order)
 -- =====================================================
+
+-- Note: Dropping of tables, types, and policies is only done because in
+-- development, phase things changes but please remove these in production.
 DROP TABLE IF EXISTS deal_documents CASCADE;
 DROP TABLE IF EXISTS deal_comments CASCADE;
 DROP TABLE IF EXISTS deal_logs CASCADE;

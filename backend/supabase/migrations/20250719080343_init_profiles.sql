@@ -1,11 +1,11 @@
 create table profiles (
   id uuid primary key references auth.users(id) on delete cascade,
-  full_name text,
+  first_name text,
+  last_name text,
   email text,
   title text,
   profile_photo text,
   bio text,
-  organization_tag text,
   created_at timestamp default now()
 );
 
