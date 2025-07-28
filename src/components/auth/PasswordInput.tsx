@@ -8,15 +8,19 @@ const PasswordInput = ({
   value,
   onChange,
   placeholder = "Enter password",
+  label = "Password",
 }: {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
+  label?: string;
 }) => {
   const [show, setShow] = useState(false);
   return (
     <div>
-      <Label className="block text-sm font-medium text-black mb-2">Password</Label>
+      <Label className="block text-sm font-medium text-black mb-2">
+        {label} {label === "Password" ? <span className="text-red-500">*</span> : ""}
+      </Label>
       <div className="relative flex items-center">
         <Input
           type={show ? "text" : "password"}

@@ -1,9 +1,8 @@
-import DealCard from "@/components/builder-dashboard/Dealcard";
-
 export interface ProfileData {
   id: string;
-  fullName: string;
-  title: string;
+  firstName: string;
+  lastName: string;
+  location: string;
   email: string;
   profilePhoto: string;
   bio: string;

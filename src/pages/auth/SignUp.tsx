@@ -1,66 +1,59 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import AuthLayout from "@/components/auth/AuthLayout";
 import AuthForm from "@/components/auth/AuthForm";
-import { useAuth } from "@/context/AuthProvider";
-import { Toaster, toast } from 'sonner';
+import AuthLayout from "@/components/auth/AuthLayout";
+import { useAuthorization } from "@/hooks/useAuthorization";
+import { ROUTES } from "@/config/routes";
+import { SignUpFormType } from "@/types/auth/Signup";
 
-
-const SignUp = () => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+export default function SignUp() {
   const navigate = useNavigate();
-  const { signUp } = useAuth();
+  const { loading, handleInputChange, handleSignUp } = useAuthorization();
+  
+  // Form state
+  const [formData, setFormData] = useState<SignUpFormType>({
+    email: "",
+    password: "",
+    confirmPassword: "",
+    firstName: "",
+    lastName: "",
+    location: "",
+    organizationName: "",
+    organizationCode: "",
+    organizationType: "create",
+  });
 
-  const handleSignUp = async (e: React.FormEvent) => {
+  // Handle input changes
+  const onInputChange = (field: keyof SignUpFormType, value: any) => {
+    handleInputChange(formData, setFormData, field, value);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-
-    if (!email || !password) {
-      toast.error("All fields are required.");
-      setLoading(false);
-      return;
+    
+    const result = await handleSignUp(formData);
+    
+    if (result.success) {
+      navigate(ROUTES.SIGNIN);
     }
-
-    if (password.length < 8) {
-      toast.error("Password must be at least 8 characters long.");
-      setLoading(false);
-      return;
-    }
-
-    const { error: signUpError } = await signUp(email, password);
-
-    if (signUpError) {
-      toast.error(signUpError.message);
-    } else {
-      toast.success("Account created successfully! Please check your email to verify your account before signing in.");
-      setTimeout(() => {
-        navigate("/signin");
-      }, 3000);
-    }
-
-    setLoading(false);
   };
 
   return (
-    <AuthLayout title="Create Account" subtitle="Join GoDex and start managing your deals">
+    <AuthLayout
+      title="Create your account"
+      subtitle="Join GoDex to manage your deals efficiently"
+    >
       <AuthForm
         type="signup"
-        onSubmit={handleSignUp}
-        email={email}
-        password={password}
-        setEmail={setEmail}
-        setPassword={setPassword}
+        formData={formData}
+        onInputChange={onInputChange}
+        onSubmit={handleSubmit}
         loading={loading}
         submitLabel="Create Account"
         bottomText="Already have an account?"
         bottomLinkText="Sign in"
-        bottomLinkTo="/signin"
+        bottomLinkTo={ROUTES.SIGNIN}
       />
-      <Toaster position="top-right" richColors />
     </AuthLayout>
   );
-};
-
-export default SignUp;
+}

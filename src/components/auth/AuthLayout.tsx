@@ -8,7 +8,7 @@ const AuthLayout = ({ title, subtitle, children }: {
 	children: React.ReactNode;
 }) => (
 	<div className="flex min-h-screen bg-gray-50 font-inter">
-		<div className="m-auto w-full max-w-md p-6 bg-white shadow-lg rounded-xl border border-gray-200">
+		<div className="m-auto w-full max-w-2xl p-6 bg-white shadow-lg rounded-xl border border-gray-200">
 			<div className="text-center mb-8">
 				<Link to="/" className="inline-block mb-6">
 					<h1 className="text-3xl font-bold text-godex-primary">GoDex</h1>
