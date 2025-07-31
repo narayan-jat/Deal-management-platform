@@ -60,23 +60,23 @@ export default function HeroSection() {
                         transform="rotate(-90 80 80)"
                       />
                       <text
-                        x="10"
-                        y="90"
+                        x="80"
+                        y="65"
                         textAnchor="middle"
                         alignmentBaseline="middle"
                         fill="rgb(59, 130, 246)"
-                        fontSize="14"
+                        fontSize="12"
                         fontWeight="600"
                       >
                         30%
                       </text>
                       <text
-                        x="123"
-                        y="53"
+                        x="80"
+                        y="95"
                         textAnchor="middle"
                         alignmentBaseline="middle"
                         fill="rgb(0, 170, 108)"
-                        fontSize="14"
+                        fontSize="12"
                         fontWeight="600"
                       >
                         70%

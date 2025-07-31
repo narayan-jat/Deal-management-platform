@@ -60,51 +60,54 @@ export default function Header({ isMenuOpen, toggleMenu }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-      <nav className="px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center">
-            <Link to="/" className="text-2xl font-bold text-godex-primary font-inter">
-              GoDex
-            </Link>
-          </div>
-          
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+    <header className="sticky top-0 z-50">
+      <div className="max-w-full mx-auto">
+        <nav className="bg-white shadow-sm border border-gray-200 px-6 py-4">
+          <div className="flex justify-between items-center">
+            {/* Logo - Left */}
+            <div className="flex items-center">
+              <Link to="/" className="text-2xl font-bold text-godex-primary font-inter">
+                GoDex
+              </Link>
+            </div>
+            
+            {/* Desktop Auth Navigation - Right */}
+            <div className="hidden md:flex items-center space-x-8">
             {navigationConfig.mainNav.map(item => renderNavItem(item))}
+              {navigationConfig.authNav.map((item, index) => (
+                <div key={item.title}>
+                  {item.title === "Sign Up" ? (
+                    <Link to={item.path!}>
+                      <GoldButton>
+                        {item.title}
+                      </GoldButton>
+                    </Link>
+                  ) : (
+                    <Link to={item.path!}>
+                      <button className="px-6 py-2 text-base font-medium bg-gray-50 text-godex-primary rounded-full border border-gray-200 hover:bg-gray-100 transition-colors">
+                        {item.title}
+                      </button>
+                    </Link>
+                  )}
+                </div>
+              ))}
+            </div>
+            
+            {/* Mobile Menu Button */}
+            <button
+              className="md:hidden p-2 rounded-md text-gray-600 hover:text-godex-primary hover:bg-gray-100 transition-colors"
+              onClick={toggleMenu}
+              aria-label="Open menu"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect x="4" y="6" width="16" height="2" rx="1" fill="currentColor"/>
+                <rect x="4" y="11" width="16" height="2" rx="1" fill="currentColor"/>
+                <rect x="4" y="16" width="16" height="2" rx="1" fill="currentColor"/>
+              </svg>
+            </button>
           </div>
-          
-          {/* Desktop Auth Navigation */}
-          <div className="hidden md:flex items-center space-x-6">
-            {navigationConfig.authNav.map((item, index) => (
-              <div key={item.title}>
-                {item.title === "Sign Up" ? (
-                  <Link to={item.path!}>
-                    <GoldButton>
-                      {item.title}
-                    </GoldButton>
-                  </Link>
-                ) : (
-                  renderNavItem(item)
-                )}
-              </div>
-            ))}
-          </div>
-          
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2 rounded-md text-gray-600 hover:text-godex-primary hover:bg-gray-100 transition-colors"
-            onClick={toggleMenu}
-            aria-label="Open menu"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <rect x="4" y="6" width="16" height="2" rx="1" fill="currentColor"/>
-              <rect x="4" y="11" width="16" height="2" rx="1" fill="currentColor"/>
-              <rect x="4" y="16" width="16" height="2" rx="1" fill="currentColor"/>
-            </svg>
-          </button>
-        </div>
-      </nav>
+        </nav>
+      </div>
       
       {/* Mobile Menu */}
       {isMenuOpen && (

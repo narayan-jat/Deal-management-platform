@@ -3,7 +3,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
+
+type AccountType = "lender" | "borrower" | "broker" | "other";
 
 interface FormData {
   email: string;
@@ -11,36 +12,35 @@ interface FormData {
   lastName: string;
   phone: string;
   company: string;
-  accountType: string;
-  assetClasses: string[];
+  accountType: AccountType;
   message: string;
 }
 
 interface FeaturesSectionProps {
   formData: FormData;
   updateFormField: (field: string, value: string) => void;
-  toggleAssetClass: (assetClass: string) => void;
   submitForm: () => void;
 }
 
 export default function FeaturesSection({
   formData,
   updateFormField,
-  toggleAssetClass,
   submitForm,
 }: FeaturesSectionProps) {
   return (
     <div id="features">
       {/* Hero Banner */}
-      <div className="bg-godex-primary px-4 py-12 sm:px-6 lg:px-8">
-        <h2 className="mx-auto max-w-4xl text-center text-3xl font-inter font-semibold text-white leading-tight sm:text-4xl lg:text-5xl">
-          <p>Stop Chasing Emails.</p>
-          <p>Start Closing Deals.</p>
-        </h2>
+      <div className="relative overflow-hidden bg-godex-primary py-20 sm:py-24 lg:py-32 w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-center text-3xl font-inter font-semibold text-white leading-tight sm:text-4xl lg:text-5xl">
+            <p className="mb-4">Stop Chasing Emails.</p>
+            <p>Start Closing Deals.</p>
+          </h2>
+        </div>
       </div>
 
       {/* Features Content */}
-      <div className="px-4 py-16 sm:px-6 lg:px-8">
+      <div className="px-4 py-20 sm:px-6 lg:px-8 sm:py-24 lg:py-32">
         <div className="mx-auto max-w-7xl">
           <h2 className="mb-6 text-3xl font-inter font-semibold text-black sm:text-4xl lg:text-5xl">
             Streamline your private credit workflow
@@ -216,44 +216,12 @@ export default function FeaturesSection({
                       <SelectValue placeholder="Select account type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="gp">General Partner</SelectItem>
-                      <SelectItem value="lp">Limited Partner</SelectItem>
-                      <SelectItem value="service-provider">Service Provider</SelectItem>
+                      <SelectItem value="lender">Lender</SelectItem>
+                      <SelectItem value="borrower">Borrower</SelectItem>
+                      <SelectItem value="broker">Broker</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-              </div>
-
-              <div>
-                <Label className="mb-3 block text-sm font-inter font-medium text-black">
-                  Asset Classes (select all that apply)
-                </Label>
-                <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                  {[
-                    "Private Equity",
-                    "Venture Capital",
-                    "Real Estate",
-                    "Credit",
-                    "Infrastructure",
-                  ]?.map((assetClass) => (
-                    <div
-                      className="flex items-center space-x-2 font-inter"
-                      key={assetClass}
-                    >
-                      <Checkbox
-                        id={assetClass}
-                        checked={formData.assetClasses.includes(assetClass)}
-                        onCheckedChange={() => toggleAssetClass(assetClass)}
-                        className="text-godex-primary focus:ring-godex-primary/20"
-                      />
-                      <Label
-                        htmlFor={assetClass}
-                        className="text-sm text-gray-700 cursor-pointer"
-                      >
-                        {assetClass}
-                      </Label>
-                    </div>
-                  ))}
                 </div>
               </div>
 

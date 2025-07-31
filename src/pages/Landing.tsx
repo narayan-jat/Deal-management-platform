@@ -5,14 +5,15 @@ import HowItWorksSection from "@/components/landing/HowItWorksSection";
 import FeaturesSection from "@/components/landing/FeaturesSection";
 import Footer from "@/components/landing/Footer";
 
+type AccountType = "lender" | "borrower" | "broker" | "other";
+
 interface AccessRequestType {
   email: string;
   firstName: string;
   lastName: string;
   phone: string;
   company: string;
-  accountType: string;
-  assetClasses: string[];
+  accountType: AccountType;
   message: string;
 }
 
@@ -24,8 +25,7 @@ export default function Landing() {
     lastName: "",
     phone: "",
     company: "",
-    accountType: "",
-    assetClasses: [] as string[],
+    accountType: "lender",
     message: "",
   });
 
@@ -38,24 +38,6 @@ export default function Landing() {
       ...prev,
       [field]: value,
     }));
-  }
-
-  function toggleAssetClass(assetClass: string) {
-    setFormData((prev) => {
-      const index = prev.assetClasses.indexOf(assetClass);
-      const newAssetClasses = [...prev.assetClasses];
-
-      if (index > -1) {
-        newAssetClasses.splice(index, 1);
-      } else {
-        newAssetClasses.push(assetClass);
-      }
-
-      return {
-        ...prev,
-        assetClasses: newAssetClasses,
-      };
-    });
   }
 
   const handleSubmit = () => {
@@ -72,7 +54,6 @@ export default function Landing() {
           <FeaturesSection
             formData={formData}
             updateFormField={updateFormField}
-            toggleAssetClass={toggleAssetClass}
             submitForm={handleSubmit}
           />
         </div>
