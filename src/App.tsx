@@ -3,10 +3,13 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthProvider";
 import { ROUTES } from "@/config/routes";
 import DotLoader from "@/components/ui/loader";
+import { Toaster } from "sonner";
 // Public pages
 import Landing from "@/pages/Landing";
 import SignIn from "@/pages/auth/SignIn";
 import SignUp from "@/pages/auth/SignUp";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import TermsOfService from "@/pages/TermsOfService";
 
 // Protected pages
 import Dashboard from "@/pages/dashboard/Dashboard";
@@ -57,9 +60,12 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
 export default function App() {
   return (
     <BrowserRouter>
+      <Toaster position="top-right" richColors />
       <Routes>
         {/* Public Routes */}
         <Route path={ROUTES.HOME} element={<Landing />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route 
           path={ROUTES.SIGNIN} 
           element={

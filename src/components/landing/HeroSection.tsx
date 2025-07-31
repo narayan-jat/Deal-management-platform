@@ -1,5 +1,10 @@
 import { GoldButton } from "@/components/ui/button"
-export default function HeroSection() {
+
+interface HeroSectionProps {
+  openPopup: () => void;
+}
+
+export default function HeroSection({ openPopup }: HeroSectionProps) {
   return (
     <section id="hero" className="relative overflow-hidden bg-godex-primary px-4 py-16 sm:px-8 lg:px-16 lg:py-32">
       <div className="mx-auto max-w-7xl">
@@ -121,7 +126,10 @@ export default function HeroSection() {
               A simpler way to manage your deals. Built for borrowers, brokers, and
               lenders who want less friction and more focus.
             </p>
-            <GoldButton className="w-full sm:w-auto">
+            <GoldButton 
+              className="w-full sm:w-auto"
+              onClick={openPopup}
+            >
               Request Early Access
             </GoldButton>
           </div>

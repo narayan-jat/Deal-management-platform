@@ -2,6 +2,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Link } from "react-router-dom";
 
 interface FormData {
   email: string;
@@ -19,6 +20,7 @@ export default function Footer({
   updateFormField,
   submitForm,
 }: FooterProps) {
+
   return (
     <footer id="contact" className="bg-godex-primary px-4 py-16 text-white sm:px-6 lg:px-16 lg:py-20">
       <div className="mx-auto max-w-4xl text-center">
@@ -84,18 +86,18 @@ export default function Footer({
         <div className="flex flex-col items-center gap-6 border-t border-white/20 pt-8 sm:flex-row sm:justify-between">
           <p className="text-sm text-stone-300 font-inter">© 2025 GoDex</p>
           <div className="flex flex-wrap gap-6">
-            <a
+            <Link
+              to="/terms-of-service"
               className="text-sm text-stone-300 transition-colors duration-200 ease-[ease] hover:text-white font-inter"
-              href="#"
             >
               Terms of Use
-            </a>
-            <a
+            </Link>
+            <Link
+              to="/privacy-policy"
               className="text-sm text-stone-300 transition-colors duration-200 ease-[ease] hover:text-white font-inter"
-              href="#"
             >
               Privacy Policy
-            </a>
+            </Link>
           </div>
         </div>
       </div>
