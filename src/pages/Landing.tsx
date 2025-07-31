@@ -3,7 +3,11 @@ import Header from "@/components/landing/Header";
 import HeroSection from "@/components/landing/HeroSection";
 import HowItWorksSection from "@/components/landing/HowItWorksSection";
 import FeaturesSection from "@/components/landing/FeaturesSection";
+import RequestAccessPopup from "@/components/landing/RequestAccessPopup";
 import Footer from "@/components/landing/Footer";
+import { toast } from "sonner";
+
+type AccountType = "lender" | "borrower" | "broker" | "other";
 
 interface AccessRequestType {
   email: string;
@@ -11,21 +15,30 @@ interface AccessRequestType {
   lastName: string;
   phone: string;
   company: string;
-  accountType: string;
-  assetClasses: string[];
+  accountType: AccountType;
+  message: string;
+}
+
+interface ContactFormType {
+  email: string;
   message: string;
 }
 
 export default function Landing() {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const [formData, setFormData] = useState<AccessRequestType>({
+  const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
+  const [accessRequestFormData, setAccessRequestFormData] = useState<AccessRequestType>({
     email: "",
     firstName: "",
     lastName: "",
     phone: "",
     company: "",
-    accountType: "",
-    assetClasses: [] as string[],
+    accountType: "lender",
+    message: "",
+  });
+
+  const [contactFormData, setContactFormData] = useState<ContactFormType>({
+    email: "",
     message: "",
   });
 
@@ -33,54 +46,83 @@ export default function Landing() {
     setIsMenuOpen(!isMenuOpen);
   }
 
-  function updateFormField(field: string, value: string) {
-    setFormData((prev) => ({
+  function openPopup() {
+    setIsPopupOpen(true);
+  }
+
+  function closePopup() {
+    setIsPopupOpen(false);
+  }
+
+  function updateAccessRequestFormField(field: string, value: string) {
+    setAccessRequestFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
   }
 
-  function toggleAssetClass(assetClass: string) {
-    setFormData((prev) => {
-      const index = prev.assetClasses.indexOf(assetClass);
-      const newAssetClasses = [...prev.assetClasses];
-
-      if (index > -1) {
-        newAssetClasses.splice(index, 1);
-      } else {
-        newAssetClasses.push(assetClass);
-      }
-
-      return {
-        ...prev,
-        assetClasses: newAssetClasses,
-      };
-    });
+  function updateContactFormField(field: string, value: string) {
+    setContactFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   }
 
-  const handleSubmit = () => {
+  const handleSubmitEarlyAccessRequest = () => {
     // Handle form submission logic here
+    // Show success toast
+    toast.success("Thanks for reaching out. We'll be in touch soon.");
+    
+    // Reset form data
+    setAccessRequestFormData({
+      email: "",
+      firstName: "",
+      lastName: "",
+      phone: "",
+      company: "",
+      accountType: "lender",
+      message: "",
+    });
+  };
+
+  const handleContactFormSubmit = () => {
+    // Handle form submission logic here
+    // set form data to empty
+    setContactFormData({
+      email: "",
+      message: "",
+    });
+    // Show success toast
+    toast.success("Thanks for reaching out. We'll be in touch soon.");
   };
 
   return (
     <div className="min-h-screen">
       <Header isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} />
       <main>
-        <HeroSection />
+        <HeroSection openPopup={openPopup} />
         <div className="space-y-16 px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
           <HowItWorksSection />
           <FeaturesSection
-            formData={formData}
-            updateFormField={updateFormField}
-            toggleAssetClass={toggleAssetClass}
-            submitForm={handleSubmit}
+            formData={accessRequestFormData}
+            updateFormField={updateAccessRequestFormField}
+            submitForm={handleSubmitEarlyAccessRequest}
           />
         </div>
       </main>
       <Footer
-        formData={formData}
-        updateFormField={updateFormField}
-        submitForm={handleSubmit}
+        formData={contactFormData}
+        updateFormField={updateContactFormField}
+        submitForm={handleContactFormSubmit}
+      />
+
+      {/* Request Access Popup */}
+      <RequestAccessPopup
+        isOpen={isPopupOpen}
+        onClose={closePopup}
+        formData={accessRequestFormData}
+        updateFormField={updateAccessRequestFormField}
+        submitForm={handleSubmitEarlyAccessRequest}
       />
     </div>
   );
