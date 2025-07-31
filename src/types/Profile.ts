@@ -3,10 +3,11 @@ export interface ProfileData {
   firstName: string;
   lastName: string;
   location: string;
+  title: string;
   email: string;
   profilePhoto: string;
   bio: string;
-  organizationTag: string;
+  organizationName: string;
   createdAt: string;
 }
 

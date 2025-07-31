@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   DndContext,
   closestCenter,
@@ -21,6 +21,8 @@ import DroppableColumn from "./DroppableColumn";
 import { KanbanBoardColumns } from "@/types/KanbanBoard";
 import { DealCardType } from "@/types/deal/DealCard";
 import { DollarSign } from "lucide-react";
+import { formatCurrency } from "@/utility/Utility";
+
 
 const columnNames = {
   new: "New",
@@ -52,6 +54,7 @@ export default function KanbanBoard({
   onView,
   onCreate
 }: KanbanBoardProps) {
+  const [dropPosition, setDropPosition] = useState<{ columnId: string; index: number } | null>(null);
   
   // Configure sensors with proper activation constraints
   const sensors = useSensors(
@@ -69,13 +72,54 @@ export default function KanbanBoard({
     })
   );
 
+  const handleDragOver = (event: DragOverEvent) => {
+    onDragOver(event);
+    
+    const { active, over } = event;
+    if (!over) {
+      setDropPosition(null);
+      return;
+    }
+
+    const activeId = active.id as string;
+    const overId = over.id as string;
+    
+    // Find which column we're over
+    const columnId = Object.keys(deals).find(key => 
+      deals[key].some(card => card.id === overId) || overId === key
+    );
+    
+    if (columnId) {
+      const columnCards = deals[columnId];
+      const overCardIndex = columnCards.findIndex(card => card.id === overId);
+      
+      if (overCardIndex !== -1) {
+        // We're over a card, determine position
+        setDropPosition({ columnId, index: overCardIndex });
+      } else {
+        // We're over the column itself, put at the end
+        setDropPosition({ columnId, index: columnCards.length });
+      }
+    }
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    onDragEnd(event);
+    setDropPosition(null);
+  };
+
+  const handleDragStart = (event: DragStartEvent) => {
+    onDragStart(event);
+    setDropPosition(null);
+  };
+
   return (
     <DndContext
       collisionDetection={closestCenter}
       sensors={sensors}
-      onDragStart={onDragStart}
-      onDragOver={onDragOver}
-      onDragEnd={onDragEnd}
+      onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
+      onDragEnd={handleDragEnd}
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 lg:gap-6 p-1 sm:p-2 lg:p-6">
         {Object.entries(deals).map(([key, cards]) => (
@@ -89,7 +133,7 @@ export default function KanbanBoard({
             <h3 className="text-lg font-semibold mb-3">
               {columnNames[key as keyof typeof columnNames]}
               <span className="ml-2 text-sm text-gray-500 font-normal">
-                {cards.length} deals-<DollarSign className="inline-block h-3 w-3" /> {(cards.reduce((acc, card) => acc + card.requestedAmount, 0)).toFixed(2)}
+                {cards.length} deals-<DollarSign className="inline-block h-3 w-3" /> {formatCurrency(cards.reduce((acc, card) => acc + card.requestedAmount, 0))}
               </span>
             </h3>
             <DroppableColumn
@@ -100,23 +144,51 @@ export default function KanbanBoard({
               <SortableContext items={cards.map((c: DealCardType) => c.id)} strategy={verticalListSortingStrategy}>
                 {(() => {
                   const itemIds = cards.map((c: DealCardType) => c.id);
-                  return cards.map((card: DealCardType) => (
-                    <SortableCardWrapper
-                      key={card.id}
-                      deal={card}
-                      isDragging={activeId === card.id}
-                      onEdit={() => onEdit(card.id)}
-                      onView={() => onView(card)}
-                    />
+                  return cards.map((card: DealCardType, index: number) => (
+                    <React.Fragment key={card.id}>
+                      {/* Show drop indicator at the top if this is the first card and we're dropping at index 0 */}
+                      {dropPosition?.columnId === key && dropPosition.index === 0 && index === 0 && (
+                        <div className="text-sm italic text-blue-600 text-center py-2 border-2 border-dashed border-blue-400 rounded-lg bg-blue-50 mb-3">
+                          Drop here
+                        </div>
+                      )}
+                      
+                      <SortableCardWrapper
+                        deal={card}
+                        isDragging={activeId === card.id}
+                        onEdit={() => onEdit(card.id)}
+                        onView={() => onView(card)}
+                      />
+                      
+                      {/* Show drop indicator after this card if we're dropping at this position */}
+                      {dropPosition?.columnId === key && dropPosition.index === index + 1 && (
+                        <div className="text-sm italic text-blue-600 text-center py-2 border-2 border-dashed border-blue-400 rounded-lg bg-blue-50 my-3">
+                          Drop here
+                        </div>
+                      )}
+                    </React.Fragment>
                   ));
                 })()}
               </SortableContext>
-              {cards.length === 0 && (
+              
+              {/* Show drop indicator at the end if column is empty or we're dropping at the end */}
+              {dropPosition?.columnId === key && dropPosition.index === cards.length && cards.length > 0 && (
+                <div className="text-sm italic text-blue-600 text-center py-2 border-2 border-dashed border-blue-400 rounded-lg bg-blue-50 mt-3">
+                  Drop here
+                </div>
+              )}
+              
+              {/* Empty state - only show when no deals and not being dragged over */}
+              {cards.length === 0 && overId !== key && (
                 <div className="text-sm italic text-gray-400 text-center py-8">
-                  {overId === key && activeId !== null
-                    ? 'Drop here'
-                    : 'No deals in this column'
-                  }
+                  No deals in this column
+                </div>
+              )}
+              
+              {/* Show drop indicator when column is empty and being dragged over */}
+              {cards.length === 0 && overId === key && activeId !== null && (
+                <div className="text-sm italic text-blue-600 text-center py-4 border-2 border-dashed border-blue-400 rounded-lg bg-blue-50">
+                  Drop here
                 </div>
               )}
             </DroppableColumn>

@@ -54,6 +54,11 @@ export const SearchProvider: React.FC<SearchProviderProps> = ({ children }) => {
         return true;
       }
       
+      // search by contributors
+      if (deal.contributors.some((contributor) => contributor.name.toLowerCase().includes(query))) {
+        return true;
+      }
+
       return false;
     });
   }, [searchQuery, allDeals]);

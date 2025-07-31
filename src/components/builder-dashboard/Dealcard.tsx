@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import CollaboratorsModal from "./CollaboratorsModal";
 import { DealCardType } from "@/types/deal/DealCard";
 
-import { editAccessRoles } from "@/Constants";
+import { StatusToTitleMap } from "@/types/deal/DealCard";
 import { formatCurrency, getStatusInfo } from "@/utility/Utility";
 
 type DealCardProps = {
@@ -136,7 +136,7 @@ export default function DealCard(props: DealCardProps) {
             {deal.title}
           </h3>
           <span className={`text-xs px-2 py-1 rounded-full font-medium flex-shrink-0 ${statusInfo.color}`}>
-            {deal.status}
+            {StatusToTitleMap[deal.status as keyof typeof StatusToTitleMap]}
           </span>
         </div>
 
