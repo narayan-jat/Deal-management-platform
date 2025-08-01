@@ -146,10 +146,12 @@ export const useCreateEditDeal = () => {
         // add the documents to the deal documents table.
         if (dealDocuments.length > 0) {
           const createdDocuments = await DealDocumentService.createDealDocuments(dealDocuments);
-          logMetaData['documents'] = createdDocuments.map((document) => ({
+          const createdDocumentsMetaData = createdDocuments.map((document) => ({
             id: document.id,
             isUploaded: true,
+            action: 'document uploaded',
           }));
+          logMetaData['documents'] = {documents:createdDocumentsMetaData, action: 'document uploaded'};
         }
       }
 
@@ -162,6 +164,7 @@ export const useCreateEditDeal = () => {
         requestedAmount: camelCaseDeal.requestedAmount,
         endDate: camelCaseDeal.endDate,
         startDate: camelCaseDeal.startDate,
+        action: 'deal updated',
       };
       await createDealLogs(user.id, camelCaseDeal.id, logMetaData, LogType.UPDATED);
       
@@ -186,6 +189,7 @@ export const useCreateEditDeal = () => {
         documents: {
           id: documentId,
           isDeleted: true,
+          action: 'document deleted',
         },
       }, LogType.DELETED);
     } catch (error) {
