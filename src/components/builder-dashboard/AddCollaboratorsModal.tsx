@@ -9,8 +9,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { DealMemberRole } from "@/types/deal/Deal.enums";
 import { toast } from "sonner";
+
 interface AddCollaboratorsModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -29,6 +31,7 @@ function AddCollaboratorsModal({ isOpen, onClose, onInvite }: AddCollaboratorsMo
       .filter(email => email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
     return emailList;
   }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!emails.trim()) {
@@ -57,49 +60,39 @@ function AddCollaboratorsModal({ isOpen, onClose, onInvite }: AddCollaboratorsMo
     onClose();
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center px-2 sm:px-0">
-      <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={handleModalClose}
-      />
-      <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md mx-auto sm:mx-4">
-        <div className="flex items-center justify-between p-5 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Invite Collaborators</h3>
-          <button
-            onClick={handleModalClose}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            aria-label="Close modal"
-          >
-            <X className="h-5 w-5 text-gray-500" />
-          </button>
-        </div>
-        <form onSubmit={handleSubmit} className="p-5 space-y-5">
-          {/* Email Input */}
-          <div>
-            <label htmlFor="emails" className="block text-sm font-medium text-gray-700 mb-2">
-              Email Addresses
-            </label>
-            <Textarea
-              id="emails"
-              placeholder="Enter email addresses, separated by commas"
-              value={emails}
-              onChange={(e) => setEmails(e.target.value)}
-              rows={3}
-              className="w-full rounded-md border-gray-300 focus:ring-2 focus:ring-blue-500 transition"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Separate multiple emails with commas (e.g. alice@email.com, bob@email.com)
-            </p>
+    <Dialog open={isOpen} onOpenChange={handleModalClose}>
+      <DialogContent className="max-w-md">
+        <div className="space-y-5">
+          {/* Header */}
+          <div className="text-center border-b border-gray-200 pb-4">
+            <h3 className="text-xl font-semibold text-gray-900">Invite Collaborators</h3>
           </div>
-          {/* Role Dropdown */}
-          <div>
-            <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
-              Assign Role
-            </label>
-            <div className="relative z-[70]">
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Email Input */}
+            <div>
+              <label htmlFor="emails" className="block text-sm font-medium text-gray-700 mb-2">
+                Email Addresses
+              </label>
+              <Textarea
+                id="emails"
+                placeholder="Enter email addresses, separated by commas"
+                value={emails}
+                onChange={(e) => setEmails(e.target.value)}
+                rows={3}
+                className="w-full rounded-md border-gray-300 focus:ring-2 focus:ring-blue-500 transition"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Separate multiple emails with commas (e.g. alice@email.com, bob@email.com)
+              </p>
+            </div>
+
+            {/* Role Dropdown */}
+            <div>
+              <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
+                Assign Role
+              </label>
               <Select
                 value={role}
                 onValueChange={(value) => setRole(value as DealMemberRole)}
@@ -107,41 +100,39 @@ function AddCollaboratorsModal({ isOpen, onClose, onInvite }: AddCollaboratorsMo
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select a role" />
                 </SelectTrigger>
-                <SelectContent className="z-[80]">
+                <SelectContent>
                   <SelectItem value={DealMemberRole.VIEWER}>Viewer</SelectItem>
                   <SelectItem value={DealMemberRole.EDITOR}>Editor</SelectItem>
                   <SelectItem value={DealMemberRole.ADMIN}>Admin</SelectItem>
                   <SelectItem value={DealMemberRole.COMMENTER}>Commenter</SelectItem>
                 </SelectContent>
               </Select>
-              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                <svg width="16" height="16" fill="none" viewBox="0 0 20 20"><path d="M7 8l3 3 3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </span>
             </div>
-          </div>
-          {/* Actions */}
-          <div className="flex flex-col-reverse sm:flex-row gap-3 justify-end pt-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleModalClose}
-              disabled={isSubmitting}
-              className="w-full sm:w-auto"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={!emails}
-              className="flex items-center gap-2 w-full sm:w-auto"
-            >
-              <Mail className="h-4 w-4" />
-              {isSubmitting ? "Sending..." : "Send Invites"}
-            </Button>
-          </div>
-        </form>
-      </div>
-    </div>
+
+            {/* Actions */}
+            <div className="flex flex-col-reverse sm:flex-row gap-3 justify-end pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleModalClose}
+                disabled={isSubmitting}
+                className="w-full sm:w-auto"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={!emails}
+                className="flex items-center gap-2 w-full sm:w-auto"
+              >
+                <Mail className="h-4 w-4" />
+                {isSubmitting ? "Sending..." : "Send Invites"}
+              </Button>
+            </div>
+          </form>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 

@@ -19,13 +19,14 @@ interface ProfileEditFormProps {
 
 export default function ProfileEditForm({ data, open, onOpenChange, handleUploadProfileImage, handleUpdateProfile, loading }: ProfileEditFormProps) {
   const [form, setForm] = useState<ProfileEditFormType>({
-    fullName: data?.fullName || "",
-    title: data?.title || "",
+    firstName: data?.firstName || "",
+    lastName: data?.lastName || "",
     email: data?.email || "",
     profileUrl: data?.profileUrl || "",
     bio: data?.bio || "",
-    organizationTag: data?.organizationTag || "",
+    organizationName: data?.organizationName || "",
     profilePhoto: data?.profilePhoto,
+    location: data?.location || "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -65,31 +66,31 @@ export default function ProfileEditForm({ data, open, onOpenChange, handleUpload
 
           <div className="grid gap-6 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="full_name" className="text-sm font-medium text-black font-inter">
-                Full Name
+              <Label htmlFor="firstName" className="text-sm font-medium text-black font-inter">
+                First Name
               </Label>
               <Input
-                id="full_name"
+                id="firstName"
                 type="text"
-                name="full_name"
-                value={form.fullName || ""}
+                name="firstName"
+                value={form.firstName}
                 onChange={handleChange}
-                placeholder="Enter your full name"
+                placeholder="Enter your first name"
                 className="border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20 font-inter"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="title" className="text-sm font-medium text-black font-inter">
-                Title
+              <Label htmlFor="lastName" className="text-sm font-medium text-black font-inter">
+                Last Name
               </Label>
               <Input
-                id="title"
+                id="lastName"
                 type="text"
-                name="title"
-                value={form.title || ""}
+                name="lastName"
+                value={form.lastName}
                 onChange={handleChange}
-                placeholder="Your job title"
+                placeholder="Enter your last name"
                 className="border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20 font-inter"
               />
             </div>
@@ -97,18 +98,20 @@ export default function ProfileEditForm({ data, open, onOpenChange, handleUpload
 
           {/* Organisation Field */}
           <div className="space-y-2">
-            <Label htmlFor="organization_tag" className="text-sm font-medium text-black font-inter">
+            <Label htmlFor="organizationName" className="text-sm font-medium text-black font-inter">
               Organisation
             </Label>
             <Input
-              id="organization_tag"
+              id="organizationName"
               type="text"
-              name="organization_tag"
-              value={form.organizationTag || ""}
+              name="organizationName"
+              value={form.organizationName || ""}
               onChange={handleChange}
-              placeholder="Your organisation or company"
-              className="border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20 font-inter"
+              disabled
+              placeholder="Enter your organisation"
+              className="border-gray-300 bg-gray-50 text-gray-500 font-inter"
             />
+            <p className="text-xs text-gray-500 font-inter">Organisation cannot be changed</p>
           </div>
 
           <div className="space-y-2">
@@ -124,6 +127,20 @@ export default function ProfileEditForm({ data, open, onOpenChange, handleUpload
               className="border-gray-300 bg-gray-50 text-gray-500 font-inter"
             />
             <p className="text-xs text-gray-500 font-inter">Email cannot be changed</p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="location" className="text-sm font-medium text-black font-inter">
+              Location
+            </Label>
+            <Input
+              id="location"
+              type="text"
+              name="location"
+              value={form.location || ""}
+              onChange={handleChange}
+              className="border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20 font-inter"
+            />
           </div>
 
           <div className="space-y-2">

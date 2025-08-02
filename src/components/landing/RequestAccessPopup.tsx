@@ -2,7 +2,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { X } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 type AccountType = "lender" | "borrower" | "broker" | "other";
 
@@ -31,8 +31,6 @@ export default function RequestAccessPopup({
   updateFormField,
   submitForm,
 }: RequestAccessPopupProps) {
-  if (!isOpen) return null;
-
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     submitForm();
@@ -40,24 +38,15 @@ export default function RequestAccessPopup({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 sticky top-0 bg-white rounded-t-2xl">
-          <h2 className="text-xl sm:text-2xl font-inter font-semibold text-black">
-            Request Early Access
-          </h2>
-          <button
-            onClick={onClose}
-            className="p-1 sm:p-2 text-gray-400 hover:text-gray-600 transition-colors"
-            aria-label="Close popup"
-          >
-            <X size={20} className="sm:w-6 sm:h-6" />
-          </button>
-        </div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="text-center border-b border-gray-200 pb-4">
+            <h2 className="text-2xl font-bold text-gray-900 font-inter">Request Early Access</h2>
+          </div>
 
-        {/* Form */}
-        <div className="p-4 sm:p-6">
+          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             {/* Email and Company */}
             <div className="grid gap-4 sm:gap-6 sm:grid-cols-2">
@@ -99,7 +88,6 @@ export default function RequestAccessPopup({
               </div>
             </div>
 
-            {/* First Name and Last Name */}
             <div className="grid gap-4 sm:gap-6 sm:grid-cols-2">
               <div>
                 <Label
@@ -139,7 +127,6 @@ export default function RequestAccessPopup({
               </div>
             </div>
 
-            {/* Phone and Account Type */}
             <div className="grid gap-4 sm:gap-6 sm:grid-cols-2">
               <div>
                 <Label
@@ -201,7 +188,7 @@ export default function RequestAccessPopup({
             </div>
           </form>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 } 

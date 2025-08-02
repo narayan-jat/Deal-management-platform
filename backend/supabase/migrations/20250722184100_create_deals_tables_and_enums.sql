@@ -31,7 +31,7 @@ DROP TYPE IF EXISTS deal_status CASCADE;
 -- =====================================================
 
 -- Deal status enum - represents the current state of a deal
-CREATE TYPE deal_status AS ENUM ('NEW', 'IN_PROGRESS', 'NEGOTIATION', 'COMPLETED', 'REJECTED');
+CREATE TYPE deal_status AS ENUM ('NEW', 'IN_PROGRESS', 'NEGOTIATION', 'COMPLETED', 'REJECTED', 'DRAFT');
 
 -- Deal member role enum - represents the role of a member in a deal
 CREATE TYPE deal_member_role AS ENUM ('OWNER', 'EDITOR', 'VIEWER', 'ADMIN', 'COMMENTER');

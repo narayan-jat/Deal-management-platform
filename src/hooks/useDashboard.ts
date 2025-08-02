@@ -20,7 +20,7 @@ import { LogType } from '@/types/deal/Deal.enums';
  * @param profilePhoto - The profile photo to get the signed URL for.
  * @returns The signed URL for the profile image.
  */
-const getSignedProfileImageUrl = async (profilePhoto: string) => {
+export const getSignedProfileImageUrl = async (profilePhoto: string) => {
   if (!profilePhoto) return null;
   const signedUrl = await ProfileStorageService.getProfileImageSignedUrl(profilePhoto);
   return signedUrl;
@@ -155,14 +155,16 @@ export const useDashboard = () => {
     }
   }
 
-  const handleUpdateDealStatus = async (dealId: string, status: keyof typeof columnKeyToEnum) => {
+  const handleUpdateDealStatus = async (dealId: string, status: keyof typeof columnKeyToEnum, oldStatus: keyof typeof columnKeyToEnum) => {
     try {
       const updatedDeal = await DealService.updateDeal({ id: dealId, status: columnKeyToEnum[status], updatedAt: new Date().toISOString() });
       const camelCaseDeal = camelcaseKeys(updatedDeal, { deep: true }) as DealModel;
       // update the deal logs.
       await createDealLogs(user.id, camelCaseDeal.id, {
         deal: {
-          status: camelCaseDeal.status,
+          status: status,
+          oldStatus: oldStatus,
+          action: 'status changed',
         },
       }, LogType.UPDATED);
       return updatedDeal;

@@ -1,9 +1,12 @@
-import { Calendar, Users, DollarSign, Building2, Edit, Eye } from "lucide-react";
+import { Calendar, Users, DollarSign, Building2, Edit, Eye, UserPlus } from "lucide-react";
 import { useState, useEffect } from "react";
 import CollaboratorsModal from "./CollaboratorsModal";
+import AddCollaboratorsModal from "./AddCollaboratorsModal";
 import { DealCardType } from "@/types/deal/DealCard";
+import { DealMemberRole } from "@/types/deal/Deal.enums";
+import { toast } from "sonner";
 
-import { editAccessRoles } from "@/Constants";
+import { StatusToTitleMap } from "@/types/deal/DealCard";
 import { formatCurrency, getStatusInfo } from "@/utility/Utility";
 
 type DealCardProps = {
@@ -15,12 +18,13 @@ type DealCardProps = {
   onEdit: () => void;
   onView?: () => void;
   hasEditAccess: boolean;
+  onInviteCollaborators?: (emails: string[], role: DealMemberRole) => void;
 }
 
 export default function DealCard(props: DealCardProps) {
-  const { deal, refProps, styles, listeners, attributes, onEdit, onView, hasEditAccess } = props;
+  const { deal, refProps, styles, listeners, attributes, onEdit, onView, hasEditAccess, onInviteCollaborators } = props;
   const [isCollaboratorsModalOpen, setIsCollaboratorsModalOpen] = useState(false);
-
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   // Check if card is being dragged based on styles
   const isDragging = styles?.opacity === 0.8;
@@ -65,6 +69,27 @@ export default function DealCard(props: DealCardProps) {
     setIsCollaboratorsModalOpen(true);
   };
 
+  // Handle invite collaborators click
+  const handleInviteClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!hasEditAccess) {
+      toast.error("You don't have permission to invite collaborators");
+      return;
+    }
+    setIsInviteModalOpen(true);
+  };
+
+  // Handle invite collaborators submit
+  const handleInviteCollaborators = (emails: string[], role: DealMemberRole) => {
+    if (onInviteCollaborators) {
+      onInviteCollaborators(emails, role);
+      toast.success(`Invited ${emails.length} collaborator${emails.length !== 1 ? 's' : ''} to the deal`);
+    } else {
+      toast.error("Invite functionality not available");
+    }
+  };
+
   // Handle edit click
   const handleEditClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -80,6 +105,7 @@ export default function DealCard(props: DealCardProps) {
       onView();
     }
   };
+
   return (
     <>
       {/* Main card container with drag and drop attributes */}
@@ -136,7 +162,7 @@ export default function DealCard(props: DealCardProps) {
             {deal.title}
           </h3>
           <span className={`text-xs px-2 py-1 rounded-full font-medium flex-shrink-0 ${statusInfo.color}`}>
-            {deal.status}
+            {StatusToTitleMap[deal.status as keyof typeof StatusToTitleMap]}
           </span>
         </div>
 
@@ -164,33 +190,48 @@ export default function DealCard(props: DealCardProps) {
           </span>
         </div>
 
-        {/* Contributors - Clickable */}
-        <div 
-          className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200 touch-manipulation"
-          onClick={handleCollaboratorsClick}
-          data-dnd-kit-disabled-draggable
-        >
-          <Users className="h-3 w-3 text-gray-400" />
-          <span className="font-medium">
-            {deal.contributors.length} contributor{deal.contributors.length !== 1 ? 's' : ''}
-          </span>
-          {deal.contributors.length > 0 && (
-            <div className="flex -space-x-1 ml-1">
-              {deal.contributors.slice(0, 3).map((contributor, index) => (
-                <div
-                  key={index}
-                  className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium border border-white"
-                  title={contributor.name}
-                >
-                  {contributor.name.charAt(0).toUpperCase()}
-                </div>
-              ))}
-              {deal.contributors.length > 3 && (
-                <div className="w-5 h-5 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-xs font-medium border border-white">
-                  +{deal.contributors.length - 3}
-                </div>
-              )}
-            </div>
+        {/* Contributors Row - Clickable with Invite Button */}
+        <div className="flex items-center justify-between gap-2">
+          {/* Contributors Info - Clickable */}
+          <div 
+            className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200 touch-manipulation flex-1 min-w-0"
+            onClick={handleCollaboratorsClick}
+            data-dnd-kit-disabled-draggable
+          >
+            <Users className="h-3 w-3 text-gray-400 flex-shrink-0" />
+            <span className="font-medium truncate">
+              {deal.contributors.length} contributor{deal.contributors.length !== 1 ? 's' : ''}
+            </span>
+            {deal.contributors.length > 0 && (
+              <div className="flex -space-x-1 ml-1 flex-shrink-0">
+                {deal.contributors.slice(0, 3).map((contributor, index) => (
+                  <div
+                    key={index}
+                    className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium border border-white"
+                    title={contributor.name}
+                  >
+                    {contributor.name.charAt(0).toUpperCase()}
+                  </div>
+                ))}
+                {deal.contributors.length > 3 && (
+                  <div className="w-5 h-5 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-xs font-medium border border-white">
+                    +{deal.contributors.length - 3}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Invite Button */}
+          {hasEditAccess && (
+            <button
+              onClick={handleInviteClick}
+              className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200 flex-shrink-0"
+              title="Invite collaborators"
+              data-dnd-kit-disabled-draggable
+            >
+              <UserPlus className="h-3.5 w-3.5" />
+            </button>
           )}
         </div>
       </div>
@@ -201,6 +242,13 @@ export default function DealCard(props: DealCardProps) {
         onClose={() => setIsCollaboratorsModalOpen(false)}
         collaborators={deal.contributors}
         title={`Collaborators`}
+      />
+
+      {/* Invite Collaborators Modal */}
+      <AddCollaboratorsModal
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+        onInvite={handleInviteCollaborators}
       />
     </>
   );

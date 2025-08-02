@@ -40,6 +40,30 @@
   border: 2px dashed #3b82f6;
 }
 
+/* Drop indicators */
+.dnd-kit-sortable[data-dnd-kit-over] {
+  background-color: rgba(59, 130, 246, 0.1);
+  border: 2px dashed #3b82f6;
+  border-radius: 8px;
+  margin: 4px 0;
+}
+
+/* Drop indicator line */
+.dnd-kit-sortable::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #3b82f6;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.dnd-kit-sortable[data-dnd-kit-over]::before {
+  opacity: 1;
+}
+
 /* Mobile-specific improvements */
 @media (max-width: 768px) {
   .dnd-kit-sortable {

@@ -176,7 +176,7 @@ export default function Dashboard() {
     });
 
     // Update the deal status
-    handleUpdateDealStatus(draggedItem.id, targetColumn as keyof typeof columnNames);
+    handleUpdateDealStatus(draggedItem.id, targetColumn as keyof typeof columnNames, sourceColumn as keyof typeof columnNames);
 
     // Show success toast
     toast.success(
