@@ -1,31 +1,34 @@
--- Drop existing policies if they exist
+-- =====================================================
+-- DROP EXISTING POLICIES
+-- =====================================================
+
 -- Note: Dropping of tables, types, and policies is only done because in
 -- development, phase things changes but please remove these in production.
-drop policy if exists "Anyone can read profile images" on storage.objects;
-drop policy if exists "Owner can upload" on storage.objects;
-drop policy if exists "Owner can update" on storage.objects;
-drop policy if exists "Owner can delete" on storage.objects;
+DROP POLICY IF EXISTS "Anyone can read profile images" ON storage.objects;
+DROP POLICY IF EXISTS "Owner can upload" ON storage.objects;
+DROP POLICY IF EXISTS "Owner can update" ON storage.objects;
+DROP POLICY IF EXISTS "Owner can delete" ON storage.objects;
 
 -- Anyone logged in can read profile images
-create policy "Anyone can read profile images"
-on storage.objects
-for select
-using (bucket_id = 'profile-images' and auth.role() = 'authenticated');
+CREATE POLICY "Anyone can read profile images"
+ON storage.objects
+FOR SELECT
+USING (bucket_id = 'profile-images' AND auth.role() = 'authenticated');
 
 -- Only owner can upload to their own folder
-create policy "Owner can upload"
-on storage.objects
-for insert
-with check (bucket_id = 'profile-images' and (storage.foldername(name))[1] = auth.uid()::text);
+CREATE POLICY "Owner can upload"
+ON storage.objects
+FOR INSERT
+WITH CHECK (bucket_id = 'profile-images' AND (storage.foldername(name))[1] = auth.uid()::text);
 
 -- Only owner can update their own file
-create policy "Owner can update"
-on storage.objects
-for update
-with check (bucket_id = 'profile-images' and (storage.foldername(name))[1] = auth.uid()::text);
+CREATE POLICY "Owner can update"
+ON storage.objects
+FOR UPDATE
+WITH CHECK (bucket_id = 'profile-images' AND (storage.foldername(name))[1] = auth.uid()::text);
 
 -- Only owner can delete their own file
-create policy "Owner can delete"
-on storage.objects
-for delete
-using (bucket_id = 'profile-images' and (storage.foldername(name))[1] = auth.uid()::text);
+CREATE POLICY "Owner can delete"
+ON storage.objects
+FOR DELETE
+USING (bucket_id = 'profile-images' AND (storage.foldername(name))[1] = auth.uid()::text);

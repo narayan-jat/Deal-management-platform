@@ -8,7 +8,7 @@ USING (
   AND EXISTS (
     SELECT 1
     FROM deal_members
-    WHERE deal_members.deal_id::text = (storage.foldername(name))[1]
+    WHERE deal_members.deal_id::text = (storage.foldername(name))[2]
     AND deal_members.member_id = auth.uid()
   )
 );
@@ -23,7 +23,7 @@ WITH CHECK (
   AND EXISTS (
     SELECT 1
     FROM deal_members
-    WHERE deal_members.deal_id::text = (storage.foldername(name))[1]
+    WHERE deal_members.deal_id::text = (storage.foldername(name))[2]
     AND deal_members.member_id = auth.uid()
     AND deal_members.role IN ('OWNER', 'EDITOR', 'ADMIN')
   )
@@ -40,7 +40,7 @@ USING (
   AND EXISTS (
     SELECT 1
     FROM deal_members
-    WHERE deal_members.deal_id::text = (storage.foldername(name))[1]
+    WHERE deal_members.deal_id::text = (storage.foldername(name))[2]
     AND deal_members.member_id = auth.uid()
     AND deal_members.role IN ('OWNER', 'ADMIN', 'EDITOR')
   )
@@ -56,7 +56,7 @@ WITH CHECK (
   AND EXISTS (
     SELECT 1
     FROM deal_members
-    WHERE deal_members.deal_id::text = (storage.foldername(name))[1]
+    WHERE deal_members.deal_id::text = (storage.foldername(name))[2]
     AND deal_members.member_id = auth.uid()
     AND deal_members.role IN ('OWNER', 'ADMIN', 'EDITOR')
   )
