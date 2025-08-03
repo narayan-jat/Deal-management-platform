@@ -110,7 +110,7 @@ export default function DealCard(props: DealCardProps) {
     <>
       {/* Main card container with drag and drop attributes */}
       <div 
-        className={`block bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-4 space-y-3 group relative ${
+        className={`block bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg hover:border-gray-300 transition-all duration-300 ease-out p-4 space-y-3 group relative my-3 ${
           hasEditAccess ? 'dnd-kit-sortable' : 'cursor-default'
         } ${
           isDragging ? 'rotate-2 shadow-xl scale-105' : ''
@@ -158,10 +158,10 @@ export default function DealCard(props: DealCardProps) {
 
         {/* Header with title and status */}
         <div className="flex justify-between items-start gap-2">
-          <h3 className="text-sm font-semibold text-gray-900 leading-tight flex-1 group-hover:text-blue-600 transition-colors">
+          <h3 className="text-sm font-semibold text-gray-900 leading-tight flex-1 group-hover:text-blue-600 transition-colors duration-200">
             {deal.title}
           </h3>
-          <span className={`text-xs px-2 py-1 rounded-full font-medium flex-shrink-0 ${statusInfo.color}`}>
+          <span className={`text-xs px-3 py-1.5 rounded-full font-medium flex-shrink-0 ${statusInfo.color} shadow-sm`}>
             {StatusToTitleMap[deal.status as keyof typeof StatusToTitleMap]}
           </span>
         </div>
@@ -169,7 +169,7 @@ export default function DealCard(props: DealCardProps) {
         {/* Industry */}
         <div className="flex items-center gap-2 text-xs text-gray-600">
           <Building2 className="h-3 w-3 text-gray-400" />
-          <span className="bg-gray-50 px-2 py-1 rounded text-gray-600 font-medium">
+          <span className="bg-gray-50 px-3 py-1.5 rounded-lg text-gray-600 font-medium border border-gray-100">
             {deal.industry}
           </span>
         </div>
@@ -194,7 +194,7 @@ export default function DealCard(props: DealCardProps) {
         <div className="flex items-center justify-between gap-2">
           {/* Contributors Info - Clickable */}
           <div 
-            className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200 touch-manipulation flex-1 min-w-0"
+            className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer hover:bg-gray-50 p-2 rounded-xl transition-all duration-200 ease-out hover:scale-[1.02] touch-manipulation flex-1 min-w-0"
             onClick={handleCollaboratorsClick}
             data-dnd-kit-disabled-draggable
           >
@@ -203,18 +203,18 @@ export default function DealCard(props: DealCardProps) {
               {deal.contributors.length} contributor{deal.contributors.length !== 1 ? 's' : ''}
             </span>
             {deal.contributors.length > 0 && (
-              <div className="flex -space-x-1 ml-1 flex-shrink-0">
+              <div className="flex -space-x-1.5 ml-2 flex-shrink-0">
                 {deal.contributors.slice(0, 3).map((contributor, index) => (
                   <div
                     key={index}
-                    className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium border border-white"
+                    className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-white shadow-sm"
                     title={contributor.name}
                   >
                     {contributor.name.charAt(0).toUpperCase()}
                   </div>
                 ))}
                 {deal.contributors.length > 3 && (
-                  <div className="w-5 h-5 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-xs font-medium border border-white">
+                  <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-xs font-medium border-2 border-white shadow-sm">
                     +{deal.contributors.length - 3}
                   </div>
                 )}
@@ -226,11 +226,11 @@ export default function DealCard(props: DealCardProps) {
           {hasEditAccess && (
             <button
               onClick={handleInviteClick}
-              className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200 flex-shrink-0"
+              className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 ease-out hover:scale-105 flex-shrink-0"
               title="Invite collaborators"
               data-dnd-kit-disabled-draggable
             >
-              <UserPlus className="h-3.5 w-3.5" />
+              <UserPlus className="h-4 w-4" />
             </button>
           )}
         </div>

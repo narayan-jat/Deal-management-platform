@@ -30,10 +30,7 @@ interface NavItem {
 
 const navigationItems: NavItem[] = [
   { label: 'Dashboard', href: '/dashboard', icon: <LayoutDashboard className="h-4 w-4" /> },
-  { label: 'Analytics', href: '/analytics', icon: <BarChart3 className="h-4 w-4" /> },
   { label: 'Deals', href: '/deals', icon: <DollarSign className="h-4 w-4" /> },
-  { label: 'Clients', href: '/clients', icon: <Users className="h-4 w-4" /> },
-  { label: 'Contact', href: '/contact', icon: <Phone className="h-4 w-4" /> },
   { label: 'Messages', href: '/messages', icon: <Mail className="h-4 w-4" /> },
   { label: 'Notifications', href: '/notifications', icon: <Bell className="h-4 w-4" /> },
   { label: 'Profile', href: '/profile', icon: <User className="h-4 w-4" /> },

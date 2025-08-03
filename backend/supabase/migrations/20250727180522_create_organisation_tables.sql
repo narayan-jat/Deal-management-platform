@@ -4,7 +4,7 @@
 -- Note: Dropping of tables, types, and policies is only done because in
 -- development, phase things changes but please remove these in production.
 -- Drop table if it exists
-DROP TABLE IF EXISTS organizations;
+DROP TABLE IF EXISTS organizations;d
 DROP TYPE IF EXISTS organization_role;
 DROP TABLE IF EXISTS organization_members;
 DROP TYPE IF EXISTS organization_role;
@@ -17,6 +17,8 @@ CREATE TABLE organizations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
     code TEXT NOT NULL,
+    description TEXT NULL,
+    logo_path TEXT NULL,
     created_by UUID NOT NULL REFERENCES profiles(id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (code)
