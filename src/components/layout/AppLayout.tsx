@@ -2,10 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import AppBar from './AppBar';
 import Sidebar from './Sidebar';
+import CreateEditDealCard from '../builder-dashboard/CreateEditDealCard';
+import { useCreateDeal } from '@/context/CreateDealProvider';
+import { useCreateEditDeal } from '@/hooks/useCreateEditDeal';
+import { DealStatus } from '@/types/deal/Deal.enums';
+import { columnKeyToEnum } from '@/Constants';
+import { DealModel } from '@/types/deal/Deal.model';
+import { InviteMemberForm } from '@/types/deal/Deal.members';
+import { UploadDocumentForm } from '@/types/deal/Deal.documents';
 
 export default function AppLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const { isCreateDealModalOpen, closeCreateDealModal, selectedColumn, triggerRefresh } = useCreateDeal();
+  const { handleCreateDeal, handleDeleteDocument } = useCreateEditDeal();
 
   // Handle responsive behavior
   useEffect(() => {
@@ -36,6 +46,16 @@ export default function AppLayout() {
     }
   };
 
+  const handleOnSubmit = async (deal: DealModel, documents: UploadDocumentForm[], members: InviteMemberForm[]) => {
+    const createdDeal = await handleCreateDeal(deal, documents, members);
+    if (createdDeal) {
+      closeCreateDealModal();
+      // Trigger refresh to update the dashboard data
+      triggerRefresh();
+    }
+    return createdDeal;
+  };
+
   return (
     <div className="flex flex-col h-screen bg-gray-50 overflow-hidden">
       {/* AppBar - Full width, always on top */}
@@ -60,6 +80,22 @@ export default function AppLayout() {
           </div>
         </main>
       </div>
+
+      {/* Create Deal Modal */}
+      {isCreateDealModalOpen && (
+        <CreateEditDealCard
+          isOpen={isCreateDealModalOpen}
+          onClose={closeCreateDealModal}
+          mode="create"
+          initialBaseFormData={{
+            status: columnKeyToEnum[selectedColumn as keyof typeof columnKeyToEnum],
+            documents: [],
+            members: []
+          }}
+          onSubmit={handleOnSubmit}
+          handleDeleteDocument={handleDeleteDocument}
+        />
+      )}
     </div>
   );
 } 

@@ -30,7 +30,7 @@ export const getUniqueOrgCode = async () => {
   try {
     const code = Math.random().toString(36).substring(2, 8);
     const organization = await OrganizationService.getOrganizationByCode(code);
-    if (organization) {
+    if (organization && organization.length > 0) {
       return getUniqueOrgCode();
     }
     return code;

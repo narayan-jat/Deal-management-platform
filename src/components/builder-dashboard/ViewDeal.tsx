@@ -361,9 +361,9 @@ export default function ViewDeal({ deal, onEdit, onClose, dealLogs, isFetchingDe
                         className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                       >
                         <div className="flex-shrink-0">
-                          {contributor.profilePhoto ? (
+                          {contributor.profilePath ? (
                             <img
-                              src={contributor.profilePhoto}
+                              src={contributor.profilePath}
                               alt={contributor.name}
                               className="w-10 h-10 rounded-full object-cover"
                             />

@@ -92,9 +92,9 @@ export default function CollaboratorsModal({
                   <div className="flex items-center space-x-3 flex-1 min-w-0">
                     {/* Avatar */}
                     <div className="flex-shrink-0">
-                      {collaborator.profilePhoto ? (
+                      {collaborator.profilePath ? (
                         <img
-                          src={collaborator.profilePhoto}
+                          src={collaborator.profilePath}
                           alt={collaborator.name}
                           className="h-10 w-10 rounded-full object-cover"
                         />

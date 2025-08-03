@@ -28,6 +28,13 @@ CREATE TABLE shared_links (
 -- CREATE TABLE POLICIES
 -- =====================================================
 
+DROP POLICY IF EXISTS "Allow deal members to read their own shared links" ON shared_links;
+DROP POLICY IF EXISTS "Allow deal members with elevated roles to insert their own shared links" ON shared_links;
+DROP POLICY IF EXISTS "Allow deal members with elevated roles to update their own shared links" ON shared_links;
+DROP POLICY IF EXISTS "Allow deal members with elevated roles to delete their own shared links" ON shared_links;
+
+ALTER TABLE shared_links ENABLE ROW LEVEL SECURITY;
+
 -- Create read policy.
 CREATE POLICY "Allow deal members to read their own shared links"
 ON shared_links

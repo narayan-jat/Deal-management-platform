@@ -25,7 +25,7 @@ export default function ProfileEditForm({ data, open, onOpenChange, handleUpload
     profileUrl: data?.profileUrl || "",
     bio: data?.bio || "",
     organizationName: data?.organizationName || "",
-    profilePhoto: data?.profilePhoto,
+    profilePath: data?.profilePath,
     location: data?.location || "",
   });
 
@@ -34,7 +34,7 @@ export default function ProfileEditForm({ data, open, onOpenChange, handleUpload
   };
 
   const handleImageChange = (filePath: string) => {
-    setForm({ ...form, profilePhoto: filePath });
+    setForm({ ...form, profilePath: filePath });
   };
 
   const handleSubmit = async () => {
@@ -61,7 +61,7 @@ export default function ProfileEditForm({ data, open, onOpenChange, handleUpload
           </div>
           
           <div className="flex justify-center">
-            <ProfileAvatarUploader originalProfileFilePath={form.profilePhoto} imageUrl={form.profileUrl} handleImageChange={handleImageChange} handleUploadProfileImage={handleUploadProfileImage} />
+            <ProfileAvatarUploader originalProfileFilePath={form.profilePath} imageUrl={form.profileUrl} handleImageChange={handleImageChange} handleUploadProfileImage={handleUploadProfileImage} />
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2">

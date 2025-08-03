@@ -8,7 +8,7 @@ import { OrganizationService } from "@/services/organization/OrganizationService
 import { getUniqueOrgCode } from "./utils";
 import { OrganizationMemberService } from "@/services/organization/OrganizationMemberService";
 import { OrganizationRole } from "@/types/organization/Organization.model";
-
+import axios from "axios";
 /**
  * This hook is used to handle the authorization process.
  * It is used to sign up and sign in a user.
@@ -60,44 +60,52 @@ export const useAuthorization = () => {
       }
 
       // Sign up with Supabase
-      const { error } = await signUp(formData.email, formData.password);
+      const {data: signUpData, error } = await signUp(formData.email, formData.password);
 
       if (error) {
         toast.error(error.message);
         throw error;
       }
-      // Get the user's id
-      const { data: user } = await supabase.auth.getUser();
-      // Update the user's profile with the first name, last name, and location
-      await ProfileService.updateProfile(user.user.id, {
+
+      // const signUpData = {
+      //   user: {
+      //     id: "03da50fa-5bd5-477f-9020-11b49c6927d2",
+      //   },
+      // };
+      // // Get the user's id
+      console.log("user", signUpData.user);
+
+      const profileData = {
         firstName: formData.firstName,
         lastName: formData.lastName,
         location: formData.location,
-      });
+      };
 
-      if (formData.organizationType === "create") {
-        const organization: any = await OrganizationService.createOrganization({
-          name: formData.organizationName,
-          code: await getUniqueOrgCode(),
-          createdBy: user.user.id,
-        });
-        // Add this user to organization members as leader since it's the creator.
-        if (organization) {
-          await OrganizationMemberService.createOrgMember({
-            organizationId: organization.id,
-            memberId: user.user.id,
-            role: OrganizationRole.LEADER,
-          });
+      const organizationData = {
+        type: formData.organizationType,
+        name: formData?.organizationName,
+        code: formData?.organizationCode,
+      };
+      
+      // Call the create-user-data edge function
+      const response = await axios.post(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-user-data`,
+        {
+          userId: signUpData.user.id,
+          profileData,
+          organizationData,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
         }
-      }else{
-        const organization: any = await OrganizationService.getOrganizationByCode(formData.organizationCode);
-        if (organization) {
-          await OrganizationMemberService.createOrgMember({
-            organizationId: organization.id,
-            memberId: user.user.id,
-            role: OrganizationRole.MEMBER,
-          });
-        }
+      );
+
+      if (response.status !== 200) {
+        console.log("response", response);
+        throw new Error(response.data.error);
       }
 
       return { success: true };

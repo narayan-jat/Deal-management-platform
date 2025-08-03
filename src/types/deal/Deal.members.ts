@@ -15,7 +15,7 @@ export type DealMemberWithProfile = DealMember & {
   profile: {
     name: string;
     email: string;
-    profilePhoto: string;
+    profilePath: string;
   };
 };
 
@@ -24,7 +24,7 @@ export type Contributor = {
   name: string;
   email: string;
   title: string;
-  profilePhoto: string;
+  profilePath: string;
   role: string;
 }
 

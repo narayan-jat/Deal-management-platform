@@ -5,7 +5,7 @@ export interface ProfileData {
   location: string;
   title: string;
   email: string;
-  profilePhoto: string;
+  profilePath: string;
   bio: string;
   organizationName: string;
   createdAt: string;

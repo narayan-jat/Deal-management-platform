@@ -64,7 +64,7 @@ export default function ProfileAvatarUploader({ originalProfileFilePath, imageUr
           Change Photo
         </Label>
         <input
-          name="profile_photo"
+          name="profilePath"
           id="avatar-upload"
           type="file"
           accept="image/*"

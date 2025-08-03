@@ -24,9 +24,9 @@ export default function useProfile() {
 				const camelCaseProfileData = camelcaseKeys(profileData, { deep: true });
 				if (camelCaseProfileData) {
 					// Get signed URL for profile image if it exists
-					if (camelCaseProfileData.profilePhoto) {
+					if (camelCaseProfileData.profilePath) {
 						try {
-							const signedUrl = await ProfileStorageService.getProfileImageSignedUrl(camelCaseProfileData.profilePhoto);
+							const signedUrl = await ProfileStorageService.getProfileImageSignedUrl(camelCaseProfileData.profilePath);
 							setProfile({ ...camelCaseProfileData, profileUrl: signedUrl });
 						} catch (error) {
 							// If signed URL fails, use the stored path
@@ -78,9 +78,9 @@ export default function useProfile() {
 			const camelCaseUpdatedProfile = camelcaseKeys(updatedProfile, { deep: true });
 
 			// Get signed URL for profile image if it exists
-			if (camelCaseUpdatedProfile.profilePhoto) {
+			if (camelCaseUpdatedProfile.profilePath) {
 				try {
-					const signedUrl = await ProfileStorageService.getProfileImageSignedUrl(camelCaseUpdatedProfile.profilePhoto);
+					const signedUrl = await ProfileStorageService.getProfileImageSignedUrl(camelCaseUpdatedProfile.profilePath);
 					setProfile({ ...camelCaseUpdatedProfile, profileUrl: signedUrl });
 				} catch (error) {
 					// If signed URL fails, use the stored path

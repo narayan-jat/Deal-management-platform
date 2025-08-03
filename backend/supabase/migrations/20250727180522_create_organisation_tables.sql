@@ -4,10 +4,10 @@
 -- Note: Dropping of tables, types, and policies is only done because in
 -- development, phase things changes but please remove these in production.
 -- Drop table if it exists
-DROP TABLE IF EXISTS organizations;d
-DROP TYPE IF EXISTS organization_role;
-DROP TABLE IF EXISTS organization_members;
-DROP TYPE IF EXISTS organization_role;
+DROP TABLE IF EXISTS organizations CASCADE;
+DROP TYPE IF EXISTS organization_role CASCADE;
+DROP TABLE IF EXISTS organization_members CASCADE;
+DROP TYPE IF EXISTS organization_role CASCADE;
 
 -- Create enum for organization roles
 CREATE TYPE organization_role AS ENUM ('LEADER', 'ADMIN', 'MEMBER');
@@ -55,6 +55,8 @@ CREATE POLICY "Users can view their own organisations"
 ON organizations
 FOR SELECT 
 USING (
+    created_by = auth.uid()
+    OR 
     EXISTS (
         SELECT 1
         FROM organization_members
@@ -66,12 +68,24 @@ USING (
 CREATE POLICY "Users can insert their own organisations"
 ON organizations
 FOR INSERT
-WITH CHECK (created_by = auth.uid());
+WITH CHECK (
+    created_by = auth.uid()
+    OR
+    EXISTS (
+        SELECT 1
+        FROM organization_members
+        WHERE organization_id = organizations.id
+        AND member_id = auth.uid()
+        AND role IN ('LEADER', 'ADMIN')
+    )
+);
 
 CREATE POLICY "Only Leaders and Admins can update their own organisations"
 ON organizations
 FOR UPDATE
 USING (
+    created_by = auth.uid()
+    OR
     EXISTS (
         SELECT 1
         FROM organization_members
@@ -85,6 +99,8 @@ CREATE POLICY "Only Leaders and Admins can delete their own organisations"
 ON organizations
 FOR DELETE
 USING (
+    created_by = auth.uid()
+    OR
     EXISTS (  
         SELECT 1
         FROM organization_members
@@ -100,7 +116,7 @@ USING (
 ALTER TABLE organization_members ENABLE ROW LEVEL SECURITY;
 
 -- Helper function to check if the user is a member of the organisation
-CREATE FUNCTION is_organization_member(p_organization_id UUID, p_member_id UUID)
+CREATE OR REPLACE FUNCTION is_organization_member(p_organization_id UUID, p_member_id UUID)
 RETURNS BOOLEAN AS $$
 BEGIN
     RETURN EXISTS (
@@ -121,7 +137,7 @@ USING (
 );
 
 -- Helper function to check if the user is a member of the organisation with a specific role
-CREATE FUNCTION is_organization_member_with_role(p_organization_id UUID, p_member_id UUID, p_role organization_role)
+CREATE OR REPLACE FUNCTION is_organization_member_with_role(p_organization_id UUID, p_member_id UUID, p_role organization_role)
 RETURNS BOOLEAN AS $$
 BEGIN
     RETURN EXISTS (
