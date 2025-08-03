@@ -17,6 +17,8 @@ CREATE TABLE organizations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
     code TEXT NOT NULL,
+    description TEXT NULL,
+    logo_path TEXT NULL,
     created_by UUID NOT NULL REFERENCES profiles(id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (code)

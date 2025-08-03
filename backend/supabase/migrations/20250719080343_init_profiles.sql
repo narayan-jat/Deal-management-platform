@@ -1,54 +1,66 @@
-create table profiles (
-  id uuid primary key references auth.users(id) on delete cascade,
-  first_name text,
-  last_name text,
-  email text,
-  title text,
-  profile_photo text,
-  bio text,
-  created_at timestamp default now()
+
+-- =====================================================
+-- DROP EXISTING TABLES (in reverse dependency order)
+-- =====================================================
+
+-- Note: Dropping of tables, types, and policies is only done because in
+-- development, phase things changes but please remove these in production.
+DROP TABLE IF EXISTS profiles CASCADE;
+
+-- =====================================================
+-- CREATE TABLE
+-- =====================================================
+CREATE TABLE profiles (
+  id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  first_name TEXT NOT NULL,
+  last_name TEXT,
+  email TEXT NOT NULL,
+  title TEXT,
+  profile_photo TEXT,
+  bio TEXT,
+  created_at TIMESTAMP DEFAULT now()
 );
 
 -- Enable RLS
-alter table profiles enable row level security;
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
 -- Allow all authenticated users to view profiles
-create policy "Authenticated users can view any profile"
-  on profiles
-  for select
-  using (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated users can view any profile"
+  ON profiles
+  FOR SELECT
+  USING (auth.role() = 'authenticated');
 
 -- Only owners can update their profile
-create policy "Users can update their own profile"
-  on profiles
-  for update
-  using (auth.uid() = id)
-  with check (auth.uid() = id);
+CREATE POLICY "Users can update their own profile"
+  ON profiles
+  FOR UPDATE
+  USING (auth.uid() = id)
+  WITH CHECK (auth.uid() = id);
 
 -- Only owners can insert their profile
-create policy "Users can insert their own profile"
-  on profiles
-  for insert
-  with check (auth.uid() = id);
+CREATE POLICY "Users can insert their own profile"
+  ON profiles
+  FOR INSERT
+  WITH CHECK (auth.uid() = id);
 
 -- Only owners can delete their profile
-create policy "Users can delete their own profile"
-  on profiles
-  for delete
-  using (auth.uid() = id);
+CREATE POLICY "Users can delete their own profile"
+  ON profiles
+  FOR DELETE
+  USING (auth.uid() = id);
 
 -- Function to create profile on signup
-create or replace function public.handle_new_user()
-returns trigger as $$
-begin
-  insert into public.profiles (id, email)
-  values (new.id, new.email);
-  return new;
-end;
-$$ language plpgsql security definer;
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email)
+  VALUES (new.id, new.email);
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Trigger for auth.users
-create trigger on_auth_user_created
-after insert on auth.users
-for each row
-execute procedure public.handle_new_user();
+CREATE TRIGGER on_auth_user_created
+AFTER INSERT ON auth.users
+FOR EACH ROW
+EXECUTE PROCEDURE public.handle_new_user();
