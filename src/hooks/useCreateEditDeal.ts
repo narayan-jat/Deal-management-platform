@@ -41,7 +41,7 @@ export const useCreateEditDeal = () => {
         const camelCaseDeal = camelcaseKeys(createdDeal, { deep: true }) as DealModel;
 
         // Upload the documents on the storage.
-        const uploadResults = await handleUploadDocuments(camelCaseDeal.id, documents);
+        const uploadResults = await handleUploadDocuments(camelCaseDeal.id, deal.organizationId, documents);
         // Need to convert the documents and members to the correct format.
         const dealDocuments: Partial<DealDocument>[] = uploadResults.map((result) => ({
           dealId: camelCaseDeal.id,
@@ -80,7 +80,7 @@ export const useCreateEditDeal = () => {
     }
   }
 
-  const handleUploadDocuments = async (dealId: string, documents: UploadDocumentForm[]) => {
+  const handleUploadDocuments = async (dealId: string, organizationId: string, documents: UploadDocumentForm[]) => {
     if (!user?.id) {
       setApiError("User not authenticated");
       return;
@@ -88,7 +88,8 @@ export const useCreateEditDeal = () => {
     // convert documents to File[]
     const fileDocuments = documents.map((document) => document.file);
     try {
-      const uploadedDocuments = await DocumentStorageService.uploadDocument(dealId, fileDocuments);
+      // get the organization
+      const uploadedDocuments = await DocumentStorageService.uploadDocument(dealId, organizationId, fileDocuments);
       return uploadedDocuments;
     } catch (error) {
       setApiError(error.message);
@@ -132,7 +133,7 @@ export const useCreateEditDeal = () => {
       // having a filePath.
       const documentsToUpload = documents.filter((document) => !document.filePath);
       if (documentsToUpload.length > 0) {
-        const uploadResults = await handleUploadDocuments(camelCaseDeal.id, documentsToUpload);
+        const uploadResults = await handleUploadDocuments(camelCaseDeal.id, deal.organizationId, documentsToUpload);
         // Need to convert the documents and members to the correct format.
         const dealDocuments: Partial<DealDocument>[] = uploadResults.map((result) => ({
           dealId: camelCaseDeal.id,

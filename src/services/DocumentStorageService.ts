@@ -5,9 +5,9 @@ import { StorageConfig, UploadResult } from "@/types/Storage";
 export class DocumentStorageService {
   private static readonly CONFIG: StorageConfig = {
     bucket: "deal-documents",
-    allowedFileTypes: ["application/pdf", "application/doc", "application/docx", "text/plain", "image/jpeg", "image/png", "image/gif"],
+    allowedFileTypes: ["application/pdf", "application/doc", "application/docx", "text/plain", "image/jpeg", "image/png", "image/gif", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation"],
     maxFileSize: 1024 * 1024 * 1024, // 1GB
-    folder: "", // Will be set dynamically based on deal_id
+    folder: "", // Will be set dynamically based on deal_id and organization_id
     signedUrlExpiry: 3600 // 1 hour
   };
 
@@ -17,10 +17,10 @@ export class DocumentStorageService {
    * @param files - Array of document files to upload
    * @returns Array of upload results with path and URLs
    */
-  static async uploadDocument(dealId: string, files: File[]): Promise<UploadResult[]> {
+  static async uploadDocument(dealId: string, organizationId: string, files: File[]): Promise<UploadResult[]> {
     const config = {
       ...this.CONFIG,
-      folder: `${dealId}`
+      folder: `organization_${organizationId}/deal_${dealId}`
     };
     const uploadPromises = files.map(file => StorageService.uploadFile(dealId, file, config));
     return Promise.all(uploadPromises);
