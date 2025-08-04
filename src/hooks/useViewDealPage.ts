@@ -102,7 +102,7 @@ export const useViewDealPage = () => {
                   name: memberDetails.full_name,
                   email: memberDetails.email,
                   title: memberDetails.title,
-                  profilePhoto: await getSignedProfileImageUrl(memberDetails.profile_photo),
+                  profilePath: await getSignedProfileImageUrl(memberDetails.profile_path),
                   role: member.role,
                 };
               } catch (error) {

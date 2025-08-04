@@ -174,6 +174,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
                     className="w-full border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20"
                     required={isSignup}
                   />
+                  <p className="text-sm text-gray-500">Please fill N/A if you don't have an organization</p>
                 </div>
               ) : (
                 <div>

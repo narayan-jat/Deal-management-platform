@@ -13,7 +13,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthProvider';
 import { useSearch } from '@/context/SearchProvider';
-
+import { useCreateDeal } from '@/context/CreateDealProvider';
+import { useNavigate } from 'react-router-dom';
 interface AppBarProps {
   onMenuClick: () => void;
   isSidebarOpen: boolean;
@@ -21,12 +22,14 @@ interface AppBarProps {
 
 export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const { 
     searchQuery, 
     setSearchQuery, 
     isSearchActive, 
     setIsSearchActive 
   } = useSearch();
+  const { openCreateDealModal } = useCreateDeal();
 
   const handleSearchToggle = () => {
     setIsSearchActive(!isSearchActive);
@@ -42,6 +45,16 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
+  };
+
+  const handleProfileClick = () => {
+    setIsSearchActive(false);
+    navigate('/profile');
+  };
+
+  const handleCreateDeal = () => {
+    setIsSearchActive(false);
+    openCreateDealModal();
   };
 
   // Mobile search view
@@ -105,7 +118,11 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
       <div className="flex items-center gap-2">
         {/* Desktop icons */}
         <div className="hidden lg:flex items-center gap-2">
-          <button className="p-2 rounded-md hover:bg-gray-100 transition-colors">
+          <button 
+            className="p-2 rounded-md hover:bg-gray-100 transition-colors"
+            onClick={handleCreateDeal}
+            title="Create new deal"
+          >
             <Plus className="h-5 w-5 text-gray-600" />
           </button>
 
@@ -142,7 +159,7 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
         {/* Profile dropdown */}
         <div className="relative">
           <button
-            onClick={() => setIsSearchActive(false)}
+            onClick={() => handleProfileClick()}
             className="p-2 rounded-md hover:bg-gray-100 transition-colors flex items-center gap-1"
           >
             <User className="h-5 w-5 text-gray-600" />
@@ -153,9 +170,12 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
           {false && (
             <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 lg:hidden">
               <div className="py-2">
-                <button className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3">
+                <button 
+                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
+                  onClick={handleCreateDeal}
+                >
                   <Plus className="h-4 w-4" />
-                  <span>Add New</span>
+                  <span>Create New Deal</span>
                 </button>
                 <button className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 relative">
                   <Bell className="h-4 w-4" />
@@ -180,7 +200,7 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
                   </div>
                 )}
                 <div className="border-t border-gray-200 my-1"></div>
-                <button className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3">
+                <button className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3" onClick={() => handleProfileClick()}>
                   <User className="h-4 w-4" />
                   <span>Profile</span>
                 </button>

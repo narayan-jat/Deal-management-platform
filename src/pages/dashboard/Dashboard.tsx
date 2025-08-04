@@ -18,6 +18,7 @@ import { UploadDocumentForm } from "@/types/deal/Deal.documents";
 import { InviteMemberForm } from "@/types/deal/Deal.members";
 import { ROUTES } from "@/config/routes";
 import { useSearch } from "@/context/SearchProvider";
+import { useCreateDeal } from "@/context/CreateDealProvider";
 
 const columnNames = {
   new: "New",
@@ -29,6 +30,7 @@ const columnNames = {
 export default function Dashboard() {
   const { initialDeals: originalDeals, loading, apiError: getDealsError, handleUpdateDeals, handleUpdateDealStatus } = useDashboard();
   const { filteredDeals, searchQuery, clearSearch } = useSearch();
+  const { setSelectedColumn, setRefreshCallback } = useCreateDeal();
   const [dealId, setDealId] = useState<string | null>(null);
   const { handleCreateDeal, handleEditDeal, handleDeleteDocument, apiError: createDealError} = useCreateEditDeal();
   const [isCreateEditFormOpen, setIsCreateEditFormOpen] = useState<boolean>(false);
@@ -39,6 +41,11 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [dragTimeout, setDragTimeout] = useState<NodeJS.Timeout | null>(null);
   
+  // Set up refresh callback for create deal modal
+  useEffect(() => {
+    setRefreshCallback(() => handleUpdateDeals);
+  }, [setRefreshCallback, handleUpdateDeals]);
+
   // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
@@ -234,12 +241,6 @@ export default function Dashboard() {
           setIsCreateEditFormOpen(true);
         }}
         onView={handleViewDeal}
-        onCreate={(columnKey: string) => {
-          setColumnSelected(columnKey);
-          setMode("create");
-          setIsCreateEditFormOpen(true);
-          setDealId(null);
-        }}
       />
 
       {isCreateEditFormOpen && (

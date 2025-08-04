@@ -16,13 +16,19 @@ CREATE TABLE profiles (
   last_name TEXT,
   email TEXT NOT NULL,
   title TEXT,
-  profile_photo TEXT,
+  profile_path TEXT,
+  location TEXT,
   bio TEXT,
   created_at TIMESTAMP DEFAULT now()
 );
 
 -- Enable RLS
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Authenticated users can view any profile" ON profiles;
+DROP POLICY IF EXISTS "Users can update their own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can insert their own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can delete their own profile" ON profiles;
 
 -- Allow all authenticated users to view profiles
 CREATE POLICY "Authenticated users can view any profile"
@@ -49,12 +55,14 @@ CREATE POLICY "Users can delete their own profile"
   FOR DELETE
   USING (auth.uid() = id);
 
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+
 -- Function to create profile on signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, email)
-  VALUES (new.id, new.email);
+  INSERT INTO public.profiles (id, email, first_name)
+  VALUES (new.id, new.email, new.email);
   RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

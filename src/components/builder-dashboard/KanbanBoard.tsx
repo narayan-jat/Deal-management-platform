@@ -22,6 +22,7 @@ import { KanbanBoardColumns } from "@/types/KanbanBoard";
 import { DealCardType } from "@/types/deal/DealCard";
 import { DollarSign } from "lucide-react";
 import { formatCurrency } from "@/utility/Utility";
+import { useCreateDeal } from "@/context/CreateDealProvider";
 
 
 const columnNames = {
@@ -40,7 +41,6 @@ interface KanbanBoardProps {
   onDragEnd: (event: DragEndEvent) => void;
   onEdit: (dealId: string) => void;
   onView: (deal: DealCardType) => void;
-  onCreate: (columnKey: string) => void;
 }
 
 export default function KanbanBoard({
@@ -51,10 +51,10 @@ export default function KanbanBoard({
   onDragOver,
   onDragEnd,
   onEdit,
-  onView,
-  onCreate
+  onView
 }: KanbanBoardProps) {
   const [dropPosition, setDropPosition] = useState<{ columnId: string; index: number } | null>(null);
+  const { setSelectedColumn, openCreateDealModal } = useCreateDeal();
 
   // Configure sensors with proper activation constraints
   const sensors = useSensors(
@@ -199,7 +199,10 @@ export default function KanbanBoard({
               {/* </DroppableColumn> */}
 
               <button
-                onClick={() => onCreate(key)}
+                onClick={() => {
+                  setSelectedColumn(key);
+                  openCreateDealModal();
+                }}
                 className="mt-6 w-full text-sm text-teal-700 border border-teal-600 hover:bg-teal-50 py-3 rounded-xl transition-all duration-200 ease-out hover:scale-[1.02] font-medium shadow-sm"
               >
                 + Add Deal

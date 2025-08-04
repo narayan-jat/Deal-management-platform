@@ -17,12 +17,12 @@ import { LogType } from '@/types/deal/Deal.enums';
 
 /**
  * Get the signed URL for the profile image.
- * @param profilePhoto - The profile photo to get the signed URL for.
+ * @param profilePath - The profile photo to get the signed URL for.
  * @returns The signed URL for the profile image.
  */
-export const getSignedProfileImageUrl = async (profilePhoto: string) => {
-  if (!profilePhoto) return null;
-  const signedUrl = await ProfileStorageService.getProfileImageSignedUrl(profilePhoto);
+export const getSignedProfileImageUrl = async (profilePath: string) => {
+  if (!profilePath) return null;
+  const signedUrl = await ProfileStorageService.getProfileImageSignedUrl(profilePath);
   return signedUrl;
 }
 
@@ -60,7 +60,7 @@ export const useDashboard = () => {
                 name: memberDetails.full_name,
                 email: memberDetails.email,
                 title: memberDetails.title,
-                profilePhoto: await getSignedProfileImageUrl(memberDetails.profile_photo),
+                profilePath: await getSignedProfileImageUrl(memberDetails.profile_path),
                 role: member.role,
               };
             } catch (error) {
