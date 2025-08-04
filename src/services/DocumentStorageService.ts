@@ -20,7 +20,7 @@ export class DocumentStorageService {
   static async uploadDocument(dealId: string, organizationId: string, files: File[]): Promise<UploadResult[]> {
     const config = {
       ...this.CONFIG,
-      folder: `organization_${organizationId}/deal_${dealId}`
+      folder: `${organizationId}/${dealId}`
     };
     const uploadPromises = files.map(file => StorageService.uploadFile(dealId, file, config));
     return Promise.all(uploadPromises);

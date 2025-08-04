@@ -16,8 +16,7 @@ import { useCreateEditDeal } from "./useCreateEditDeal";
 import { UploadDocumentForm } from "@/types/deal/Deal.documents";
 import { InviteMemberForm } from "@/types/deal/Deal.members";
 import camelcaseKeys from "camelcase-keys";
-import { getSignedProfileImageUrl } from "./useDashboard";
-
+import { getSignedProfileImageUrl } from "@/utility/Utility";
 export const useViewDealPage = () => {
   const { dealId } = useParams<{ dealId: string }>();
   const navigate = useNavigate();
@@ -99,7 +98,7 @@ export const useViewDealPage = () => {
                 if (!memberDetails) return null;
                 return {
                   id: memberDetails.id,
-                  name: memberDetails.full_name,
+                  name: memberDetails.first_name + ' ' + memberDetails.last_name,
                   email: memberDetails.email,
                   title: memberDetails.title,
                   profilePath: await getSignedProfileImageUrl(memberDetails.profile_path),

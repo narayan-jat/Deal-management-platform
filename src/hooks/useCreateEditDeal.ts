@@ -13,11 +13,13 @@ import { getDateString } from '@/utility/Utility';
 import { DealDocumentService } from '@/services/deals/DealDocumentService';
 import { DealMemberService } from '@/services/deals/DealMemberService';
 import { createDealLogs } from './utils';
+import { useUserProfile } from '@/context/UserProfileProvider';
 
 export const useCreateEditDeal = () => {
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const { user } = useAuth();
+  const { userProfile } = useUserProfile();
 
   // Create a new deal
   const handleCreateDeal = async (deal: Partial<DealModel>, documents: UploadDocumentForm[], members: InviteMemberForm[]): Promise<DealModel | null> => {
@@ -30,6 +32,8 @@ export const useCreateEditDeal = () => {
       try {
         // Add the createdBy field to the deal.
         deal.createdBy = user.id;
+        // Add the organizationId field to the deal.
+        deal.organizationId = userProfile?.primaryOrganization.organization.id;
         // Convert the date fields to correct format if the date is provided. 
         // Send a string in 'YYYY-MM-DD' format. If no date is provided, do not include the field.
         deal.startDate = deal.startDate ? getDateString(new Date(deal.startDate)) : null;
@@ -116,7 +120,8 @@ export const useCreateEditDeal = () => {
       
       // Add the updatedAt field to the deal.
       deal.updatedAt = new Date().toISOString();
-
+      // Add the organizationId field to the deal.
+      deal.organizationId = userProfile?.primaryOrganization.organization.id;
       // Convert the date fields to correct format if the date is provided. 
       // Send a string in 'YYYY-MM-DD' format. If no date is provided, do not include the field.
       deal.startDate = deal.startDate ? getDateString(new Date(deal.startDate)) : null;

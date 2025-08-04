@@ -30,7 +30,6 @@ const columnNames = {
 export default function Dashboard() {
   const { initialDeals: originalDeals, loading, apiError: getDealsError, handleUpdateDeals, handleUpdateDealStatus } = useDashboard();
   const { filteredDeals, searchQuery, clearSearch } = useSearch();
-  const { setSelectedColumn, setRefreshCallback } = useCreateDeal();
   const [dealId, setDealId] = useState<string | null>(null);
   const { handleCreateDeal, handleEditDeal, handleDeleteDocument, apiError: createDealError} = useCreateEditDeal();
   const [isCreateEditFormOpen, setIsCreateEditFormOpen] = useState<boolean>(false);
@@ -39,13 +38,9 @@ export default function Dashboard() {
   const [overId, setOverId] = useState<string | null>(null);
   const [mode, setMode] = useState<"create" | "edit">("create");
   const navigate = useNavigate();
+  const { setRefreshCallback } = useCreateDeal();
   const [dragTimeout, setDragTimeout] = useState<NodeJS.Timeout | null>(null);
   
-  // Set up refresh callback for create deal modal
-  useEffect(() => {
-    setRefreshCallback(() => handleUpdateDeals);
-  }, [setRefreshCallback, handleUpdateDeals]);
-
   // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
@@ -54,6 +49,10 @@ export default function Dashboard() {
       }
     };
   }, [dragTimeout]);
+
+  useEffect(() => {
+    setRefreshCallback(() => handleUpdateDeals);
+  }, []);
 
   // Use filtered deals when search is active, otherwise use original deals
   const deals = searchQuery.trim() ? 

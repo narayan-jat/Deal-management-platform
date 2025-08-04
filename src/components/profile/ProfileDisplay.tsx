@@ -4,6 +4,8 @@ import { Button } from "../ui/button";
 import { useState } from "react";
 import ProfileEditForm from "./ProfileForm";
 import defaultProfile from "@/assets/default-profile.png";
+import { UserProfileData } from "@/types/UserProfile";
+import { getSignedProfileImageUrl } from "@/utility/Utility";
 
 interface ProfileDisplayProps {
   data: ProfileEditFormType;
@@ -35,10 +37,13 @@ export default function ProfileDisplay({ data, isOwner, handleUpdateProfile, han
             {data.firstName + " " + data.lastName || "No name provided"}
           </h2>
           <p className="text-lg text-godex-primary font-medium font-inter mb-2">
-            {data.title || "Engineer(default)"} @ {data.organizationName || "Godex(default)"}
+            {data.title || "Engineer(default)"} @ {data.primaryOrganization.organization.name || "Godex(default)"}
           </p>
           <p className="text-gray-600 font-inter">
             {data.email || "No email provided"}
+          </p>
+          <p className="text-gray-600 font-inter">
+            {data.location || "No location provided"}
           </p>
         </div>
         {isOwner && (

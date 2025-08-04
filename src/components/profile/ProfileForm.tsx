@@ -24,7 +24,6 @@ export default function ProfileEditForm({ data, open, onOpenChange, handleUpload
     email: data?.email || "",
     profileUrl: data?.profileUrl || "",
     bio: data?.bio || "",
-    organizationName: data?.organizationName || "",
     profilePath: data?.profilePath,
     location: data?.location || "",
   });
@@ -105,7 +104,7 @@ export default function ProfileEditForm({ data, open, onOpenChange, handleUpload
               id="organizationName"
               type="text"
               name="organizationName"
-              value={form.organizationName || ""}
+              value={data.primaryOrganization.organization.name || ""}
               onChange={handleChange}
               disabled
               placeholder="Enter your organisation"

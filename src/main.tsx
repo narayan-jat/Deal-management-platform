@@ -6,15 +6,18 @@ import './index.css';
 import { AuthProvider } from "./context/AuthProvider";
 import { SearchProvider } from "./context/SearchProvider";
 import { CreateDealProvider } from "./context/CreateDealProvider";
+import { UserProfileProvider } from "./context/UserProfileProvider";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <AuthProvider>
-      <SearchProvider>
-        <CreateDealProvider>
-          <App />
-        </CreateDealProvider>
-      </SearchProvider>
+      <UserProfileProvider>
+        <SearchProvider>
+          <CreateDealProvider>
+            <App />
+          </CreateDealProvider>
+        </SearchProvider>
+      </UserProfileProvider>
     </AuthProvider>
   </React.StrictMode>
 )

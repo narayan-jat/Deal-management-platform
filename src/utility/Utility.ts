@@ -1,3 +1,5 @@
+import { ProfileStorageService } from "@/services/ProfileStorageService";
+
 export const isMobile = () => {
   // First, check for mobile device via user agent
   const isDeviceMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -57,3 +59,14 @@ export const formatDate = (dateString: string) => {
     return 'Invalid date';
   }
 };
+
+/**
+ * Get the signed URL for the profile image.
+ * @param profilePath - The profile photo to get the signed URL for.
+ * @returns The signed URL for the profile image.
+ */
+export const getSignedProfileImageUrl = async (profilePath: string) => {
+  if (!profilePath) return null;
+  const signedUrl = await ProfileStorageService.getProfileImageSignedUrl(profilePath);
+  return signedUrl;
+}

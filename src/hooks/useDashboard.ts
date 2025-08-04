@@ -8,23 +8,12 @@ import { ErrorService } from '@/services/ErrorService';
 import { columnKeyToEnum } from '@/Constants';
 import camelcaseKeys from 'camelcase-keys';
 import { ProfileService } from '@/services/ProfileService';
-import { ProfileStorageService } from '@/services/ProfileStorageService';
 import { DealDocumentService } from '@/services/deals/DealDocumentService';
 import { DealCardType } from '@/types/deal/DealCard';
 import { useSearch } from '@/context/SearchProvider';
 import { createDealLogs } from './utils';
 import { LogType } from '@/types/deal/Deal.enums';
-
-/**
- * Get the signed URL for the profile image.
- * @param profilePath - The profile photo to get the signed URL for.
- * @returns The signed URL for the profile image.
- */
-export const getSignedProfileImageUrl = async (profilePath: string) => {
-  if (!profilePath) return null;
-  const signedUrl = await ProfileStorageService.getProfileImageSignedUrl(profilePath);
-  return signedUrl;
-}
+import { getSignedProfileImageUrl } from '@/utility/Utility';
 
 export const useDashboard = () => {
   const [initialDeals, setInitialDeals] = useState<KanbanBoardColumns>({
@@ -57,7 +46,7 @@ export const useDashboard = () => {
               if (!memberDetails) return null;
               return {
                 id: memberDetails.id,
-                name: memberDetails.full_name,
+                name: memberDetails.first_name + ' ' + memberDetails.last_name,
                 email: memberDetails.email,
                 title: memberDetails.title,
                 profilePath: await getSignedProfileImageUrl(memberDetails.profile_path),
@@ -175,4 +164,4 @@ export const useDashboard = () => {
   }
 
   return { loading, apiError, initialDeals, handleUpdateDeals, fetchDeals, handleConvertToKanbanBoardColumns, handleUpdateDealStatus };
-}; 
+};

@@ -73,27 +73,6 @@ export class OrganizationService {
   }
   
   /**
-   * Gets an organization by member ID
-   * @param memberId - The ID of the member
-   * @returns The organization
-   */
-  static async getOrganizationByMemberId(memberId: string) {
-    try {
-      const { data, error } = await supabase
-        .from("organizations").select("*").eq("member_id", memberId);
-
-      if (error) {
-        throw error;
-      }
-
-      return data;
-    } catch (error) {
-      ErrorService.logError(error, "OrganizationService.getOrganizationByMemberId");
-      throw error;
-    }
-  }
-  
-  /**
    * Updates an organization
    * @param updateData - The data to update the organization with
    * @returns The updated organization

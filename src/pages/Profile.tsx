@@ -4,9 +4,10 @@ import DotLoader from "@/components/ui/loader";
 import useProfile from "@/hooks/useProfile";
 
 export default function Profile() {
-  const { profile, isOwner, loading, handleUpdateProfile, handleUploadProfileImage } = useProfile();
+  const { profile, isOwner, loading, handleUpdateProfile, handleUploadProfileImage, userProfile } = useProfile();
 
-  console.log("profile", profile);
+  console.log(profile);
+  console.log(userProfile);
   if (loading) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>

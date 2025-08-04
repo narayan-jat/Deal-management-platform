@@ -1,3 +1,5 @@
+import { UserProfileData } from "./UserProfile";
+
 export interface ProfileData {
   id: string;
   firstName: string;
@@ -7,10 +9,9 @@ export interface ProfileData {
   email: string;
   profilePath: string;
   bio: string;
-  organizationName: string;
   createdAt: string;
 }
 
-export type ProfileEditFormType = Partial<ProfileData> & {
+export type ProfileEditFormType = Partial<UserProfileData> & {
   profileUrl?: string;
 };
