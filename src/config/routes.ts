@@ -9,12 +9,10 @@ export const ROUTES = {
   DASHBOARD: '/dashboard',
   DEALS: '/deals',
   VIEW_DEAL: '/deals/:dealId',
-  PROFILE: '/profile',
-  ANALYTICS: '/dashboard/analytics',
-  CONTACT: '/dashboard/contact',
   MESSAGES: '/dashboard/messages',
   NOTIFICATIONS: '/dashboard/notifications',
-  SETTINGS: '/dashboard/settings',
+  PROFILE: '/profile',
+  DEAL_LINK_INVITE: '/deals/shared/:token',
 } as const;
 
 // Route groups for easier management
@@ -22,18 +20,16 @@ export const PUBLIC_ROUTES = {
   HOME: ROUTES.HOME,
   SIGNIN: ROUTES.SIGNIN,
   SIGNUP: ROUTES.SIGNUP,
+  DEAL_LINK_INVITE: ROUTES.DEAL_LINK_INVITE,
 } as const;
 
 export const PROTECTED_ROUTES = {
   DASHBOARD: ROUTES.DASHBOARD,
   DEALS: ROUTES.DEALS,
   VIEW_DEAL: ROUTES.VIEW_DEAL,
-  PROFILE: ROUTES.PROFILE,
-  ANALYTICS: ROUTES.ANALYTICS,
-  CONTACT: ROUTES.CONTACT,
   MESSAGES: ROUTES.MESSAGES,
   NOTIFICATIONS: ROUTES.NOTIFICATIONS,
-  SETTINGS: ROUTES.SETTINGS,
+  PROFILE: ROUTES.PROFILE,
 } as const;
 
 // Route metadata for navigation and breadcrumbs
@@ -68,21 +64,6 @@ export const ROUTE_METADATA = {
     description: 'View details for a specific deal',
     requiresAuth: true,
   },
-  [ROUTES.PROFILE]: {
-    title: 'Profile',
-    description: 'Manage your profile',
-    requiresAuth: true,
-  },
-  [ROUTES.ANALYTICS]: {
-    title: 'Analytics',
-    description: 'View deal analytics',
-    requiresAuth: true,
-  },
-  [ROUTES.CONTACT]: {
-    title: 'Contact',
-    description: 'Contact management',
-    requiresAuth: true,
-  },
   [ROUTES.MESSAGES]: {
     title: 'Messages',
     description: 'View your messages',
@@ -93,9 +74,14 @@ export const ROUTE_METADATA = {
     description: 'View your notifications',
     requiresAuth: true,
   },
-  [ROUTES.SETTINGS]: {
-    title: 'Settings',
-    description: 'Account settings',
-    requiresAuth: true,
+  [ROUTES.DEAL_LINK_INVITE]: {
+    title: 'Deal Invite',
+    description: 'Accept a deal invite',
+    requiresAuth: false,
   },
+  [ROUTES.PROFILE]: {
+    title: 'Profile',
+    description: 'Manage your profile',
+    requiresAuth: true,
+  }
 } as const; 

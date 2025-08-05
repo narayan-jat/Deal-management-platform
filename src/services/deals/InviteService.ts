@@ -3,6 +3,11 @@ import { DealMemberRole } from "@/types/deal/Deal.enums";
 import { ErrorService } from "../ErrorService";
 import snakecaseKeys from 'snakecase-keys';
 import { InviteForm, SharedLinkForm, SharedLink, UserSearchResult } from "@/types/deal/Deal.invites";
+import { DealService } from "./DealService";
+import { DealMemberModel } from "@/types/deal";
+import { DealMemberService } from "./DealMemberService";
+import { DealLogService } from "./DealLogService";
+import { LogType } from "@/types/deal/Deal.enums";
 
 
 export class InviteService {
@@ -85,7 +90,7 @@ export class InviteService {
         throw error;
       }
 
-      const shareableUrl = `${window.location.origin}/deal/shared/${data.token}`;
+      const shareableUrl = `${window.location.origin}/deals/shared/${data.token}`;
 
       return {
         ...data,
@@ -97,6 +102,69 @@ export class InviteService {
     }
   }
 
+  static async acceptLinkInvite(userId: string, token: string){
+    try{
+      const { data, error } = await supabase.from("shared_links").select("*").eq("token", token).single();
+
+      if (error) {
+        throw error;
+      }
+
+      // Check if the invite is expired.
+      if (data.expires_at < new Date()) {
+        throw new Error("Link invite expired");
+      }
+
+      const dealMember = {
+        deal_id: data.deal_id,
+        member_id: userId,
+        role: data.role,
+        added_by: data.created_by,
+      }
+      // add to the deal_members table.
+      await DealMemberService.createDealMembers([dealMember]);
+      // Now update the expired at to current timestamp.
+      await supabase.from("shared_links").update({ expires_at: new Date() }).eq("token", token);
+      // Log the deal member added to the deal logs.
+      await DealLogService.createDealLog({
+        dealId: data.deal_id,
+        memberId: userId,
+        logType: LogType.UPDATED,
+        logData: {
+          members: {
+            member_id: [userId],
+            action: "member added",
+          },
+        }
+      });
+    }
+    catch(err: any){
+      ErrorService.handleApiError(err, "InviteService.acceptLinkInvite");
+      throw err;
+    }
+  }
+
+  /**
+   * Check if a link invite is expired.
+   * @param token - The token of the link invite
+   * @returns True if the invite is expired, false otherwise
+   */
+  static async checkIfLinkInviteExpired(token: string){
+    try{
+      const { data, error } = await supabase.from("shared_links").select("*").eq("token", token).single();
+
+      if (error) {
+        throw error;
+      }
+
+      // Check if the invite is expired.
+      return data.expires_at < new Date();
+    }
+    catch(err: any){
+      ErrorService.handleApiError(err, "InviteService.checkIfLinkInviteExpired");
+      throw err;
+    }
+  }
   /**
    * Get all shared links for a deal
    */

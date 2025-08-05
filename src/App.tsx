@@ -19,6 +19,7 @@ import Profile from "@/pages/Profile";
 
 // Layouts
 import AppLayout from "@/components/layout/AppLayout";
+import DealInvite from "@/components/builder-dashboard/DealInvite";
 
 // Route protection components
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -81,6 +82,10 @@ export default function App() {
               <SignUp />
             </PublicRoute>
           } 
+        />
+        <Route
+          path={ROUTES.DEAL_LINK_INVITE}
+          element={<DealInvite />}
         />
         
         {/* Protected Routes */}
