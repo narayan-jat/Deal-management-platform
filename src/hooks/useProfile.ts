@@ -12,7 +12,7 @@ export default function useProfile() {
 	const [loading, setLoading] = useState(false);
 	const [apiStatus, setApiStatus] = useState<string | null>(null);
 	const { user } = useAuth();
-	const { userProfile, refreshUserProfile } = useUserProfile();
+	const { userProfile, refreshUserProfile, loading: userProfileLoading } = useUserProfile();
 
 	useEffect(() => {
 		const getProfile = async () => {
@@ -27,7 +27,7 @@ export default function useProfile() {
 			setIsOwner(userProfile.id === user.id);
 		}
 		getProfile();
-	}, [userProfile]);
+	}, [userProfile, user]);
 
 	const handleUploadProfileImage = async (originalProfileFilePath: string, file: File): Promise<string> => {
 		if (!user?.id) {
@@ -73,5 +73,6 @@ export default function useProfile() {
 		handleUploadProfileImage,
 		handleUpdateProfile,
 		userProfile,
+		userProfileLoading,
 	};
 }

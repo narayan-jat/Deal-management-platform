@@ -104,7 +104,7 @@ export default function ProfileEditForm({ data, open, onOpenChange, handleUpload
               id="organizationName"
               type="text"
               name="organizationName"
-              value={data.primaryOrganization.organization.name || ""}
+              value={data?.primaryOrganization?.organization?.name || ""}
               onChange={handleChange}
               disabled
               placeholder="Enter your organisation"
