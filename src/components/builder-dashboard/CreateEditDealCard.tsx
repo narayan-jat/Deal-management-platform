@@ -84,11 +84,6 @@ export default function CreateEditDealCard({
     setIsAddCollaboratorsModalOpen(false);
   };
 
-  const handleInviteCollaborators = (emails: string[], role: DealMemberRole) => {
-    // need to handle if the collaborator is already in the list
-    setMembers(prev => [...prev, ...emails.map(email => ({ email, role }))]);
-  };
-
   const handleRemoveMember = (index: number) => {
     const memberId = members[index]?.id;
     if (memberId) {
@@ -389,11 +384,12 @@ export default function CreateEditDealCard({
                   )}
                 </div>
 
-                {/* Collaborators */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Collaborators
-                  </label>
+                {/* Add Collaborators only if edit */}
+                {mode === 'edit' && (
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Collaborators
+                    </label>
                   <Button
                     type="button"
                     onClick={() => setIsAddCollaboratorsModalOpen(true)}
@@ -401,9 +397,10 @@ export default function CreateEditDealCard({
                     className="w-full flex items-center gap-2"
                   >
                     <Users className="h-4 w-4" />
-                    Invite Collaborators
-                  </Button>
-                </div>
+                    Add Collaborators
+                    </Button>
+                  </div>
+                )}
 
                 {/* Collaborators Chips */}
                 {members.length > 0 && (
@@ -475,7 +472,7 @@ export default function CreateEditDealCard({
       <AddCollaboratorsModal
         isOpen={isAddCollaboratorsModalOpen}
         onClose={handleCloseAddCollaboratorsModal}
-        onInvite={handleInviteCollaborators}
+        dealId={formData.id || ""}
       />
     </>
   );

@@ -248,7 +248,7 @@ export default function DealCard(props: DealCardProps) {
       <AddCollaboratorsModal
         isOpen={isInviteModalOpen}
         onClose={() => setIsInviteModalOpen(false)}
-        onInvite={handleInviteCollaborators}
+        dealId={deal.id}
       />
     </>
   );

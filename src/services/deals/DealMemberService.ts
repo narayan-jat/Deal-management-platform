@@ -24,8 +24,7 @@ export class DealMemberService {
       const { data, error } = await supabase
         .from("deal_members")
         .insert(newDealMembers)
-        .select()
-        .single();
+        .select();
 
       if (error) {
         throw error;
