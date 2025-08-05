@@ -11,9 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { DealMemberRole } from "@/types/deal/Deal.enums";
-import { toast } from "sonner";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useAddCollaboratorsModal } from "@/hooks/useAddCollaboratorsModal";
@@ -63,7 +61,7 @@ function AddCollaboratorsModal({ isOpen, onClose, dealId }: AddCollaboratorsModa
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden sm:max-w-3xl lg:max-w-4xl">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden sm:max-w-[90vw] md:max-w-[80vw] lg:max-w-[60vw] xl:max-w-[40vw]">
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-gray-200 pb-4">

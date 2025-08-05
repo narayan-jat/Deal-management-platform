@@ -172,13 +172,13 @@ export const useAddCollaboratorsModal = (dealId: string) => {
   const handleGenerateLink = async () => {
     setIsGeneratingLink(true);
     try {
-      const link = await InviteService.createSharedLink({
+      const shareLink: SharedLink = await InviteService.createSharedLink({
         dealId,
         role: linkRole,
         createdBy: user?.id || ""
       });
       
-      setGeneratedLink(link);
+      setGeneratedLink(shareLink);
       toast.success("Shareable link generated");
     } catch (error) {
       toast.error("Failed to generate link");

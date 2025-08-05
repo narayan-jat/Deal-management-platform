@@ -65,16 +65,19 @@ export class InviteService {
    */
   static async createSharedLink(sharedLink: SharedLinkForm): Promise<SharedLink> {
     try {
-      const token = this.generateToken();
+      // May need to change for better security.
+      const token = crypto.randomUUID();
       const sharedLinkData = {
         ...sharedLink,
         token,
-        permissions: sharedLink.permissions || { allowEditing: false, allowCommenting: true }
       };
+
+      // Make the data to use snake_case keys.
+      const sharedLinkDataSnakeCase = snakecaseKeys(sharedLinkData as unknown as Record<string, unknown>, { deep: true });
 
       const { data, error } = await supabase
         .from("shared_links")
-        .insert(snakecaseKeys(sharedLinkData as unknown as Record<string, unknown>, { deep: true }))
+        .insert(sharedLinkDataSnakeCase)
         .select()
         .single();
 
