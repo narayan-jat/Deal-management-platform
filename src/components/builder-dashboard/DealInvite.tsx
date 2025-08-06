@@ -1,20 +1,30 @@
-import { ROUTES } from "@/config/routes";
-import { useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import DealLoader from "@/components/ui/loader";
+import { useAcceptInvite } from "@/hooks/useAcceptInvite";
 
-export default function DealInvite() {
-  const { token } = useParams();
-  const navigate = useNavigate();
+type InviteType = 'link' | 'email';
 
-  useEffect(() => {
-    if (!token) {
-      navigate(ROUTES.HOME);
-    }
-  }, [token]);
+interface DealInviteProps {
+  inviteType: InviteType;
+}
+
+export default function DealInvite({ inviteType }: DealInviteProps) {
+  const { isAcceptingInvite, acceptInviteError } = useAcceptInvite(inviteType);
+
+  if (isAcceptingInvite) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <DealLoader />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center h-screen">
-      <h1 className="text-2xl font-bold">Deal Invite</h1>
+      {acceptInviteError && (
+        <h1 className="text-2xl font-bold">
+          Sorry, something went wrong. Please try again or contact support. Redirecting to dashboard...
+        </h1>
+      )}
     </div>
   );
-}
+} 

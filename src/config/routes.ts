@@ -9,10 +9,11 @@ export const ROUTES = {
   DASHBOARD: '/dashboard',
   DEALS: '/deals',
   VIEW_DEAL: '/deals/:dealId',
-  MESSAGES: '/dashboard/messages',
-  NOTIFICATIONS: '/dashboard/notifications',
+  MESSAGES: '/messages',
+  NOTIFICATIONS: '/notifications',
   PROFILE: '/profile',
-  DEAL_LINK_INVITE: '/deals/shared/:token',
+  DEAL_LINK_INVITE: '/deals/deal-link-invite/:token',
+  DEAL_EMAIL_INVITE: '/deals/deal-email-invite/:token',
 } as const;
 
 // Route groups for easier management
@@ -21,6 +22,7 @@ export const PUBLIC_ROUTES = {
   SIGNIN: ROUTES.SIGNIN,
   SIGNUP: ROUTES.SIGNUP,
   DEAL_LINK_INVITE: ROUTES.DEAL_LINK_INVITE,
+  DEAL_EMAIL_INVITE: ROUTES.DEAL_EMAIL_INVITE,
 } as const;
 
 export const PROTECTED_ROUTES = {
@@ -75,8 +77,13 @@ export const ROUTE_METADATA = {
     requiresAuth: true,
   },
   [ROUTES.DEAL_LINK_INVITE]: {
-    title: 'Deal Invite',
-    description: 'Accept a deal invite',
+    title: 'Deal Link Invite',
+    description: 'Accept a deal link invite',
+    requiresAuth: false,
+  },
+  [ROUTES.DEAL_EMAIL_INVITE]: {
+    title: 'Deal Email Invite',
+    description: 'Accept a deal email invite',
     requiresAuth: false,
   },
   [ROUTES.PROFILE]: {

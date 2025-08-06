@@ -33,12 +33,12 @@ const navigationItems: NavItem[] = [
   { label: 'Deals', href: '/deals', icon: <DollarSign className="h-4 w-4" /> },
   { label: 'Messages', href: '/messages', icon: <Mail className="h-4 w-4" /> },
   { label: 'Notifications', href: '/notifications', icon: <Bell className="h-4 w-4" /> },
-  { 
-    label: 'Settings', 
-    href: '/settings', 
-    icon: <Settings className="h-4 w-4" />,
-    children: []
-  }
+  // { 
+  //   label: 'Settings', 
+  //   href: '/settings', 
+  //   icon: <Settings className="h-4 w-4" />,
+  //   children: []
+  // }
 ];
 
 export default function Sidebar({ isOpen, isCollapsed, onToggle }: SidebarProps) {

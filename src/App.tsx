@@ -20,11 +20,12 @@ import Profile from "@/pages/Profile";
 // Layouts
 import AppLayout from "@/components/layout/AppLayout";
 import DealInvite from "@/components/builder-dashboard/DealInvite";
+import NotificationsPage from "./pages/Notifications";
 
 // Route protection components
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
-  
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -32,17 +33,17 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       </div>
     );
   }
-  
+
   if (!user) {
     return <Navigate to={ROUTES.SIGNIN} replace />;
   }
-  
+
   return <>{children}</>;
 };
 
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
-  
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -50,11 +51,11 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
       </div>
     );
   }
-  
+
   if (user) {
     return <Navigate to={ROUTES.DASHBOARD} replace />;
   }
-  
+
   return <>{children}</>;
 };
 
@@ -67,27 +68,31 @@ export default function App() {
         <Route path={ROUTES.HOME} element={<Landing />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
-        <Route 
-          path={ROUTES.SIGNIN} 
+        <Route
+          path={ROUTES.SIGNIN}
           element={
             <PublicRoute>
               <SignIn />
             </PublicRoute>
-          } 
+          }
         />
-        <Route 
-          path={ROUTES.SIGNUP} 
+        <Route
+          path={ROUTES.SIGNUP}
           element={
             <PublicRoute>
               <SignUp />
             </PublicRoute>
-          } 
+          }
         />
         <Route
           path={ROUTES.DEAL_LINK_INVITE}
-          element={<DealInvite />}
+          element={<DealInvite inviteType="link" />}
         />
-        
+        <Route
+          path={ROUTES.DEAL_EMAIL_INVITE}
+          element={<DealInvite inviteType="email" />}
+        />
+
         {/* Protected Routes */}
         <Route
           path={ROUTES.DASHBOARD}
@@ -98,14 +103,8 @@ export default function App() {
           }
         >
           <Route index element={<Dashboard />} />
-          <Route path="analytics" element={<Landing />} />
-          <Route path="contact" element={<Landing />} />
-          <Route path="messages" element={<Landing />} />
-          <Route path="notifications" element={<Landing />} />
-          <Route path="settings" element={<Landing />} />
-          <Route path="profile" element={<Profile />} />
         </Route>
-        
+
         <Route
           path={ROUTES.DEALS}
           element={
@@ -117,7 +116,29 @@ export default function App() {
           <Route index element={<DealsPage />} />
           <Route path=":dealId" element={<ViewDealPage />} />
         </Route>
-        
+
+        <Route
+          path={ROUTES.NOTIFICATIONS}
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<NotificationsPage />} />
+        </Route>
+
+        <Route
+          path={ROUTES.MESSAGES}
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Landing />} />
+        </Route>
+
         <Route
           path={ROUTES.PROFILE}
           element={
@@ -128,7 +149,7 @@ export default function App() {
         >
           <Route index element={<Profile />} />
         </Route>
-        
+
         {/* Fallback Routes */}
         <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
       </Routes>

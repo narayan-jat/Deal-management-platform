@@ -51,7 +51,11 @@ export const useViewDealPage = () => {
             setLoading(false);
             setIsFetchingDealLogs(false);
           }
-        } 
+        }
+        else {
+          // Get the deal from the deal ID.
+          refreshDealCardDetails(dealId);
+        }
       }
     }
     fetchDealCardDetails();

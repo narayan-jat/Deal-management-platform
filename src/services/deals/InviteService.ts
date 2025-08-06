@@ -8,7 +8,7 @@ import { DealMemberModel } from "@/types/deal";
 import { DealMemberService } from "./DealMemberService";
 import { DealLogService } from "./DealLogService";
 import { LogType } from "@/types/deal/Deal.enums";
-
+import { ROUTES } from "@/config/routes";
 
 export class InviteService {
 
@@ -90,7 +90,7 @@ export class InviteService {
         throw error;
       }
 
-      const shareableUrl = `${window.location.origin}/deals/shared/${data.token}`;
+      const shareableUrl = `${import.meta.env.VITE_APP_URL}${ROUTES.DEAL_LINK_INVITE.replace(':token', data.token)}`;
 
       return {
         ...data,
@@ -102,6 +102,12 @@ export class InviteService {
     }
   }
 
+  /**
+   * Accept a link invite
+   * @param userId - The user id of the user accepting the invite
+   * @param token - The token of the invite
+   * @returns The deal member that was added
+   */
   static async acceptLinkInvite(userId: string, token: string){
     try{
       const { data, error } = await supabase.from("shared_links").select("*").eq("token", token).single();
@@ -111,7 +117,7 @@ export class InviteService {
       }
 
       // Check if the invite is expired.
-      if (data.expires_at < new Date()) {
+      if (data.expires_at && data.expires_at < new Date()) {
         throw new Error("Link invite expired");
       }
 
@@ -121,10 +127,13 @@ export class InviteService {
         role: data.role,
         added_by: data.created_by,
       }
+      console.log("deal accepted")
       // add to the deal_members table.
       await DealMemberService.createDealMembers([dealMember]);
+      console.log("deal member added")
       // Now update the expired at to current timestamp.
       await supabase.from("shared_links").update({ expires_at: new Date() }).eq("token", token);
+      console.log("deal link expired at updated")
       // Log the deal member added to the deal logs.
       await DealLogService.createDealLog({
         dealId: data.deal_id,
@@ -137,9 +146,52 @@ export class InviteService {
           },
         }
       });
+
+      return dealMember;
+    }catch(err: any){
+      ErrorService.handleApiError(err, "InviteService.acceptLinkInvite");
+      throw err;
+    }
+  }
+
+  /**
+   * Accept an email invite
+   * @param userId - The user id of the user accepting the invite
+   * @param token - The token of the invite
+   * @returns The deal member that was added
+   */
+  static async acceptEmailInvite(userId: string, token: string){
+    try{
+      // Update the invite status to accep the deal.
+      const { data: updatedData, error: updateError } = await supabase.from("invites").update({ status: "ACCEPTED" }).eq("token", token).select("*").single();
+      if (updateError) {
+        throw updateError;
+      }
+
+      const dealMember = {
+        deal_id: updatedData.deal_id,
+        member_id: userId,
+        role: updatedData.role,
+      }
+      // add to the deal_members table.
+      await DealMemberService.createDealMembers([dealMember]);
+      // Log the deal member added to the deal logs.
+      await DealLogService.createDealLog({
+        dealId: updatedData.deal_id,
+        memberId: userId,
+        logType: LogType.UPDATED,
+        logData: {
+          members: {
+            member_id: [userId],
+            action: "member added",
+          },
+        }
+      });
+
+      return dealMember;
     }
     catch(err: any){
-      ErrorService.handleApiError(err, "InviteService.acceptLinkInvite");
+      ErrorService.handleApiError(err, "InviteService.acceptEmailInvite");
       throw err;
     }
   }
@@ -158,7 +210,8 @@ export class InviteService {
       }
 
       // Check if the invite is expired.
-      return data.expires_at < new Date();
+      // exprires_at can be null, and time stamp can be 0.
+      return data.expires_at ? data.expires_at < new Date() : false;
     }
     catch(err: any){
       ErrorService.handleApiError(err, "InviteService.checkIfLinkInviteExpired");
@@ -182,7 +235,7 @@ export class InviteService {
 
       return data?.map(link => ({
         ...link,
-        shareableUrl: `${window.location.origin}/deal/shared/${link.token}`
+        shareableUrl: `${import.meta.env.VITE_APP_URL}${ROUTES.DEAL_LINK_INVITE.replace(':token', link.token)}`
       })) || [];
     } catch (error) {
       ErrorService.handleApiError(error, "InviteService.getSharedLinks");

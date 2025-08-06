@@ -39,7 +39,7 @@ serve(async (req) => {
 
   for (const invite of invites) {
     const token = crypto.randomUUID();
-    const inviteUrl = `${APP_URL}/accept-deal-invite?token=${token}`;
+    const inviteUrl = `${APP_URL}/deals/deal-email-invite?token=${token}`;
 
     const { error: emailError } = await resend.emails.send({
       from: `GoDex <noreply@${DOMAIN}>`,

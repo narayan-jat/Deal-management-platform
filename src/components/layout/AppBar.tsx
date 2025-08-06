@@ -15,6 +15,9 @@ import { useAuth } from '@/context/AuthProvider';
 import { useSearch } from '@/context/SearchProvider';
 import { useCreateDeal } from '@/context/CreateDealProvider';
 import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '@/config/routes';
+
+
 interface AppBarProps {
   onMenuClick: () => void;
   isSidebarOpen: boolean;
@@ -126,9 +129,8 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
             <Plus className="h-5 w-5 text-gray-600" />
           </button>
 
-          <button className="p-2 rounded-md hover:bg-gray-100 transition-colors relative">
+          <button className="p-2 rounded-md hover:bg-gray-100 transition-colors relative" onClick={() => navigate(ROUTES.NOTIFICATIONS)}>
             <Bell className="h-5 w-5 text-gray-600" />
-            <Lock className="h-3 w-3 text-gray-400 absolute -top-1 -right-1" />
             <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
               <span className="text-white text-xs font-medium">1</span>
             </div>
@@ -177,7 +179,7 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
                   <Plus className="h-4 w-4" />
                   <span>Create New Deal</span>
                 </button>
-                <button className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 relative">
+                <button className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 relative" onClick={() => navigate(ROUTES.NOTIFICATIONS)}>
                   <Bell className="h-4 w-4" />
                   <span>Notifications</span>
                   <div className="ml-auto w-3 h-3 bg-red-500 rounded-full"></div>
