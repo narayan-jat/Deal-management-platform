@@ -8,8 +8,8 @@ import { SignInFormType } from "@/types/auth/Signup";
 
 export default function SignIn() {
   const navigate = useNavigate();
-  const { loading, handleInputChange, handleSignIn } = useAuthorization();
-  
+  const { loading, handleInputChange, handleSignIn, redirectUrl, createSignUpLink } = useAuthorization();
+
   // Form state
   const [formData, setFormData] = useState<SignInFormType>({
     email: "",
@@ -28,9 +28,15 @@ export default function SignIn() {
     const result = await handleSignIn(formData);
     
     if (result.success) {
-      navigate(ROUTES.DASHBOARD);
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+      } else {
+        navigate(ROUTES.DASHBOARD);
+      }
     }
   };
+
+
 
   return (
     <AuthLayout
@@ -46,7 +52,7 @@ export default function SignIn() {
         submitLabel="Sign In"
         bottomText="Don't have an account?"
         bottomLinkText="Sign up"
-        bottomLinkTo={ROUTES.SIGNUP}
+        bottomLinkTo={createSignUpLink()}
       />
     </AuthLayout>
   );

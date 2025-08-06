@@ -9,6 +9,10 @@ import { getUniqueOrgCode } from "./utils";
 import { OrganizationMemberService } from "@/services/organization/OrganizationMemberService";
 import { OrganizationRole } from "@/types/organization/Organization.model";
 import axios from "axios";
+import { useSearchParams } from "react-router-dom";
+import { ROUTES } from "@/config/routes";
+
+
 /**
  * This hook is used to handle the authorization process.
  * It is used to sign up and sign in a user.
@@ -19,6 +23,17 @@ import axios from "axios";
 export const useAuthorization = () => {
   const [loading, setLoading] = useState(false);
   const { signUp, signIn } = useAuth();
+  const [searchParams] = useSearchParams();
+  let redirectUrl = searchParams.get("redirectUrl");
+
+  // Decode the redirectUrl if it exists
+  if (redirectUrl) {
+    try {
+      redirectUrl = decodeURIComponent(redirectUrl);
+    } catch (error) {
+      console.error("Error decoding redirectUrl:", error);
+    }
+  }
 
   // Generic form handler for any form data
   const handleInputChange = <T extends Record<string, any>>(
@@ -60,20 +75,12 @@ export const useAuthorization = () => {
       }
 
       // Sign up with Supabase
-      const {data: signUpData, error } = await signUp(formData.email, formData.password);
+      const {data: signUpData, error } = await signUp(formData.email, formData.password, redirectUrl);
 
       if (error) {
         toast.error(error.message);
         throw error;
       }
-
-      // const signUpData = {
-      //   user: {
-      //     id: "03da50fa-5bd5-477f-9020-11b49c6927d2",
-      //   },
-      // };
-      // // Get the user's id
-      console.log("user", signUpData.user);
 
       const profileData = {
         firstName: formData.firstName,
@@ -104,7 +111,6 @@ export const useAuthorization = () => {
       );
 
       if (response.status !== 200) {
-        console.log("response", response);
         throw new Error(response.data.error);
       }
 
@@ -143,10 +149,31 @@ export const useAuthorization = () => {
     }
   };
 
+  const createSignUpLink = () => {
+    if (redirectUrl) {
+      // encode the redirectUrl
+      const encodedRedirectUrl = encodeURIComponent(redirectUrl);
+      return `${ROUTES.SIGNUP}?redirectUrl=${encodedRedirectUrl}`;
+    }
+    return ROUTES.SIGNUP;
+  };
+
+  const createSignInLink = () => {
+    if (redirectUrl) {
+      // encode the redirectUrl
+      const encodedRedirectUrl = encodeURIComponent(redirectUrl);
+      return `${ROUTES.SIGNIN}?redirectUrl=${encodedRedirectUrl}`;
+    }
+    return ROUTES.SIGNIN;
+  };
+
   return {
     loading,
     handleInputChange,
     handleSignUp,
     handleSignIn,
+    createSignUpLink,
+    createSignInLink,
+    redirectUrl,
   };
 };

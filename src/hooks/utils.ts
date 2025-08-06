@@ -3,6 +3,7 @@ import { DealLogService } from "@/services/deals/DealLogService";
 import { ErrorService } from "@/services/ErrorService";
 import { LogType } from "@/types/deal/Deal.enums";
 import { OrganizationService } from "@/services/organization/OrganizationService";
+import { InviteType } from "@/types/deal/Deal.invites";
 
 export const createDealLogs = async (userId: string, dealId: string, logMetaData: any, logType: LogType) => {
   try {
@@ -39,3 +40,27 @@ export const getUniqueOrgCode = async () => {
     throw error;
   }
 }
+
+// Utility function to check for pending invites
+export const checkPendingInvite = () => {
+  const linkToken = localStorage.getItem('pending_link_invite_token');
+  const emailToken = localStorage.getItem('pending_email_invite_token');
+  
+  if (linkToken) {
+    return { type: 'link' as const, token: linkToken };
+  }
+  if (emailToken) {
+    return { type: 'email' as const, token: emailToken };
+  }
+  return null;
+};
+
+// Utility function to clear pending invites
+export const clearPendingInvite = (type?: InviteType) => {
+  if (type) {
+    localStorage.removeItem(`pending_${type}_invite_token`);
+  } else {
+    localStorage.removeItem('pending_link_invite_token');
+    localStorage.removeItem('pending_email_invite_token');
+  }
+};

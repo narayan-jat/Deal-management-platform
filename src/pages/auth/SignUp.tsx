@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import AuthForm from "@/components/auth/AuthForm";
 import AuthLayout from "@/components/auth/AuthLayout";
 import { useAuthorization } from "@/hooks/useAuthorization";
@@ -8,8 +8,9 @@ import { SignUpFormType } from "@/types/auth/Signup";
 
 export default function SignUp() {
   const navigate = useNavigate();
-  const { loading, handleInputChange, handleSignUp } = useAuthorization();
-  
+  const { loading, handleInputChange, handleSignUp, createSignInLink } = useAuthorization();
+
+
   // Form state
   const [formData, setFormData] = useState<SignUpFormType>({
     email: "",
@@ -34,7 +35,7 @@ export default function SignUp() {
     const result = await handleSignUp(formData);
     
     if (result.success) {
-      navigate(ROUTES.SIGNIN);
+      navigate(createSignInLink());
     }
   };
 
@@ -52,7 +53,7 @@ export default function SignUp() {
         submitLabel="Create Account"
         bottomText="Already have an account?"
         bottomLinkText="Sign in"
-        bottomLinkTo={ROUTES.SIGNIN}
+        bottomLinkTo={createSignInLink()}
       />
     </AuthLayout>
   );

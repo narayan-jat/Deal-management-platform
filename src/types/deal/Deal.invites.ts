@@ -47,3 +47,5 @@ export interface SharedLink {
 export type SharedLinkForm = Partial<SharedLink>;
 
 export type UserSearchResult = Partial<ProfileData>;
+
+export type InviteType = 'link' | 'email';

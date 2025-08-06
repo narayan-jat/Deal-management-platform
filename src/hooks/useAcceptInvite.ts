@@ -4,8 +4,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { ROUTES } from "@/config/routes";
 import { InviteService } from "@/services/deals/InviteService";
+import { InviteType } from "@/types/deal/Deal.invites";
+import { clearPendingInvite } from "./utils";
 
-type InviteType = 'link' | 'email';
 
 export function useAcceptInvite(inviteType: InviteType) {
   const { user, loading: isFetchingUser } = useAuth();
@@ -14,6 +15,7 @@ export function useAcceptInvite(inviteType: InviteType) {
   const [isAcceptingInvite, setIsAcceptingInvite] = useState(false);
   const [acceptInviteError, setAcceptInviteError] = useState<string | null>(null);
   const hasProcessed = useRef(false);
+  const inviteUrl = window.location.href;
 
   const storageKey = `pending_${inviteType}_invite_token`;
   const acceptMethod = inviteType === 'link' 
@@ -31,7 +33,9 @@ export function useAcceptInvite(inviteType: InviteType) {
       }
       // Redirect to the login page.
       hasProcessed.current = true;
-      navigate(ROUTES.SIGNIN);
+      // add the invite url to the query params.
+      const encodedInviteUrl = encodeURIComponent(inviteUrl);
+      navigate(`${ROUTES.SIGNIN}?redirectUrl=${encodedInviteUrl}`);
     } else {
       // If user is logged in, check if there is a token.
       if (token) {
@@ -80,7 +84,7 @@ export function useAcceptInvite(inviteType: InviteType) {
     } finally {
       setIsAcceptingInvite(false);
       // Clear the stored token
-      localStorage.removeItem(storageKey);
+      clearPendingInvite(inviteType);
     }
   };
 
