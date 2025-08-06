@@ -117,8 +117,11 @@ export class InviteService {
       }
 
       // Check if the invite is expired.
-      if (data.expires_at && data.expires_at < new Date()) {
-        throw new Error("Link invite expired");
+      if (data.expires_at) {
+        const expiresAt = new Date(data.expires_at);
+        if (expiresAt.getTime() < Date.now()) {
+          throw new Error("Link invite expired");
+        }
       }
 
       const dealMember = {
@@ -127,13 +130,10 @@ export class InviteService {
         role: data.role,
         added_by: data.created_by,
       }
-      console.log("deal accepted")
       // add to the deal_members table.
       await DealMemberService.createDealMembers([dealMember]);
-      console.log("deal member added")
       // Now update the expired at to current timestamp.
       await supabase.from("shared_links").update({ expires_at: new Date() }).eq("token", token);
-      console.log("deal link expired at updated")
       // Log the deal member added to the deal logs.
       await DealLogService.createDealLog({
         dealId: data.deal_id,
@@ -211,7 +211,14 @@ export class InviteService {
 
       // Check if the invite is expired.
       // exprires_at can be null, and time stamp can be 0.
-      return data.expires_at ? data.expires_at < new Date() : false;
+      if (data.expires_at) {
+        const expiresAt = new Date(data.expires_at);
+        if (expiresAt.getTime() < Date.now()) {
+          return true;
+        }
+      }
+
+      return false;
     }
     catch(err: any){
       ErrorService.handleApiError(err, "InviteService.checkIfLinkInviteExpired");

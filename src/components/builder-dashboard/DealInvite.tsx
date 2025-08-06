@@ -22,7 +22,7 @@ export default function DealInvite({ inviteType }: DealInviteProps) {
     <div className="flex flex-col items-center justify-center h-screen">
       {acceptInviteError && (
         <h1 className="text-2xl font-bold">
-          Sorry, something went wrong. Please try again or contact support. Redirecting to dashboard...
+          Could not accept invite, token not found or expired. Please try again. Redirecting to dashboard...
         </h1>
       )}
     </div>
