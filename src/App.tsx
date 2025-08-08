@@ -13,7 +13,7 @@ import TermsOfService from "@/pages/TermsOfService";
 
 // Protected pages
 import Dashboard from "@/pages/dashboard/Dashboard";
-import DealsPage from "@/pages/dealspage";
+import ManageDeals from "@/pages/deals/ManageDeals";
 import ViewDealPage from "@/pages/deals/ViewDealPage";
 import Profile from "@/pages/Profile";
 
@@ -113,7 +113,7 @@ export default function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<DealsPage />} />
+          <Route index element={<ManageDeals />} />
           <Route path=":dealId" element={<ViewDealPage />} />
         </Route>
 

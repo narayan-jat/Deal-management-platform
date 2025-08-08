@@ -108,8 +108,17 @@ export default function CreateEditDealCard({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // validate required fields
-    if (!formData.title.trim() || !formData.status || !formData.industry || !formData.startDate || !formData.nextMeetingDate) {
+    await submitDeal(false);
+  };
+
+  const handleDraftSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await submitDeal(true);
+  };
+
+  const submitDeal = async (isDraft: boolean) => {
+    // validate required fields only if not saving as draft
+    if ((!formData.title.trim() || !formData.status || !formData.industry || !formData.startDate || !formData.nextMeetingDate)) {
       toast.error("Please fill in all required fields", { style: { zIndex: 10001 } });
       return;
     }
@@ -124,17 +133,28 @@ export default function CreateEditDealCard({
     setIsSubmitting(true);
 
     try {
-      const deal = await onSubmit(formData, documents, members);
+      // Create a copy of form data for submission
+      const submissionData = { ...formData };
+      
+      // If saving as draft, set status to DRAFT if not already set
+      if (isDraft && submissionData.status !== DealStatus.DRAFT) {
+        submissionData.status = DealStatus.DRAFT;
+      }
+
+      const deal = await onSubmit(submissionData, documents, members);
       if (deal) {
-        toast.success(`Deal ${mode === 'create' ? 'created' : 'updated'} successfully`);
+        const action = isDraft ? 'saved as draft' : (mode === 'create' ? 'created' : 'updated');
+        toast.success(`Deal ${action} successfully`);
         onClose();
       } else {
         console.error('onSubmit returned null/undefined');
-        toast.error(`Failed to ${mode === 'create' ? 'create' : 'update'} deal`);
+        const action = isDraft ? 'saving as draft' : (mode === 'create' ? 'creating' : 'updating');
+        toast.error(`Failed to ${action} deal`);
       }
     } catch (error) {
-      console.error(`Error ${mode === 'create' ? 'creating' : 'updating'} deal:`, error);
-      toast.error(`Error ${mode === 'create' ? 'creating' : 'updating'} deal: ${error.message}`);
+      console.error(`Error ${isDraft ? 'saving draft' : (mode === 'create' ? 'creating' : 'updating')} deal:`, error);
+      const action = isDraft ? 'saving as draft' : (mode === 'create' ? 'creating' : 'updating');
+      toast.error(`Error ${action} deal: ${error.message}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -144,6 +164,7 @@ export default function CreateEditDealCard({
   const submitButtonText = isSubmitting
     ? (mode === 'create' ? "Creating..." : "Updating...")
     : (mode === 'create' ? "Create Deal" : "Update Deal");
+  const draftButtonText = isSubmitting ? "Saving..." : "Save as Draft";
 
   return (
     <>
@@ -454,6 +475,16 @@ export default function CreateEditDealCard({
                   >
                     Cancel
                   </Button>
+                 { mode === "create" && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleDraftSubmit}
+                    disabled={isSubmitting || !isFormValid}
+                    className="min-w-[120px]"
+                  >
+                    {draftButtonText}
+                  </Button>)}
                   <Button
                     type="submit"
                     disabled={isSubmitting || !isFormValid}

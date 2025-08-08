@@ -59,6 +59,30 @@ export class DealService {
   }
 
   /**
+   * Gets all deals for a user (created by the user).
+   * @param userId - The ID of the user.
+   * @returns The deals.
+   */
+  static async getAllDealsForUser(userId: string) {
+    try {
+      const { data, error } = await supabase
+        .from("deals")
+        .select("*")
+        .eq("created_by", userId)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        throw error;
+      }
+
+      return data;
+    } catch (error) {
+      ErrorService.handleApiError(error, "DealService.getAllDealsForUser");
+      throw error;
+    }
+  }
+
+  /**
    * Updates a deal in the "deals" table.
    * @param deal - The deal to update.
    * @returns The updated deal.

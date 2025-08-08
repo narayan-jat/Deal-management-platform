@@ -80,7 +80,7 @@ export const useViewDealPage = () => {
   };
 
   const handleClose = () => {
-    navigate('/dashboard');
+    navigate(-1);
   };
 
   const handleEditSubmit = async (dealData: Partial<DealModel>, documents: UploadDocumentForm[], members: InviteMemberForm[]): Promise<DealModel | null> => {
