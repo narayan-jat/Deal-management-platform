@@ -15,17 +15,20 @@ import {
   Tag,
   MessageSquare,
   ArrowLeft,
-  Activity
+  Activity,
+  MessageCircle,
+  Send
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '../ui/separator';
+import { Textarea } from '@/components/ui/textarea';
 import { DealCardType } from '@/types/deal/DealCard';
 import { DealStatus } from '@/types/deal/Deal.enums';
 import { cn } from '@/lib/utils';
 import { formatCurrency, getStatusInfo, formatDate } from '@/utility/Utility';
-import { DealLogModel } from '@/types/deal/Deal.model';
+import { DealLogModel, DealCommentModel } from '@/types/deal/Deal.model';
 import { parseLogData } from '@/utility/LogDataParser';
 import { getLogIcon } from '@/utility/LogIconUtils';
 import DealLogDetailsDialog from './DealLogDetailsDialog';
@@ -36,12 +39,30 @@ interface ViewDealProps {
   onClose?: () => void;
   dealLogs: DealLogModel[];
   isFetchingDealLogs: boolean;
+  dealComments: DealCommentModel[];
+  isFetchingDealComments: boolean;
+  onCreateComment: (comment: string) => Promise<DealCommentModel | null>;
+  onUpdateComment: (commentId: string, comment: string) => Promise<DealCommentModel | null>;
 }
 
-export default function ViewDeal({ deal, onEdit, onClose, dealLogs, isFetchingDealLogs }: ViewDealProps) {
+export default function ViewDeal({ 
+  deal, 
+  onEdit, 
+  onClose, 
+  dealLogs, 
+  isFetchingDealLogs,
+  dealComments,
+  isFetchingDealComments,
+  onCreateComment,
+  onUpdateComment
+}: ViewDealProps) {
   const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
   const [selectedLog, setSelectedLog] = useState<DealLogModel | null>(null);
   const [isLogDialogOpen, setIsLogDialogOpen] = useState(false);
+  const [newComment, setNewComment] = useState('');
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editingCommentText, setEditingCommentText] = useState('');
 
   const statusInfo = getStatusInfo(deal.status);
 
@@ -71,6 +92,46 @@ export default function ViewDeal({ deal, onEdit, onClose, dealLogs, isFetchingDe
   // Handle document preview
   const handleDocumentPreview = (document: any) => {
     // TODO: Implement document preview logic
+  };
+
+  // Handle comment submission
+  const handleSubmitComment = async () => {
+    if (!newComment.trim()) return;
+    
+    setIsSubmittingComment(true);
+    try {
+      await onCreateComment(newComment.trim());
+      setNewComment('');
+    } catch (error) {
+      console.error('Error submitting comment:', error);
+    } finally {
+      setIsSubmittingComment(false);
+    }
+  };
+
+  // Handle comment edit
+  const handleEditComment = (comment: DealCommentModel) => {
+    setEditingCommentId(comment.id);
+    setEditingCommentText(comment.comment);
+  };
+
+  // Handle comment update
+  const handleUpdateComment = async () => {
+    if (!editingCommentId || !editingCommentText.trim()) return;
+    
+    try {
+      await onUpdateComment(editingCommentId, editingCommentText.trim());
+      setEditingCommentId(null);
+      setEditingCommentText('');
+    } catch (error) {
+      console.error('Error updating comment:', error);
+    }
+  };
+
+  // Handle cancel comment edit
+  const handleCancelEdit = () => {
+    setEditingCommentId(null);
+    setEditingCommentText('');
   };
 
   return (
@@ -200,6 +261,119 @@ export default function ViewDeal({ deal, onEdit, onClose, dealLogs, isFetchingDe
                   <div className="pt-4 border-t border-gray-200">
                     <h4 className="text-sm font-medium text-gray-900 mb-2">Notes</h4>
                     <p className="text-gray-700 whitespace-pre-wrap">{deal.notes}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Comments Section */}
+            <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h3 className="text-lg font-semibold flex items-center space-x-2">
+                  <MessageCircle className="w-5 h-5" />
+                  <span>Comments</span>
+                  <Badge variant="secondary" className="ml-2">
+                    {dealComments?.length || 0}
+                  </Badge>
+                </h3>
+              </div>
+              <div className="p-6">
+                {/* Add Comment Form */}
+                <div className="mb-6">
+                  <div className="flex space-x-3 items-center">
+                    <Textarea
+                      placeholder="Add a comment..."
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      className="flex-1 min-h-[80px] resize-none"
+                      disabled={isSubmittingComment}
+                    />
+                    <Button
+                      onClick={handleSubmitComment}
+                      disabled={!newComment.trim() || isSubmittingComment}
+                    >
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Comments List */}
+                {isFetchingDealComments ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="text-gray-500">Loading comments...</p>
+                  </div>
+                ) : dealComments && dealComments.length > 0 ? (
+                  <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
+                    {dealComments.map((comment, index) => (
+                      <div
+                        key={comment.id || index}
+                        className="flex items-start space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors min-w-0"
+                      >
+                        <div className="flex-shrink-0 mt-1">
+                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <MessageCircle className="w-4 h-4 text-blue-600" />
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mb-2">
+                            <p className="font-medium text-gray-900 text-sm truncate">
+                              {getMemberName(comment.memberId)}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {formatDate(comment.createdAt)}
+                            </p>
+                          </div>
+                          
+                          {editingCommentId === comment.id ? (
+                            <div className="space-y-2">
+                              <Textarea
+                                value={editingCommentText}
+                                onChange={(e) => setEditingCommentText(e.target.value)}
+                                className="min-h-[60px] resize-none"
+                              />
+                              <div className="flex space-x-2">
+                                <Button
+                                  size="sm"
+                                  onClick={handleUpdateComment}
+                                  disabled={!editingCommentText.trim()}
+                                >
+                                  Save
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={handleCancelEdit}
+                                >
+                                  Cancel
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex items-start justify-between">
+                              <p className="text-sm text-gray-700 break-words flex-1">
+                                {comment.comment}
+                              </p>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleEditComment(comment)}
+                                className="ml-2 flex-shrink-0 p-2 h-8 w-8 hover:bg-gray-50 hover:border-gray-300"
+                                title="Edit comment"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <MessageCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500">No comments yet</p>
+                    <p className="text-sm text-gray-400">Be the first to add a comment</p>
                   </div>
                 )}
               </div>

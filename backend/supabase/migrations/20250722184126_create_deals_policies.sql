@@ -322,7 +322,7 @@ WITH CHECK (
 -- DEAL COMMENTS - SELECT POLICY
 -- =====================================================
 -- create a read policy for the deals_comments table
-CREATE POLICY "Allow deal members to read their own deal comments"
+CREATE POLICY "Allow deal members to read comments if they are deal members"
 ON deal_comments
 FOR SELECT
 USING (

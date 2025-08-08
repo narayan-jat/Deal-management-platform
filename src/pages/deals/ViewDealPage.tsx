@@ -19,7 +19,23 @@ import { useViewDealPage } from '@/hooks/useViewDealPage';
 
 export default function ViewDealPage() {
   const navigate = useNavigate();
-  const { dealId, deal, loading, isEditModalOpen, handleEdit, handleClose, handleDeleteDocument, handleEditSubmit, handleCloseEditModal, dealLogs, isFetchingDealLogs } = useViewDealPage();
+  const { 
+    dealId, 
+    deal, 
+    loading, 
+    isEditModalOpen, 
+    handleEdit, 
+    handleClose, 
+    handleDeleteDocument, 
+    handleEditSubmit, 
+    handleCloseEditModal, 
+    dealLogs, 
+    isFetchingDealLogs,
+    dealComments,
+    isFetchingDealComments,
+    handleCreateComment,
+    handleUpdateComment
+  } = useViewDealPage();
 
   if (loading) {
     return (
@@ -51,9 +67,13 @@ export default function ViewDealPage() {
       <ViewDeal
         dealLogs={dealLogs}
         isFetchingDealLogs={isFetchingDealLogs}
+        dealComments={dealComments}
+        isFetchingDealComments={isFetchingDealComments}
         deal={deal} 
         onEdit={handleEdit} 
         onClose={handleClose}
+        onCreateComment={handleCreateComment}
+        onUpdateComment={handleUpdateComment}
       />
       
       {isEditModalOpen && (
