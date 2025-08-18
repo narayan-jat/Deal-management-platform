@@ -2,6 +2,11 @@ import supabase from "@/lib/supabase";
 import { ProfileEditFormType } from "@/types/Profile";
 import { ErrorService } from "./ErrorService";
 import snakecaseKeys from "snakecase-keys";
+
+// =====================================================
+// PROFILE SERVICE
+// =====================================================
+
 export class ProfileService {
   /**
    * Fetches a user profile from the "profiles" table using the given user ID.

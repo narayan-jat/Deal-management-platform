@@ -10,6 +10,7 @@ export interface ProfileData {
   profilePath: string;
   bio: string;
   createdAt: string;
+  matrix_user_id?: string; // Matrix user ID for chat functionality
 }
 
 export type ProfileEditFormType = Partial<UserProfileData> & {

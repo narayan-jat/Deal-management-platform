@@ -5,8 +5,8 @@ import { Resend } from 'npm:resend';
 
 // ⬇️ Your API key from Resend or your provider
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"))
-const APP_URL = Deno.env.get("APP_URL") || "https://godex-three.vercel.app"
-const DOMAIN = Deno.env.get("DOMAIN") || "godex-three.vercel.app"
+const APP_URL = Deno.env.get("APP_URL") || "https://godex.cloud"
+const DOMAIN = Deno.env.get("DOMAIN") || "godex.cloud"
 
 // CORS headers
 const corsHeaders = {
@@ -39,7 +39,7 @@ serve(async (req) => {
 
   for (const invite of invites) {
     const token = crypto.randomUUID();
-    const inviteUrl = `${APP_URL}/deals/deal-email-invite?token=${token}`;
+    const inviteUrl = `${APP_URL}/deals/deal-email-invite/${token}`;
 
     const { error: emailError } = await resend.emails.send({
       from: `GoDex <noreply@${DOMAIN}>`,
@@ -58,7 +58,11 @@ serve(async (req) => {
     }
 
     const { error: dbError } = await supabaseAdmin.from("invites").insert({
-      ...invite,
+      email: invite.email,
+      deal_id: invite.dealId,
+      role: invite.role,
+      invited_by: invite.invitedBy,
+      permissions: invite?.permissions || null,
       token,
       status: "PENDING"
     });

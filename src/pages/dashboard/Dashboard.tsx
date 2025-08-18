@@ -19,7 +19,8 @@ import { InviteMemberForm } from "@/types/deal/Deal.members";
 import { ROUTES } from "@/config/routes";
 import { useSearch } from "@/context/SearchProvider";
 import { useCreateDeal } from "@/context/CreateDealProvider";
-
+import { useMatrix } from "@/hooks/useMatrix";
+import { MatrixRegistrationPopup } from "@/components/messages/MatrixRegistrationPopup";
 const columnNames = {
   new: "New",
   inProgress: "In Progress",
@@ -40,7 +41,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { setRefreshCallback } = useCreateDeal();
   const [dragTimeout, setDragTimeout] = useState<NodeJS.Timeout | null>(null);
-  
+  const { isMatrixRegistrationPopupOpen, setIsMatrixRegistrationPopupOpen, setMatrixUserId, setMatrixPassword, onRegister } = useMatrix();
   // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
@@ -252,6 +253,17 @@ export default function Dashboard() {
           handleDeleteDocument={handleDeleteDocument}
         />
       )}
+      {
+      isMatrixRegistrationPopupOpen && (
+        <MatrixRegistrationPopup
+          isOpen={isMatrixRegistrationPopupOpen}
+          onClose={() => setIsMatrixRegistrationPopupOpen(false)}
+          setMatrixUserId={setMatrixUserId}
+          setMatrixPassword={setMatrixPassword}
+          onRegister={onRegister}
+        />
+      )
+    }
     </div>
   );
 }

@@ -27,4 +27,38 @@ export const DialogContent = React.forwardRef<
     </DialogPrimitive.Content>
   </DialogPrimitive.Portal>
 ))
+
+export const DialogTitle = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Title>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Title  
+    ref={ref}
+    className={cn(
+      "text-lg font-semibold leading-none tracking-tight",
+      className
+    )}
+    {...props}
+  />
+))
+
+export const DialogDescription = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Description>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Description
+    ref={ref}
+    className={cn(
+      "text-sm text-muted-foreground",
+      className
+    )}
+    {...props}
+  />
+))
+
+export const DialogClose = DialogPrimitive.Close
+
 DialogContent.displayName = "DialogContent"
+DialogTitle.displayName = "DialogTitle"
+DialogDescription.displayName = "DialogDescription"
+DialogClose.displayName = "DialogClose"

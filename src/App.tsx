@@ -16,6 +16,7 @@ import Dashboard from "@/pages/dashboard/Dashboard";
 import ManageDeals from "@/pages/deals/ManageDeals";
 import ViewDealPage from "@/pages/deals/ViewDealPage";
 import Profile from "@/pages/Profile";
+import Messages from "@/pages/messages/Messages";
 
 // Layouts
 import AppLayout from "@/components/layout/AppLayout";
@@ -136,7 +137,7 @@ export default function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<Landing />} />
+          <Route index element={<Messages />} />
         </Route>
 
         <Route
