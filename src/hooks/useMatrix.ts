@@ -21,7 +21,6 @@ export function useMatrix() {
   const [isFetchingMatrixUser, setIsFetchingMatrixUser] = useState(true);
   const [matrixPassword, setMatrixPassword] = useState<string | null>(null);
   const [isMatrixRegistrationPopupOpen, setIsMatrixRegistrationPopupOpen] = useState(false);
-  const [isMatrixInitialized, setIsMatrixInitialized] = useState(false);
 
   // Check if the user is authorized with matrix.org.
   // Check if the user has a matrix user.
@@ -35,48 +34,41 @@ export function useMatrix() {
         setMatrixUserId(matrixUserId);
         setMatrixPassword(matrixPassword);
       } catch (error) {
-        ErrorService.logError(error, "useMatrix.useEffect");
+        ErrorService.logError(error, "useMessages.useEffect");
         throw error;
       } finally {
         setIsFetchingMatrixUser(false);
       }
     };
-    
-    if (user?.id) {
-      checkAuthorization();
-    }
-  }, [user?.id]);
+    checkAuthorization();
+  }, []);
 
   useEffect(() => {
     if (isFetchingMatrixUser) { 
       return;
     }
-    
     if (!matrixUserId || !matrixPassword) {
       // Redirect to the matrix registration page open in new tab.
       const registrationUrl = "https://app.element.io/#/register";
       window.open(registrationUrl, "_blank", "noopener,noreferrer");
       setIsMatrixRegistrationPopupOpen(true);
-    } else {
+    }
+    else{
       handleMatrixLogin();
     }
-  }, [isFetchingMatrixUser, matrixUserId, matrixPassword]);
+  }, [isFetchingMatrixUser]);
 
   const handleMatrixLogin = async () => {
     try {
       const matrixLoggedInUser = await MatrixService.login({
-        username: matrixUserId!,
-        password: matrixPassword!,
+        username: matrixUserId,
+        password: matrixPassword,
       });
-      
       // store userid and access token in the local storage.
       localStorage.setItem("matrixUserId", matrixLoggedInUser.userId);
       localStorage.setItem("matrixAccessToken", matrixLoggedInUser.accessToken);
-      
-      setIsMatrixInitialized(true);
-      console.log('Matrix login successful');
     } catch (error) {
-      ErrorService.logError(error, "useMatrix.handleMatrixLogin");
+      ErrorService.logError(error, "useMessages.handleMatrixLogin");
       toast.error("Could not login to matrix. Please check your credentials.");
     }
   };
@@ -99,7 +91,7 @@ export function useMatrix() {
         setIsMatrixRegistrationPopupOpen(false);
         handleMatrixLogin();
       } catch (error) {
-      ErrorService.logError(error, "useMatrix.onRegister");
+      ErrorService.logError(error, "useMessages.onRegister");
       toast.error("matrix user creation failed.");
     }
   };
@@ -113,6 +105,5 @@ export function useMatrix() {
     isMatrixRegistrationPopupOpen,
     setIsMatrixRegistrationPopupOpen,
     onRegister,
-    isMatrixInitialized,
   };
 }

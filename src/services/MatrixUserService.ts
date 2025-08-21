@@ -3,11 +3,18 @@ import { ProfileEditFormType } from "@/types/Profile";
 import { ErrorService } from "./ErrorService";
 import snakecaseKeys from "snakecase-keys";
 import { MatrixUserModel } from "@/types/Matrix";
-import { sign } from "crypto";
+import { MatrixService } from "./MatrixService";
 
 // =====================================================
 // MATRIX USER SERVICE
 // =====================================================
+
+const formatUserId = (userId: string) => {
+  if(userId && !userId.includes('@')) {
+    return `@${userId}:${MatrixService.homeserverDomain}`;
+  }
+  return userId;
+}
 
 export class MatrixUserService {
   /**
@@ -38,11 +45,12 @@ export class MatrixUserService {
    * Fetches all matrix users from the "matrix_users" table.
    * @returns The matrix user data or null if not found.
    */ 
-    static async getAllMatrixUsers() {
+    static async getAllMatchingMatrixUsers(query: string) {
       try {
         const { data, error } = await supabase
           .from("matrix_users")
-          .select("*");
+          .select("*")
+          .ilike("matrix_user_id", `%${query}%`);
           
       if (error) {
         throw error;
@@ -50,7 +58,7 @@ export class MatrixUserService {
   
         return data;
       } catch (error) {
-        ErrorService.logError(error, "MatrixUserService.getMatrixUser");
+        ErrorService.logError(error, "MatrixUserService.getAllMatchingMatrixUsers");
         throw error;
       }
     }
@@ -66,9 +74,14 @@ export class MatrixUserService {
     try {
       // convert the matrixUser to snakecase
       const snakeCaseMatrixUser = snakecaseKeys(matrixUser);
+      // Need to remove this later. if we host our own homeserver.
+      const formattedUserId = formatUserId(snakeCaseMatrixUser.matrix_user_id);
       const { data, error } = await supabase
         .from("matrix_users")
-        .insert(snakeCaseMatrixUser)
+        .insert({
+          ...snakeCaseMatrixUser,
+          matrix_user_id: formattedUserId,
+        })
         .select();
 
     if (error) {

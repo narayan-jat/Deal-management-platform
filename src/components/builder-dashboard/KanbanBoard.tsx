@@ -23,6 +23,7 @@ import { DealCardType } from "@/types/deal/DealCard";
 import { DollarSign } from "lucide-react";
 import { formatCurrency } from "@/utility/Utility";
 import { useCreateDeal } from "@/context/CreateDealProvider";
+import { getPlural } from "./utils";
 
 
 const columnNames = {
@@ -138,7 +139,7 @@ export default function KanbanBoard({
               <h3 className="text-lg font-semibold mb-4">
                 {columnNames[key as keyof typeof columnNames]}
                 <span className="ml-2 text-sm text-gray-500 font-normal">
-                  {cards.length} deals-<DollarSign className="inline-block h-3 w-3" /> {formatCurrency(cards.reduce((acc, card) => acc + card.requestedAmount, 0))}
+                  {cards.length} {getPlural(cards.length)} - <DollarSign className="inline-block h-3 w-3" /> {formatCurrency(cards.reduce((acc, card) => acc + card.requestedAmount, 0))}
                 </span>
               </h3>
               {/* <DroppableColumn
