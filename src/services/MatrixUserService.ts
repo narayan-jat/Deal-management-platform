@@ -28,13 +28,14 @@ export class MatrixUserService {
         .from("matrix_users")
         .select("*")
         .eq("user_id", userId)
-        .single();
         
     if (error) {
       throw error;
     }
-
-      return data;
+    if (data.length === 0) {
+      return [];
+    }
+    return data[0];
     } catch (error) {
       ErrorService.logError(error, "MatrixUserService.getMatrixUser");
       throw error;

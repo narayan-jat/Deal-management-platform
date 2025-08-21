@@ -4,32 +4,22 @@ import { MatrixClient } from 'matrix-js-sdk';
 import { MatrixService } from '@/services/MatrixService';
 import { ErrorService } from '@/services/ErrorService';
 import { toast } from 'sonner';
-
-// Assuming you have a Deal type - adjust based on your actual types
-type Deal = {
-  id: string;
-  title: string;
-  members: Array<{
-    id: string;
-    matrixUserId: string;
-    displayName: string;
-  }>;
-  // Add other deal properties as needed
-};
+import { DealCardType } from '@/types/deal/DealCard';
+import { MatrixUserService } from '@/services/MatrixUserService';
+import { useAuth } from "@/context/AuthProvider";
 
 export function useDealChat() {
   const navigate = useNavigate();
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
-
+  const { user } = useAuth();
   // Create or get existing chat room for a deal
-  const getOrCreateDealRoom = useCallback(async (deal: Deal): Promise<string | null> => {
+  const getOrCreateDealRoom = useCallback(async (deal: DealCardType): Promise<string | null> => {
     try {
       setIsCreatingRoom(true);
       const client = await MatrixService.initializeClient();
 
       // First, try to find existing room by checking if we're already in a room with this deal title
       const existingRoom = await findExistingDealRoom(client, deal.title);
-      
       if (existingRoom) {
         // Room exists, just navigate to it
         navigateToDealChat(existingRoom);
@@ -70,7 +60,7 @@ export function useDealChat() {
       
       // Look for room with matching name (deal title)
       for (const room of rooms) {
-        if (room.name === dealTitle) {
+        if (room.name.includes(dealTitle)) {
           return room.roomId;
         }
       }
@@ -83,32 +73,43 @@ export function useDealChat() {
   }, []);
 
   // Create new Matrix room for the deal
-  const createDealRoom = useCallback(async (client: MatrixClient, deal: Deal): Promise<string | null> => {
+  const createDealRoom = useCallback(async (client: MatrixClient, deal: DealCardType): Promise<string | null> => {
     try {
       // Extract Matrix user IDs from deal members
-      const memberUserIds = deal.members
-        .map(member => member.matrixUserId)
-        .filter(Boolean); // Filter out any undefined/null values
+      const memberUserIds = deal.contributors
+        .map(member => member.id)
+        .filter((userId) => userId !== user?.id); // Filter out any undefined/null values
 
-      if (memberUserIds.length === 0) {
-        toast.error('No valid Matrix users found in deal members');
-        return null;
-      }
+      // Above memberuserIds are the applicationi user ids get matrix user ids 
+      // from matrix user table.
+
+      const matrixUsers = await Promise.all(memberUserIds.map(async (userId) => {
+        return await MatrixUserService.getMatrixUser(userId);
+      }));
+      const matrixUserIds = matrixUsers.map((user) => user.matrix_user_id);
+      // filter out any undefined/null values
+      const filteredMatrixUserIds = matrixUserIds.filter((id) => id !== null && id !== undefined);
 
       // Create room options
       const roomOptions: any = {
-        preset: 'public_chat',
-        visibility: 'public',
+        preset: 'private_chat',
+        visibility: 'private',
         name: deal.title,
         topic: '', // Empty topic as requested
-        invite: memberUserIds,
+        invite: filteredMatrixUserIds,
       };
 
       // Create the room
       const result = await (client as any).createRoom(roomOptions);
       const roomId = result?.room_id as string;
 
+      if (filteredMatrixUserIds.length !== matrixUserIds.length) {
+        toast.error('Failed to create room - some users were not added to the room, add them manually');
+        return null;
+      }
+
       if (!roomId) {
+        toast.error('Failed to create room - no room ID returned');
         throw new Error('Failed to create room - no room ID returned');
       }
 
@@ -130,16 +131,11 @@ export function useDealChat() {
   // Navigate to the deal chat in Messages page
   const navigateToDealChat = useCallback((roomId: string) => {
     // Navigate to Messages page with the specific room selected
-    navigate('/messages', { 
-      state: { 
-        selectedRoomId: roomId,
-        fromDeal: true 
-      } 
-    });
+    navigate('/messages');
   }, [navigate]);
 
   // Handle deal chat button click
-  const handleDealChatClick = useCallback(async (deal: Deal) => {
+  const handleDealChatClick = useCallback(async (deal: DealCardType) => {
     await getOrCreateDealRoom(deal);
   }, [getOrCreateDealRoom]);
 

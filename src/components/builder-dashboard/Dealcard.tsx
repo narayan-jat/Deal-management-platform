@@ -1,11 +1,11 @@
-import { Calendar, Users, DollarSign, Building2, Edit, Eye, UserPlus } from "lucide-react";
+import { Calendar, Users, DollarSign, Building2, Edit, Eye, UserPlus, MessageCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import CollaboratorsModal from "./CollaboratorsModal";
 import AddCollaboratorsModal from "./AddCollaboratorsModal";
 import { DealCardType } from "@/types/deal/DealCard";
 import { DealMemberRole } from "@/types/deal/Deal.enums";
 import { toast } from "sonner";
-
+import { useDealChat } from "@/hooks/useDealChat";
 import { StatusToTitleMap } from "@/types/deal/DealCard";
 import { formatCurrency, getStatusInfo } from "@/utility/Utility";
 
@@ -25,6 +25,7 @@ export default function DealCard(props: DealCardProps) {
   const { deal, refProps, styles, listeners, attributes, onEdit, onView, hasEditAccess, onInviteCollaborators } = props;
   const [isCollaboratorsModalOpen, setIsCollaboratorsModalOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const {handleDealChatClick} = useDealChat();
 
   // Check if card is being dragged based on styles
   const isDragging = styles?.opacity === 0.8;
@@ -32,13 +33,13 @@ export default function DealCard(props: DealCardProps) {
   // Format the next meeting date
   const formatMeetingDate = (dateString: string) => {
     if (!dateString) return 'No meeting scheduled';
-    
+
     try {
       const date = new Date(dateString);
       const now = new Date();
       const diffTime = date.getTime() - now.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      
+
       if (diffDays < 0) {
         return 'Meeting overdue';
       } else if (diffDays === 0) {
@@ -48,8 +49,8 @@ export default function DealCard(props: DealCardProps) {
       } else if (diffDays <= 7) {
         return `In ${diffDays} days`;
       } else {
-        return date.toLocaleDateString('en-US', { 
-          month: 'short', 
+        return date.toLocaleDateString('en-US', {
+          month: 'short',
           day: 'numeric',
           year: 'numeric'
         });
@@ -109,12 +110,10 @@ export default function DealCard(props: DealCardProps) {
   return (
     <>
       {/* Main card container with drag and drop attributes */}
-      <div 
-        className={`block bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg hover:border-gray-300 transition-all duration-300 ease-out p-4 space-y-3 group relative my-3 ${
-          hasEditAccess ? 'dnd-kit-sortable' : 'cursor-default'
-        } ${
-          isDragging ? 'rotate-2 shadow-xl scale-105' : ''
-        } ${!hasEditAccess ? 'opacity-90' : ''}`}
+      <div
+        className={`block bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg hover:border-gray-300 transition-all duration-300 ease-out p-4 space-y-3 group relative my-3 ${hasEditAccess ? 'dnd-kit-sortable' : 'cursor-default'
+          } ${isDragging ? 'rotate-2 shadow-xl scale-105' : ''
+          } ${!hasEditAccess ? 'opacity-90' : ''}`}
         ref={hasEditAccess ? refProps : undefined}
         style={hasEditAccess ? styles : undefined}
         {...(hasEditAccess ? attributes : {})}
@@ -127,6 +126,15 @@ export default function DealCard(props: DealCardProps) {
           {/* Show edit button only if the role is in editAccessRoles, otherwise show view button at that place. If both, show both. Always visible, not on hover */}
           {hasEditAccess ? (
             <>
+              <button
+                onClick={() => handleDealChatClick(deal)}
+                className="absolute top-0  p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
+                style={{ right: '4.2rem' }}
+                title="Chat"
+                data-dnd-kit-disabled-draggable
+              >
+                <MessageCircle className="h-4 w-4" />
+              </button>
               <button
                 onClick={handleViewClick}
                 className="absolute top-0 right-10 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
@@ -145,14 +153,24 @@ export default function DealCard(props: DealCardProps) {
               </button>
             </>
           ) : (
-            <button
-              onClick={handleViewClick}
-              className="absolute top-0 right-3 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
-              title="View deal"
-              data-dnd-kit-disabled-draggable
-            >
-              <Eye className="h-4 w-4" />
-            </button>
+            <>
+              <button
+                onClick={handleViewClick}
+                className="absolute top-0 right-10 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
+                title="View deal"
+                data-dnd-kit-disabled-draggable
+              >
+                <MessageCircle className="h-4 w-4" />
+              </button>
+              <button
+                onClick={handleViewClick}
+                className="absolute top-0 right-3 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
+                title="View deal"
+                data-dnd-kit-disabled-draggable
+              >
+                <Eye className="h-4 w-4" />
+              </button>
+            </>
           )}
         </div>
 
@@ -193,7 +211,7 @@ export default function DealCard(props: DealCardProps) {
         {/* Contributors Row - Clickable with Invite Button */}
         <div className="flex items-center justify-between gap-2">
           {/* Contributors Info - Clickable */}
-          <div 
+          <div
             className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer hover:bg-gray-50 p-2 rounded-xl transition-all duration-200 ease-out hover:scale-[1.02] touch-manipulation flex-1 min-w-0"
             onClick={handleCollaboratorsClick}
             data-dnd-kit-disabled-draggable
