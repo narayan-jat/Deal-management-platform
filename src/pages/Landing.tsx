@@ -5,6 +5,7 @@ import HowItWorksSection from "@/components/landing/HowItWorksSection";
 import FeaturesSection from "@/components/landing/FeaturesSection";
 import RequestAccessPopup from "@/components/landing/RequestAccessPopup";
 import Footer from "@/components/landing/Footer";
+import { homeNavigationConfig } from "@/config/navigation";
 import { toast } from "sonner";
 
 type AccountType = "lender" | "borrower" | "broker" | "other";
@@ -98,7 +99,7 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen">
-      <Header isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} />
+      <Header isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} navigationConfig={homeNavigationConfig} />
       <main>
         <HeroSection openPopup={openPopup} />
         <div className="space-y-16 px-4 py-16 sm:px-6 lg:px-8 lg:py-20">

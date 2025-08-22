@@ -1,8 +1,9 @@
 import Header from "@/components/landing/Header";
-import { Link } from "react-router-dom";
-
+import { OtherExternalPageNavigationConfig } from "@/config/navigation";
 export default function PrivacyPolicy() {
   return (
+    <>
+    <Header isMenuOpen={false} toggleMenu={() => {}} navigationConfig={OtherExternalPageNavigationConfig} />
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <main className="max-w-4xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
@@ -142,5 +143,6 @@ export default function PrivacyPolicy() {
         </div>
       </main>
     </div>
+    </>
   );
 } 

@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
-
+import Header from "@/components/landing/Header";
+import { OtherExternalPageNavigationConfig } from "@/config/navigation";
 export default function TermsOfService() {
   return (
+    <>
+    <Header isMenuOpen={false} toggleMenu={() => {}} navigationConfig={OtherExternalPageNavigationConfig} />
     <div className="min-h-screen bg-gray-50">
 
       {/* Content */}
@@ -187,6 +190,7 @@ export default function TermsOfService() {
           </div>
         </div>
       </main>
-    </div>
+      </div>
+    </>
   );
 } 

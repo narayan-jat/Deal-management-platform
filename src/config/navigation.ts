@@ -12,7 +12,7 @@ export interface NavigationConfig {
   authNav: NavigationItem[];
 }
 
-export const navigationConfig: NavigationConfig = {
+export const homeNavigationConfig: NavigationConfig = {
   mainNav: [
     {
       title: "Home",
@@ -33,6 +33,43 @@ export const navigationConfig: NavigationConfig = {
       title: "Contact",
       scrollTarget: "contact",
       type: "scroll"
+    }
+  ],
+  authNav: [
+    {
+      title: "Sign in",
+      path: ROUTES.SIGNIN, 
+      type: "route"
+    },
+    {
+      title: "Sign Up",
+      path: ROUTES.SIGNUP,
+      type: "route"
+    }
+  ]
+};
+
+export const OtherExternalPageNavigationConfig: NavigationConfig = {
+  mainNav: [
+    {
+      title: "Home",
+      path: "/",
+      type: "route"
+    },
+    {
+      title: "How It Works",
+      path: "/",
+      type: "route"
+    },
+    {
+      title: "Features",
+      path: "/",
+      type: "route"
+    },
+    {
+      title: "Contact",
+      path: "/",
+      type: "route"
     }
   ],
   authNav: [

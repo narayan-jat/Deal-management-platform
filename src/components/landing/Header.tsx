@@ -1,13 +1,14 @@
 import { GoldButton } from "@/components/ui/button"
 import { Link } from "react-router-dom";
-import { navigationConfig, NavigationItem } from "@/config/navigation";
+import { NavigationConfig, NavigationItem } from "@/config/navigation";
 import logo from '@/assets/godex-logo.png';
 interface HeaderProps {
   isMenuOpen: boolean;
   toggleMenu: () => void;
+  navigationConfig: NavigationConfig
 }
 
-export default function Header({ isMenuOpen, toggleMenu }: HeaderProps) {
+export default function Header({ isMenuOpen, toggleMenu, navigationConfig }: HeaderProps) {
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -47,8 +48,8 @@ export default function Header({ isMenuOpen, toggleMenu }: HeaderProps) {
     if (item.type === 'scroll') {
       return (
         <button
-          key={item.title}
-          onClick={() => isMobile ? handleMobileNavClick(item) : handleNavClick(item)}
+         key={item.title}
+          onClick={( ) => isMobile ? handleMobileNavClick(item) : handleNavClick(item)}
           className={`${baseClasses} ${mobileClasses}`}
         >
           {item.title}
