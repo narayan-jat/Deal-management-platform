@@ -20,13 +20,13 @@ export const navigationConfig: NavigationConfig = {
       type: "scroll"
     },
     {
-      title: "Features",
-      scrollTarget: "features",
+      title: "How It Works",
+      scrollTarget: "how-it-works",
       type: "scroll"
     },
     {
-      title: "How It Works",
-      scrollTarget: "how-it-works",
+      title: "Features",
+      scrollTarget: "features",
       type: "scroll"
     },
     {

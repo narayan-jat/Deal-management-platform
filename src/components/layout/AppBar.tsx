@@ -16,7 +16,7 @@ import { useSearch } from '@/context/SearchProvider';
 import { useCreateDeal } from '@/context/CreateDealProvider';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/config/routes';
-
+import logo from '@/assets/godex-logo.png';
 
 interface AppBarProps {
   onMenuClick: () => void;
@@ -99,7 +99,12 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
         </button>
 
         <div className="flex items-center gap-2">
-          <span className="font-semibold text-gray-900 hidden sm:block">Godex</span>
+          <img
+            src={logo}
+            alt="Godex Logo"
+            className="h-8 w-auto"
+            style={{ maxHeight: 32 }}
+          />
         </div>
       </div>
 

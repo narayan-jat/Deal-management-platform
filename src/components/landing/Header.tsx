@@ -1,7 +1,7 @@
 import { GoldButton } from "@/components/ui/button"
 import { Link } from "react-router-dom";
 import { navigationConfig, NavigationItem } from "@/config/navigation";
-
+import logo from '@/assets/godex-logo.png';
 interface HeaderProps {
   isMenuOpen: boolean;
   toggleMenu: () => void;
@@ -34,9 +34,9 @@ export default function Header({ isMenuOpen, toggleMenu }: HeaderProps) {
 
     if (item.type === 'route' && item.path) {
       return (
-        <Link 
+        <Link
           key={item.title}
-          to={item.path} 
+          to={item.path}
           className={`${baseClasses} ${mobileClasses}`}
         >
           {item.title}
@@ -67,13 +67,18 @@ export default function Header({ isMenuOpen, toggleMenu }: HeaderProps) {
             {/* Logo - Left */}
             <div className="flex items-center">
               <Link to="/" className="text-2xl font-bold text-godex-primary font-inter">
-                GoDex
+                <img
+                  src={logo}
+                  alt="Godex Logo"
+                  className="h-8 w-auto"
+                  style={{ maxHeight: 32 }}
+                />
               </Link>
             </div>
-            
+
             {/* Desktop Auth Navigation - Right */}
             <div className="hidden md:flex items-center space-x-8">
-            {navigationConfig.mainNav.map(item => renderNavItem(item))}
+              {navigationConfig.mainNav.map(item => renderNavItem(item))}
               {navigationConfig.authNav.map((item, index) => (
                 <div key={item.title}>
                   {item.title === "Sign Up" ? (
@@ -92,7 +97,7 @@ export default function Header({ isMenuOpen, toggleMenu }: HeaderProps) {
                 </div>
               ))}
             </div>
-            
+
             {/* Mobile Menu Button */}
             <button
               className="md:hidden p-2 rounded-md text-gray-600 hover:text-godex-primary hover:bg-gray-100 transition-colors"
@@ -100,15 +105,15 @@ export default function Header({ isMenuOpen, toggleMenu }: HeaderProps) {
               aria-label="Open menu"
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <rect x="4" y="6" width="16" height="2" rx="1" fill="currentColor"/>
-                <rect x="4" y="11" width="16" height="2" rx="1" fill="currentColor"/>
-                <rect x="4" y="16" width="16" height="2" rx="1" fill="currentColor"/>
+                <rect x="4" y="6" width="16" height="2" rx="1" fill="currentColor" />
+                <rect x="4" y="11" width="16" height="2" rx="1" fill="currentColor" />
+                <rect x="4" y="16" width="16" height="2" rx="1" fill="currentColor" />
               </svg>
             </button>
           </div>
         </nav>
       </div>
-      
+
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-200 shadow-lg">
@@ -119,7 +124,7 @@ export default function Header({ isMenuOpen, toggleMenu }: HeaderProps) {
                 {navigationConfig.mainNav.map(item => renderNavItem(item, true))}
               </div>
             </div>
-            
+
             {/* Mobile Auth Navigation */}
             <div className="pt-4 border-t border-gray-200 space-y-3">
               <div className="flex flex-col items-center space-y-3">
