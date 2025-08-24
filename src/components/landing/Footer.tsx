@@ -3,14 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Link } from "react-router-dom";
-
-interface FormData {
-  email: string;
-  message: string;
-}
+import { Contact } from "@/types/Contact";
 
 interface FooterProps {
-  formData: FormData;
+  formData: Partial<Contact>;
   updateFormField: (field: string, value: string) => void;
   submitForm: () => void;
 }

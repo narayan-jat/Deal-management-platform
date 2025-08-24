@@ -129,6 +129,7 @@ export default function HeroSection({ openPopup }: HeroSectionProps) {
             <GoldButton 
               className="w-full sm:w-auto"
               onClick={openPopup}
+              id="request-early-access-button"
             >
               Request Early Access
             </GoldButton>

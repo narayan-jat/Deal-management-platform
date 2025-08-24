@@ -3,24 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-
-type AccountType = "lender" | "borrower" | "broker" | "other";
-
-interface FormData {
-  email: string;
-  firstName: string;
-  lastName: string;
-  phone: string;
-  company: string;
-  accountType: AccountType;
-  message: string;
-}
+import { EarlyAccessModel, EarlyAccessAccountType, EarlyAccessAccountTypeLabels } from "@/types/EarlyAccess";
 
 interface RequestAccessPopupProps {
   isOpen: boolean;
   onClose: () => void;
-  formData: FormData;
-  updateFormField: (field: string, value: string) => void;
+  formData: Partial<EarlyAccessModel>;
+  updateFormField: (field: keyof EarlyAccessModel, value: string) => void;
   submitForm: () => void;
 }
 
@@ -160,10 +149,11 @@ export default function RequestAccessPopup({
                     <SelectValue placeholder="Select account type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="lender">Lender</SelectItem>
-                    <SelectItem value="borrower">Borrower</SelectItem>
-                    <SelectItem value="broker">Broker</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
+                    {Object.entries(EarlyAccessAccountTypeLabels).map(([key, label]) => (
+                      <SelectItem key={key} value={key}>
+                        {label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

@@ -3,21 +3,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-type AccountType = "lender" | "borrower" | "broker" | "other";
-
-interface FormData {
-  email: string;
-  firstName: string;
-  lastName: string;
-  phone: string;
-  company: string;
-  accountType: AccountType;
-  message: string;
-}
+import { EarlyAccessModel } from "@/types/EarlyAccess";
 
 interface FeaturesSectionProps {
-  formData: FormData;
+  formData: Partial<EarlyAccessModel>;
   updateFormField: (field: string, value: string) => void;
   submitForm: () => void;
 }

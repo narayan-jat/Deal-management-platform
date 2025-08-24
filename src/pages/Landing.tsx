@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "@/components/landing/Header";
 import HeroSection from "@/components/landing/HeroSection";
 import HowItWorksSection from "@/components/landing/HowItWorksSection";
@@ -7,38 +7,17 @@ import RequestAccessPopup from "@/components/landing/RequestAccessPopup";
 import Footer from "@/components/landing/Footer";
 import { homeNavigationConfig } from "@/config/navigation";
 import { toast } from "sonner";
-
-type AccountType = "lender" | "borrower" | "broker" | "other";
-
-interface AccessRequestType {
-  email: string;
-  firstName: string;
-  lastName: string;
-  phone: string;
-  company: string;
-  accountType: AccountType;
-  message: string;
-}
-
-interface ContactFormType {
-  email: string;
-  message: string;
-}
+import { EarlyAccessModel } from "@/types/EarlyAccess";
+import { Contact } from "@/types/Contact";
+import useRequestEarlyAccess from "@/hooks/useRequestEarlyAccess";
+import axios from "axios";
 
 export default function Landing() {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
-  const [accessRequestFormData, setAccessRequestFormData] = useState<AccessRequestType>({
-    email: "",
-    firstName: "",
-    lastName: "",
-    phone: "",
-    company: "",
-    accountType: "lender",
-    message: "",
-  });
+  const { accessRequestFormData, updateAccessRequestFormField, handleSubmitEarlyAccessRequest } = useRequestEarlyAccess();
 
-  const [contactFormData, setContactFormData] = useState<ContactFormType>({
+  const [contactFormData, setContactFormData] = useState<Partial<Contact>>({
     email: "",
     message: "",
   });
@@ -55,13 +34,6 @@ export default function Landing() {
     setIsPopupOpen(false);
   }
 
-  function updateAccessRequestFormField(field: string, value: string) {
-    setAccessRequestFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  }
-
   function updateContactFormField(field: string, value: string) {
     setContactFormData((prev) => ({
       ...prev,
@@ -69,32 +41,37 @@ export default function Landing() {
     }));
   }
 
-  const handleSubmitEarlyAccessRequest = () => {
+  const handleContactFormSubmit = async () => {
     // Handle form submission logic here
-    // Show success toast
-    toast.success("Thanks for reaching out. We'll be in touch soon.");
-    
-    // Reset form data
-    setAccessRequestFormData({
-      email: "",
-      firstName: "",
-      lastName: "",
-      phone: "",
-      company: "",
-      accountType: "lender",
-      message: "",
-    });
-  };
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/contact`,
+        {
+          contactData: contactFormData
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+        }
+      );
 
-  const handleContactFormSubmit = () => {
-    // Handle form submission logic here
-    // set form data to empty
-    setContactFormData({
-      email: "",
-      message: "",
-    });
-    // Show success toast
-    toast.success("Thanks for reaching out. We'll be in touch soon.");
+      if (response.status !== 200) {
+        throw new Error(response.data.error);
+      }
+
+      // set form data to empty
+      setContactFormData({
+        email: "",
+        message: "",
+      });
+      // Show success toast
+      toast.success("Thanks for reaching out. We'll be in touch soon.");
+    }
+    catch (error) {
+      toast.error(error.message)
+    }
   };
 
   return (
