@@ -24,14 +24,10 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const snakeCaseContactData = {
-      email: contactData.email,
-      message: contactData.message,
-    }
     // Insert into contacts
     const { error: contactError } = await supabaseAdmin
       .from("contacts")
-      .insert(snakeCaseContactData);
+      .insert(contactData);
 
     if (contactError) {
       return new Response(JSON.stringify({ error: contactError.message }), {
