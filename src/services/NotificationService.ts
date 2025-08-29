@@ -12,9 +12,9 @@ import { NotificationModel } from "@/types/Notification";
 
 export class NotificationService {
   /**
-   * Fetches a matrix user from the "matrix_users" table using the given user ID.
+   * Fetches all notifications for a user from the "notifications" table.
    * @param userId - The unique ID of the user.
-   * @returns The matrix user data or null if not found.
+   * @returns Array of notifications for the user.
    */
   static async getNotifications(userId: string) {
     try {
@@ -22,14 +22,13 @@ export class NotificationService {
         .from("notifications")
         .select("*")
         .eq("user_id", userId)
+        .order("created_at", { ascending: false });
         
     if (error) {
       throw error;
     }
-    if (data.length === 0) {
-      return [];
-    }
-    return data[0];
+    
+    return data || [];
     } catch (error) {
       ErrorService.logError(error, "NotificationService.getNotifications");
       throw error;
@@ -37,21 +36,42 @@ export class NotificationService {
   }
 
   /**
-   * Creates a matrix user in the "matrix_users" table.
+   * Fetches unread notifications for a user from the "notifications" table.
    * @param userId - The unique ID of the user.
-   * @param matrixUserId - The unique ID of the matrix user.
-   * @param matrixAccessToken - The access token for the matrix user.
-   * @param matrixRefreshToken - The refresh token for the matrix user.
+   * @returns Array of unread notifications for the user.
+   */
+  static async getUnreadNotifications(userId: string) {
+    try {
+      const { data, error } = await supabase
+        .from("notifications")
+        .select("*")
+        .eq("user_id", userId)
+        .eq("read", false)
+        .order("created_at", { ascending: false });
+        
+    if (error) {
+      throw error;
+    }
+    
+    return data || [];
+    } catch (error) {
+      ErrorService.logError(error, "NotificationService.getUnreadNotifications");
+      throw error;
+    }
+  }
+
+  /**
+   * Creates a notification in the "notifications" table.
+   * @param notification - The notification data to create.
    */
   static async createNotification(notification: Partial<NotificationModel>) {
     try {
-      // convert the matrixUser to snakecase
+      // convert the notification to snakecase
       const snakeCaseNotification = snakecaseKeys(notification);
       const { data, error } = await supabase
-        .from("matrix_users")
+        .from("notifications")
         .insert({
-          ...snakeCaseMatrixUser,
-          matrix_user_id: formattedUserId,
+          ...snakeCaseNotification,
         })
         .select();
 
@@ -61,24 +81,24 @@ export class NotificationService {
 
       return data;
     } catch (error) {
-      ErrorService.logError(error, "MatrixUserService.createMatrixUser");
+      ErrorService.logError(error, "NotificationService.createNotification");
       throw error;
     }
   }
 
   /**
-   * Updates a matrix user in the "matrix_users" table.
-   * @param matrixUserId - The unique ID of the matrix user.
-   * @param matrixUser - The matrix user data to update.
+   * Updates a notification in the "notifications" table.
+   * @param notificationId - The unique ID of the notification.
+   * @param notification - The notification data to update.
    */
-  static async updateMatrixUser(matrixUserId: string, matrixUser: Partial<MatrixUserModel>) {
+  static async updateNotification(notificationId: string, notification: Partial<NotificationModel>) {
     try {
-      // convert the matrixUser to snakecase
-      const snakeCaseMatrixUser = snakecaseKeys(matrixUser);
+      // convert the notification to snakecase
+      const snakeCaseNotification = snakecaseKeys(notification);
       const { data, error } = await supabase
-        .from("matrix_users")
-        .update(snakeCaseMatrixUser)
-        .eq("id", matrixUserId)
+        .from("notifications")
+        .update(snakeCaseNotification)
+        .eq("id", notificationId)
         .select();
 
     if (error) {
@@ -87,7 +107,54 @@ export class NotificationService {
 
       return data;
     } catch (error) {
-      ErrorService.logError(error, "MatrixUserService.updateMatrixUser");
+      ErrorService.logError(error, "NotificationService.updateNotification");
+      throw error;
+    }
+  }
+
+  /**
+   * Marks a notification as read.
+   * @param notificationId - The unique ID of the notification.
+   */
+  static async markAsRead(notificationId: string) {
+    try {
+      const { data, error } = await supabase
+        .from("notifications")
+        .update({ read: true })
+        .eq("id", notificationId)
+        .select();
+
+    if (error) {
+      throw error;
+    }
+
+      return data;
+    } catch (error) {
+      ErrorService.logError(error, "NotificationService.markAsRead");
+      throw error;
+    }
+  }
+
+  /**
+   * Marks all notifications for a user as read.
+   * @param userId - The unique ID of the user.
+   */
+  static async markAllAsRead(userId: string) {
+    try {
+      const { data, error } = await supabase
+        .from("notifications")
+        .update({ read: true })
+        .eq("user_id", userId)
+        .eq("read", false)
+        .select();
+
+    if (error) {
+      throw error;
+    }
+
+      return data;
+    } catch (error) {
+      ErrorService.logError(error, "NotificationService.markAllAsRead");
       throw error;
     }
   }
