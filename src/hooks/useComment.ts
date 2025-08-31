@@ -7,6 +7,7 @@ import camelcaseKeys from "camelcase-keys";
 import { toast } from "sonner";
 import { NotificationService } from "@/services/NotificationService";
 import { ErrorService } from "@/services/ErrorService";
+import { DealCardType } from "@/types/deal/DealCard";
 
 export const useComment = () => {
   const { user } = useAuth();
@@ -159,18 +160,18 @@ export const useComment = () => {
   };
 
   // add funtionality to mention deal members in the comment
-  const handleMentionMember = async (memberId: string, commentId: string, comment: string) => {
+  const handleMentionMember = async (memberId: string, deal: DealCardType) => {
     if (!user?.id) {
       setApiError("User not authenticated");
       return false;
     }
     try {
       // create a notification for the member
+      const message = `You have been mentioned in a comment on deal ${deal.title}`;
       await NotificationService.createNotification({
         userId: memberId,
         data: {
-          "deal_id": dealId,
-          "comment": comment,
+          message: message,
         },
         type: "mentions",
       });
@@ -264,7 +265,7 @@ export const useComment = () => {
   
 
   // Handle comment submission with members for mention processing
-  const handleSubmitCommentWithMembers = async (members: any[]) => {
+  const handleSubmitCommentWithMembers = async (deal: DealCardType) => {
     if (!newComment.trim()) return;
 
     setIsSubmittingComment(true);
@@ -274,10 +275,10 @@ export const useComment = () => {
       // Extract and process mentions from the comment text
       console.log("createdComment", createdComment);
       if (createdComment) {
-        const extractedMentions = extractMentions(newComment.trim(), members);
+        const extractedMentions = extractMentions(newComment.trim(), deal.contributors || []);
         if (extractedMentions.length > 0) {
           for (const mention of extractedMentions) {
-            await handleMentionMember(mention.memberId, createdComment.id, newComment.trim());
+            await handleMentionMember(mention.memberId, deal);
           }
         }
       }
@@ -293,7 +294,7 @@ export const useComment = () => {
   // Handle comment submission (legacy function)
   const handleSubmitComment = async () => {
     if (!newComment.trim()) return;
-    await handleSubmitCommentWithMembers([]);
+    await handleSubmitCommentWithMembers({} as DealCardType);
   };
   // Handle comment edit
   const handleEditComment = (comment: DealCommentModel) => {
@@ -302,7 +303,7 @@ export const useComment = () => {
   };
 
   // Handle comment update with members for mention processing
-  const handleUpdateCommentLocalWithMembers = async (members: any[]) => {
+  const handleUpdateCommentLocalWithMembers = async (deal: DealCardType) => {
     if (!editingCommentId || !editingCommentText.trim()) return;
 
     try {
@@ -310,10 +311,10 @@ export const useComment = () => {
       
       // Extract and process mentions from the comment text
       if (updatedComment) {
-        const extractedMentions = extractMentions(editingCommentText.trim(), members);
+        const extractedMentions = extractMentions(editingCommentText.trim(), deal.contributors || []);
         if (extractedMentions.length > 0) {
           for (const mention of extractedMentions) {
-            await handleMentionMember(mention.memberId, updatedComment.id, editingCommentText.trim());
+            await handleMentionMember(mention.memberId, deal);
           }
         }
       }
@@ -328,7 +329,7 @@ export const useComment = () => {
   // Handle comment update (legacy function)
   const handleUpdateCommentLocal = async () => {
     if (!editingCommentId || !editingCommentText.trim()) return;
-    await handleUpdateCommentLocalWithMembers([]);
+    await handleUpdateCommentLocalWithMembers({} as DealCardType);
   };
 
   // Handle cancel comment edit

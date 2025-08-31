@@ -12,9 +12,7 @@ import {
   CheckCheck, 
   RefreshCw, 
   AlertCircle,
-  Info,
   MessageSquare,
-  Calendar,
   User
 } from "lucide-react";
 
@@ -37,11 +35,7 @@ export default function NotificationsPage() {
         return <MessageSquare className="h-5 w-5 text-blue-500" />;
       case "alert":
         return <AlertCircle className="h-5 w-5 text-red-500" />;
-      case "info":
-        return <Info className="h-5 w-5 text-blue-500" />;
-      case "calendar":
-        return <Calendar className="h-5 w-5 text-green-500" />;
-      case "user":
+      case "mentions":
         return <User className="h-5 w-5 text-purple-500" />;
       default:
         return <Bell className="h-5 w-5 text-gray-500" />;
@@ -54,11 +48,7 @@ export default function NotificationsPage() {
         return "bg-blue-50 border-blue-200";
       case "alert":
         return "bg-red-50 border-red-200";
-      case "info":
-        return "bg-blue-50 border-blue-200";
-      case "calendar":
-        return "bg-green-50 border-green-200";
-      case "user":
+      case "mentions":
         return "bg-purple-50 border-purple-200";
       default:
         return "bg-gray-50 border-gray-200";
@@ -204,7 +194,7 @@ export default function NotificationsPage() {
                         <div className="text-sm text-gray-900 mb-2">
                           {typeof notification.data === 'string' 
                             ? notification.data 
-                            : JSON.stringify(notification.data)
+                            : (notification.data as any).message
                           }
                         </div>
                         

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   Calendar, 
   MapPin, 
@@ -9,8 +9,6 @@ import {
   Edit, 
   Download,
   Eye,
-  Trash2,
-  Plus,
   Clock,
   Tag,
   MessageSquare,
@@ -18,18 +16,15 @@ import {
   Activity,
   MessageCircle,
   Send,
-  Upload
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '../ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { DealCardType } from '@/types/deal/DealCard';
-import { DealStatus } from '@/types/deal/Deal.enums';
 import { cn } from '@/lib/utils';
 import { formatCurrency, getStatusInfo, formatDate } from '@/utility/Utility';
-import { DealLogModel, DealCommentModel } from '@/types/deal/Deal.model';
+import { DealLogModel } from '@/types/deal/Deal.model';
 import { parseLogData } from '@/utility/LogDataParser';
 import { getLogIcon } from '@/utility/LogIconUtils';
 import DealLogDetailsDialog from './DealLogDetailsDialog';
@@ -37,6 +32,8 @@ import { useComment } from '@/hooks/useComment';
 import { MentionDropdown } from '@/components/ui/MentionDropdown';
 import { DocumentUploadButton } from './DocumentUploadButton';
 import { useDocumentUpload } from '@/hooks/useDocumentUpload';
+import { toast } from 'sonner';
+import { DocumentStorageService } from '@/services/DocumentStorageService';
 
 interface ViewDealProps {
   deal: DealCardType;
@@ -111,13 +108,47 @@ export default function ViewDeal({
   };
 
   // Handle document download
-  const handleDocumentDownload = (document: any) => {
-    // TODO: Implement document download logic
+  const handleDocumentDownload = async (dealDocument: any) => {
+    try {
+      // For files stored in Supabase storage, we need to get a signed URL first
+      if (dealDocument.filePath) {
+        // This would require getting a signed URL from Supabase
+        const signedUrl = await DocumentStorageService.getDocumentSignedUrl(dealDocument.filePath);
+        const link = document.createElement('a');
+        link.href = `${signedUrl}&download=${encodeURIComponent(dealDocument.fileName || 'document')}`;
+        link.setAttribute('download', dealDocument.fileName || 'document');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+      }      
+      toast.success(`Downloading ${dealDocument.fileName}`);
+    } catch (error) {
+      console.error('Error downloading document:', error);
+      toast.error('Failed to download document');
+    }
   };
 
   // Handle document preview
-  const handleDocumentPreview = (document: any) => {
-    // TODO: Implement document preview logic
+  const handleDocumentPreview = async (document: any) => {
+    const fileExtension = document.fileName?.split('.').pop()?.toLowerCase();
+    const previewableExtensions = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+    
+    if (previewableExtensions.includes(fileExtension)) {
+      // Open in new tab for previewable files
+      try {
+        const signedUrl = await DocumentStorageService.getDocumentSignedUrl(document.filePath);
+        window.open(signedUrl, '_blank');
+        toast.success(`Opening ${document.fileName} in new tab`);
+      } catch (error) {
+        console.error('Error opening document preview:', error);
+        toast.error('Failed to open document preview');
+      }
+    } else {
+      // For non-previewable files, trigger download
+      toast.info(`${document.fileName} cannot be previewed. Downloading instead.`);
+      handleDocumentDownload(document);
+    }
   };
 
 
@@ -386,7 +417,7 @@ export default function ViewDeal({
                       disabled={isSubmittingComment}
                     />
                     <Button
-                      onClick={() => handleSubmitCommentWithMembers(deal.contributors || [])}
+                      onClick={() => handleSubmitCommentWithMembers(deal)}
                       disabled={!newComment.trim() || isSubmittingComment}
                     >
                       <Send className="w-4 h-4" />
@@ -442,7 +473,7 @@ export default function ViewDeal({
                               <div className="flex space-x-2">
                                 <Button
                                   size="sm"
-                                  onClick={() => handleUpdateCommentLocalWithMembers(deal.contributors || [])}
+                                  onClick={() => handleUpdateCommentLocalWithMembers(deal)}
                                   disabled={!editingCommentText.trim()}
                                 >
                                   Save
@@ -516,15 +547,27 @@ export default function ViewDeal({
                       >
                         <div 
                           className="flex items-center space-x-3 flex-1 min-w-0 cursor-pointer"
-                          onClick={() => handleDocumentPreview(document)}
                         >
                           <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0 group-hover:bg-blue-200 transition-colors">
                             <FileText className="w-4 h-4 text-blue-600" />
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-gray-900 truncate text-sm sm:text-base group-hover:text-blue-600 transition-colors">
-                              {document.fileName}
-                            </p>
+                          <div className="flex-1 min-w-0" onClick={() => handleDocumentPreview(document)}>
+                            <div className="flex items-center space-x-2">
+                              <p className="font-medium text-gray-900 truncate text-sm sm:text-base group-hover:text-blue-600 transition-colors">
+                                {document.fileName}
+                              </p>
+                              {(() => {
+                                const fileExtension = document.fileName?.split('.').pop()?.toLowerCase();
+                                const previewableExtensions = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+                                const isPreviewable = previewableExtensions.includes(fileExtension);
+                                
+                                return isPreviewable ? (
+                                  <Badge variant="outline" className="text-xs text-green-600 border-green-200 bg-green-50">
+                                    Preview
+                                  </Badge>
+                                ) : null;
+                              })()}
+                            </div>
                             <p className="text-xs text-gray-500 hidden sm:block">
                               {document.mimeType} • {formatDate(document.uploadedAt)}
                             </p>
