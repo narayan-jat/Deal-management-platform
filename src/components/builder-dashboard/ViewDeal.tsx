@@ -17,7 +17,8 @@ import {
   ArrowLeft,
   Activity,
   MessageCircle,
-  Send
+  Send,
+  Upload
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -34,6 +35,8 @@ import { getLogIcon } from '@/utility/LogIconUtils';
 import DealLogDetailsDialog from './DealLogDetailsDialog';
 import { useComment } from '@/hooks/useComment';
 import { MentionDropdown } from '@/components/ui/MentionDropdown';
+import { DocumentUploadButton } from './DocumentUploadButton';
+import { useDocumentUpload } from '@/hooks/useDocumentUpload';
 
 interface ViewDealProps {
   deal: DealCardType;
@@ -41,6 +44,7 @@ interface ViewDealProps {
   onClose?: () => void;
   dealLogs: DealLogModel[];
   isFetchingDealLogs: boolean;
+  onRefreshDeal?: () => void;
 }
 
 export default function ViewDeal({ 
@@ -48,7 +52,8 @@ export default function ViewDeal({
   onEdit, 
   onClose, 
   dealLogs, 
-  isFetchingDealLogs
+  isFetchingDealLogs,
+  onRefreshDeal
 }: ViewDealProps) {
   const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
   const [selectedLog, setSelectedLog] = useState<DealLogModel | null>(null);
@@ -74,6 +79,9 @@ export default function ViewDeal({
     handleMemberSelection,
     getFilteredMembers,
   } = useComment();
+
+  // Use the document upload hook
+  const { updateDealDocuments } = useDocumentUpload();
 
   // Mention-related state
   const [isMentionDropdownOpen, setIsMentionDropdownOpen] = useState(false);
@@ -111,6 +119,8 @@ export default function ViewDeal({
   const handleDocumentPreview = (document: any) => {
     // TODO: Implement document preview logic
   };
+
+
 
   // Handle mention input changes
   const handleCommentInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>, isEditing: boolean = false) => {
@@ -216,13 +226,34 @@ export default function ViewDeal({
                 <p className="text-sm text-gray-500">Deal Details</p>
               </div>
             </div>
-            <Button
-              onClick={onEdit}
-              className="flex items-center space-x-2"
-            >
-              <Edit className="w-4 h-4" />
-              <span className="hidden sm:inline">Edit Deal</span>
-            </Button>
+            <div className="flex items-center space-x-3">
+              {/* Document Upload Button */}
+              <DocumentUploadButton
+                dealId={deal.id}
+                organizationId={deal.organizationId}
+                onUpload={async (documents) => {
+                  return await updateDealDocuments(deal.id, documents, deal.organizationId || '');
+                }}
+                onSuccess={() => {
+                  if (onRefreshDeal) {
+                    onRefreshDeal();
+                  }
+                }}
+                variant="outline"
+                size="default"
+                buttonText="Upload Documents"
+                loadingText="Uploading..."
+              />
+
+              {/* Edit Deal Button */}
+              <Button
+                onClick={onEdit}
+                className="flex items-center space-x-2"
+              >
+                <Edit className="w-4 h-4" />
+                <span className="hidden sm:inline">Edit Deal</span>
+              </Button>
+            </div>
           </div>
         </div>
       </div>

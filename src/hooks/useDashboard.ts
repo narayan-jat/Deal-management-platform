@@ -8,9 +8,9 @@ import { ErrorService } from '@/services/ErrorService';
 import { columnKeyToEnum } from '@/Constants';
 import camelcaseKeys from 'camelcase-keys';
 import { ProfileService } from '@/services/ProfileService';
-import { DealDocumentService } from '@/services/deals/DealDocumentService';
 import { DealCardType } from '@/types/deal/DealCard';
 import { useSearch } from '@/context/SearchProvider';
+import { useDocumentUpload } from './useDocumentUpload';
 import { createDealLogs } from './utils';
 import { LogType } from '@/types/deal/Deal.enums';
 import { getSignedProfileImageUrl } from '@/utility/Utility';
@@ -26,6 +26,7 @@ export const useDashboard = () => {
   const [apiError, setApiError] = useState<string | null>(null);
   const { user } = useAuth();
   const { setAllDeals } = useSearch();
+  const { getDealDocuments } = useDocumentUpload();
 
   const fetchDeals = async () => {
     try {
@@ -64,7 +65,7 @@ export const useDashboard = () => {
 
       // Get the documents of the deals to show on the card.
       await Promise.all(deals.map(async (deal) => {
-        const dealDocuments = await DealDocumentService.getDealDocuments(deal.id);
+        const dealDocuments = await getDealDocuments(deal.id);
         deal.documents = dealDocuments.map((document) => ({
           id: document.id,
           fileName: document.file_name,

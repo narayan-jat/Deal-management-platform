@@ -1,5 +1,14 @@
 import { useState, useEffect } from "react";
-import { X, Calendar, MapPin, Users, Upload, FileText, Trash2 } from "lucide-react";
+import {
+  X,
+  Calendar,
+  MapPin,
+  Users,
+  Upload,
+  FileText,
+  Trash2,
+} from "lucide-react";
+import { DocumentUploadButton } from "./DocumentUploadButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -26,8 +35,16 @@ interface CreateEditDealCardProps {
   onClose: () => void;
   mode: "create" | "edit";
   initialBaseFormData?: DealCardForm;
-  onSubmit: (deal: Partial<DealModel>, documents: UploadDocumentForm[], members: InviteMemberForm[]) => Promise<DealModel | null>;
-  handleDeleteDocument: (dealId: string, documentId: string, filePath: string) => Promise<void>;
+  onSubmit: (
+    deal: Partial<DealModel>,
+    documents: UploadDocumentForm[],
+    members: InviteMemberForm[]
+  ) => Promise<DealModel | null>;
+  handleDeleteDocument: (
+    dealId: string,
+    documentId: string,
+    filePath: string
+  ) => Promise<boolean>;
 }
 
 interface handleInputChangeProps {
@@ -59,26 +76,33 @@ export default function CreateEditDealCard({
     id: initialBaseFormData?.id || "", // Make sure ID is included
   });
   // Initialize documents with data when editing/creating
-  const [documents, setDocuments] = useState<UploadDocumentForm[]>(initialBaseFormData?.documents || []);
+  const [documents, setDocuments] = useState<UploadDocumentForm[]>(
+    initialBaseFormData?.documents || []
+  );
   // here not allowing to modify and see earlier members will show in other features.
-  const [members, setMembers] = useState<InviteMemberForm[]>(initialBaseFormData?.members || []);
+  const [members, setMembers] = useState<InviteMemberForm[]>(
+    initialBaseFormData?.members || []
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isAddCollaboratorsModalOpen, setIsAddCollaboratorsModalOpen] = useState(false);
+  const [isAddCollaboratorsModalOpen, setIsAddCollaboratorsModalOpen] =
+    useState(false);
   const stages = Object.values(DealStatus);
   const industries = INDUSTRY_OPTIONS;
 
   const handleInputChange = ({ field, value }: handleInputChangeProps) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleFileInputChange = (files: FileList | null) => {
-    if (!files) return;
+  // every 5 second give user a reminder to save the deal as draft. or create it.
+  useEffect(() => {
+    const interval = setInterval(() => {
+      toast.warning(
+        "Please edit the deal or create or save as draft. To prevent your changes from getting lost."
+      );
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
-    const newDocuments = Array.from(files).map(file => ({
-      file: file,
-    }));
-    setDocuments(prev => [...prev, ...newDocuments]);
-  };
 
   const handleCloseAddCollaboratorsModal = () => {
     setIsAddCollaboratorsModalOpen(false);
@@ -88,21 +112,24 @@ export default function CreateEditDealCard({
     const memberId = members[index]?.id;
     if (memberId) {
       // remove member from supabase more complex logic come back.
-      setMembers(prev => prev.filter((_, i) => i !== index));
+      setMembers((prev) => prev.filter((_, i) => i !== index));
     } else {
-      setMembers(prev => prev.filter((_, i) => i !== index));
+      setMembers((prev) => prev.filter((_, i) => i !== index));
     }
   };
-
 
   const handleRemoveDocument = async (index: number) => {
     const documentId = documents[index]?.id;
     if (documentId) {
       // remove document from supabase more complex logic come back.
-      await handleDeleteDocument(formData.id, documentId, documents[index]?.filePath);
-      setDocuments(prev => prev.filter((_, i) => i !== index));
+      await handleDeleteDocument(
+        formData.id,
+        documentId,
+        documents[index]?.filePath
+      );
+      setDocuments((prev) => prev.filter((_, i) => i !== index));
     } else {
-      setDocuments(prev => prev.filter((_, i) => i !== index));
+      setDocuments((prev) => prev.filter((_, i) => i !== index));
     }
   };
 
@@ -118,15 +145,25 @@ export default function CreateEditDealCard({
 
   const submitDeal = async (isDraft: boolean) => {
     // validate required fields only if not saving as draft
-    if ((!formData.title.trim() || !formData.status || !formData.industry || !formData.startDate || !formData.nextMeetingDate)) {
-      toast.error("Please fill in all required fields", { style: { zIndex: 10001 } });
+    if (
+      !formData.title.trim() ||
+      !formData.status ||
+      !formData.industry ||
+      !formData.startDate ||
+      !formData.nextMeetingDate
+    ) {
+      toast.error("Please fill in all required fields", {
+        style: { zIndex: 10001 },
+      });
       return;
     }
 
     // Ensure deal ID is included when editing
-    if (mode === 'edit' && !formData.id) {
-      console.error('Deal ID is missing for edit mode');
-      toast.error("Deal ID is missing for editing", { style: { zIndex: 10001 } });
+    if (mode === "edit" && !formData.id) {
+      console.error("Deal ID is missing for edit mode");
+      toast.error("Deal ID is missing for editing", {
+        style: { zIndex: 10001 },
+      });
       return;
     }
 
@@ -135,7 +172,7 @@ export default function CreateEditDealCard({
     try {
       // Create a copy of form data for submission
       const submissionData = { ...formData };
-      
+
       // If saving as draft, set status to DRAFT if not already set
       if (isDraft && submissionData.status !== DealStatus.DRAFT) {
         submissionData.status = DealStatus.DRAFT;
@@ -143,44 +180,81 @@ export default function CreateEditDealCard({
 
       const deal = await onSubmit(submissionData, documents, members);
       if (deal) {
-        const action = isDraft ? 'saved as draft' : (mode === 'create' ? 'created' : 'updated');
+        const action = isDraft
+          ? "saved as draft"
+          : mode === "create"
+          ? "created"
+          : "updated";
         toast.success(`Deal ${action} successfully`);
         onClose();
       } else {
-        console.error('onSubmit returned null/undefined');
-        const action = isDraft ? 'saving as draft' : (mode === 'create' ? 'creating' : 'updating');
+        console.error("onSubmit returned null/undefined");
+        const action = isDraft
+          ? "saving as draft"
+          : mode === "create"
+          ? "creating"
+          : "updating";
         toast.error(`Failed to ${action} deal`);
       }
     } catch (error) {
-      console.error(`Error ${isDraft ? 'saving draft' : (mode === 'create' ? 'creating' : 'updating')} deal:`, error);
-      const action = isDraft ? 'saving as draft' : (mode === 'create' ? 'creating' : 'updating');
+      console.error(
+        `Error ${
+          isDraft ? "saving draft" : mode === "create" ? "creating" : "updating"
+        } deal:`,
+        error
+      );
+      const action = isDraft
+        ? "saving as draft"
+        : mode === "create"
+        ? "creating"
+        : "updating";
       toast.error(`Error ${action} deal: ${error.message}`);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const isFormValid = formData.title.trim() && formData.status && formData.industry && formData.startDate && formData.nextMeetingDate;
+  const isFormValid =
+    formData.title.trim() &&
+    formData.status &&
+    formData.industry &&
+    formData.startDate &&
+    formData.nextMeetingDate;
   const submitButtonText = isSubmitting
-    ? (mode === 'create' ? "Creating..." : "Updating...")
-    : (mode === 'create' ? "Create Deal" : "Update Deal");
+    ? mode === "create"
+      ? "Creating..."
+      : "Updating..."
+    : mode === "create"
+    ? "Create Deal"
+    : "Update Deal";
   const draftButtonText = isSubmitting ? "Saving..." : "Save as Draft";
 
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" style={{ scrollBehavior: "smooth" }}>
+        <DialogContent
+          className="max-w-2xl max-h-[90vh] overflow-y-auto"
+          style={{ scrollBehavior: "smooth" }}
+        >
           <div className="space-y-6">
             {/* Header */}
             <div className="text-center border-b border-gray-200 pb-4">
-              <h2 className="text-2xl font-bold text-gray-900 font-inter">{mode === 'create' ? 'Create New Deal' : 'Edit Deal'}</h2>
+              <h2 className="text-2xl font-bold text-gray-900 font-inter">
+                {mode === "create" ? "Create New Deal" : "Edit Deal"}
+              </h2>
             </div>
             {/* Form Content */}
-            <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0">
+            <form
+              onSubmit={handleSubmit}
+              className="flex-1 flex flex-col min-h-0"
+            >
               <div className="flex-1 p-6 space-y-6 overflow-y-auto">
                 {/* Deal Title */}
                 <div className="space-y-2">
-                  <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="title"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Deal Title <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -189,7 +263,12 @@ export default function CreateEditDealCard({
                     type="text"
                     placeholder="Enter deal title"
                     value={formData.title}
-                    onChange={(e) => handleInputChange({ field: "title", value: e.target.value })}
+                    onChange={(e) =>
+                      handleInputChange({
+                        field: "title",
+                        value: e.target.value,
+                      })
+                    }
                     required
                     className="w-full"
                     aria-describedby="title-error"
@@ -203,7 +282,10 @@ export default function CreateEditDealCard({
 
                 {/* Deal Value */}
                 <div className="space-y-2">
-                  <label htmlFor="requestedAmount" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="requestedAmount"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Requested Amount
                   </label>
                   <div className="relative">
@@ -216,7 +298,12 @@ export default function CreateEditDealCard({
                       type="number"
                       placeholder="0.00"
                       value={formData.requestedAmount}
-                      onChange={(e) => handleInputChange({ field: "requestedAmount", value: parseFloat(e.target.value) || 0 })}
+                      onChange={(e) =>
+                        handleInputChange({
+                          field: "requestedAmount",
+                          value: parseFloat(e.target.value) || 0,
+                        })
+                      }
                       className="w-full pl-8"
                       step="0.01"
                     />
@@ -225,12 +312,20 @@ export default function CreateEditDealCard({
 
                 {/* Status */}
                 <div className="space-y-2">
-                  <label htmlFor="status" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="status"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Status <span className="text-red-500">*</span>
                   </label>
                   <Select
                     value={formData.status}
-                    onValueChange={(value) => handleInputChange({ field: "status", value: value as DealStatus })}
+                    onValueChange={(value) =>
+                      handleInputChange({
+                        field: "status",
+                        value: value as DealStatus,
+                      })
+                    }
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select a status" />
@@ -247,12 +342,17 @@ export default function CreateEditDealCard({
 
                 {/* Industry */}
                 <div className="space-y-2">
-                  <label htmlFor="industry" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="industry"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Industry <span className="text-red-500">*</span>
                   </label>
                   <Select
                     value={formData.industry}
-                    onValueChange={(value) => handleInputChange({ field: "industry", value: value })}
+                    onValueChange={(value) =>
+                      handleInputChange({ field: "industry", value: value })
+                    }
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select an industry" />
@@ -269,7 +369,10 @@ export default function CreateEditDealCard({
 
                 {/* Location */}
                 <div className="space-y-2">
-                  <label htmlFor="location" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="location"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Location
                   </label>
                   <div className="relative">
@@ -280,7 +383,12 @@ export default function CreateEditDealCard({
                       type="text"
                       placeholder="Enter location"
                       value={formData.location || ""}
-                      onChange={(e) => handleInputChange({ field: "location", value: e.target.value })}
+                      onChange={(e) =>
+                        handleInputChange({
+                          field: "location",
+                          value: e.target.value,
+                        })
+                      }
                       className="w-full pl-10"
                     />
                   </div>
@@ -288,11 +396,16 @@ export default function CreateEditDealCard({
 
                 {/* Date Range - Responsive Grid */}
                 <div className="space-y-4">
-                  <h3 className="text-sm font-medium text-gray-700">Deal Timeline</h3>
+                  <h3 className="text-sm font-medium text-gray-700">
+                    Deal Timeline
+                  </h3>
 
                   {/* Start Date */}
                   <div className="space-y-2">
-                    <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
+                    <label
+                      htmlFor="startDate"
+                      className="block text-sm font-medium text-gray-700"
+                    >
                       Start Date <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
@@ -302,7 +415,12 @@ export default function CreateEditDealCard({
                         name="startDate"
                         type="date"
                         value={formData.startDate}
-                        onChange={(e) => handleInputChange({ field: "startDate", value: e.target.value })}
+                        onChange={(e) =>
+                          handleInputChange({
+                            field: "startDate",
+                            value: e.target.value,
+                          })
+                        }
                         className="w-full pl-10"
                       />
                     </div>
@@ -310,7 +428,10 @@ export default function CreateEditDealCard({
 
                   {/* End Date */}
                   <div className="space-y-2">
-                    <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">
+                    <label
+                      htmlFor="endDate"
+                      className="block text-sm font-medium text-gray-700"
+                    >
                       End Date
                     </label>
                     <div className="relative">
@@ -320,7 +441,12 @@ export default function CreateEditDealCard({
                         name="endDate"
                         type="date"
                         value={formData.endDate}
-                        onChange={(e) => handleInputChange({ field: "endDate", value: e.target.value })}
+                        onChange={(e) =>
+                          handleInputChange({
+                            field: "endDate",
+                            value: e.target.value,
+                          })
+                        }
                         className="w-full pl-10"
                       />
                     </div>
@@ -329,7 +455,10 @@ export default function CreateEditDealCard({
 
                 {/* Next Meeting */}
                 <div className="space-y-2">
-                  <label htmlFor="nextMeetingDate" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="nextMeetingDate"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Next Meeting <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
@@ -339,7 +468,12 @@ export default function CreateEditDealCard({
                       name="nextMeetingDate"
                       type="date"
                       value={formData.nextMeetingDate}
-                      onChange={(e) => handleInputChange({ field: "nextMeetingDate", value: e.target.value })}
+                      onChange={(e) =>
+                        handleInputChange({
+                          field: "nextMeetingDate",
+                          value: e.target.value,
+                        })
+                      }
                       className="w-full pl-10"
                     />
                   </div>
@@ -347,28 +481,30 @@ export default function CreateEditDealCard({
 
                 {/* Documents Section */}
                 <div className="space-y-4">
-                  <h3 className="text-sm font-medium text-gray-700">Documents</h3>
+                  <h3 className="text-sm font-medium text-gray-700">
+                    Documents
+                  </h3>
 
-                  {/* File Upload Button */}
-                  <div className="relative">
-                    <input
-                      type="file"
-                      multiple
-                      onChange={(e) => handleFileInputChange(e.target.files)}
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif"
-                      id="file-upload"
-                    />
-                    <label
-                      htmlFor="file-upload"
-                      className="flex items-center justify-center gap-2 w-full p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors cursor-pointer"
-                    >
-                      <Upload className="h-5 w-5 text-gray-400" />
-                      <span className="text-sm text-gray-600">
-                        Click to upload files or drag and drop
-                      </span>
-                    </label>
-                  </div>
+                  {/* Document Upload Component */}
+                  <DocumentUploadButton
+                    dealId={formData.id || "new-deal"}
+                    organizationId={formData.organizationId}
+                    onUpload={async (documents) => {
+                      // Add documents to local state
+                      setDocuments((prev) => [...prev, ...documents]);
+                      return documents;
+                    }}
+                    onSuccess={(uploadedDocuments) => {
+                      // Documents are already added to local state
+                      console.log(
+                        "Documents added successfully:",
+                        uploadedDocuments
+                      );
+                    }}
+                    className="w-full"
+                    buttonText="Upload Documents"
+                    loadingText="Uploading..."
+                  />
 
                   {/* File List */}
                   {documents.length > 0 && (
@@ -394,7 +530,9 @@ export default function CreateEditDealCard({
                               type="button"
                               onClick={() => handleRemoveDocument(index)}
                               className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors flex-shrink-0"
-                              aria-label={`Remove document ${document.file?.name || document.id}`}
+                              aria-label={`Remove document ${
+                                document.file?.name || document.id
+                              }`}
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
@@ -406,19 +544,19 @@ export default function CreateEditDealCard({
                 </div>
 
                 {/* Add Collaborators only if edit */}
-                {mode === 'edit' && (
+                {mode === "edit" && (
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700">
                       Collaborators
                     </label>
-                  <Button
-                    type="button"
-                    onClick={() => setIsAddCollaboratorsModalOpen(true)}
-                    variant="outline"
-                    className="w-full flex items-center gap-2"
-                  >
-                    <Users className="h-4 w-4" />
-                    Add Collaborators
+                    <Button
+                      type="button"
+                      onClick={() => setIsAddCollaboratorsModalOpen(true)}
+                      variant="outline"
+                      className="w-full flex items-center gap-2"
+                    >
+                      <Users className="h-4 w-4" />
+                      Add Collaborators
                     </Button>
                   </div>
                 )}
@@ -426,7 +564,9 @@ export default function CreateEditDealCard({
                 {/* Collaborators Chips */}
                 {members.length > 0 && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Collaborators</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Collaborators
+                    </label>
                     <div className="flex flex-wrap gap-2">
                       {members.map((member, idx) => (
                         <span
@@ -449,7 +589,10 @@ export default function CreateEditDealCard({
                 )}
                 {/* Notes */}
                 <div className="space-y-2">
-                  <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="notes"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Notes
                   </label>
                   <Textarea
@@ -457,7 +600,12 @@ export default function CreateEditDealCard({
                     name="notes"
                     placeholder="Add any additional notes about this deal..."
                     value={formData.notes || ""}
-                    onChange={(e) => handleInputChange({ field: "notes", value: e.target.value })}
+                    onChange={(e) =>
+                      handleInputChange({
+                        field: "notes",
+                        value: e.target.value,
+                      })
+                    }
                     rows={4}
                     className="w-full resize-none"
                   />
@@ -475,16 +623,18 @@ export default function CreateEditDealCard({
                   >
                     Cancel
                   </Button>
-                 { mode === "create" && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleDraftSubmit}
-                    disabled={isSubmitting || !isFormValid}
-                    className="min-w-[120px]"
-                  >
-                    {draftButtonText}
-                  </Button>)}
+                  {/* can not save as draft in edit mode */}
+                  {mode === "create" && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleDraftSubmit}
+                      disabled={isSubmitting || !isFormValid}
+                      className="min-w-[120px]"
+                    >
+                      {draftButtonText}
+                    </Button>
+                  )}
                   <Button
                     type="submit"
                     disabled={isSubmitting || !isFormValid}

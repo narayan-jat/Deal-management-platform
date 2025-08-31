@@ -1,17 +1,16 @@
 import { useState, useEffect } from 'react';
-import { DealModel, DealMemberModel, DealDocumentModel } from '../types/deal/Deal.model';
-import { UploadDocumentForm, DealDocument } from '@/types/deal/Deal.documents';
+import { DealModel, DealMemberModel } from '../types/deal/Deal.model';
+import { UploadDocumentForm } from '@/types/deal/Deal.documents';
 import { DealService } from '@/services/deals/DealService';
 import { ErrorService } from '@/services/ErrorService';
 import { DealMember, InviteMemberForm } from '@/types/deal/Deal.members';
 import camelcaseKeys from 'camelcase-keys';
-import { DocumentStorageService } from '@/services/DocumentStorageService';
 import { useAuth } from '@/context/AuthProvider';
-import { LogType, SignatureStatus } from '@/types/deal/Deal.enums';
+import { LogType } from '@/types/deal/Deal.enums';
 import { DealMemberRole } from '@/types/deal/Deal.enums';
 import { getDateString } from '@/utility/Utility';
-import { DealDocumentService } from '@/services/deals/DealDocumentService';
 import { DealMemberService } from '@/services/deals/DealMemberService';
+import { useDocumentUpload } from './useDocumentUpload';
 
 import { createDealLogs } from './utils';
 import { useUserProfile } from '@/context/UserProfileProvider';
@@ -21,6 +20,7 @@ export const useCreateEditDeal = () => {
   const [apiError, setApiError] = useState<string | null>(null);
   const { user } = useAuth();
   const { userProfile } = useUserProfile();
+  const { createDealDocuments, updateDealDocuments, handleDeleteDocument: deleteDocument } = useDocumentUpload();
 
   // Create a new deal
   const handleCreateDeal = async (deal: Partial<DealModel>, documents: UploadDocumentForm[], members: InviteMemberForm[]): Promise<DealModel | null> => {
@@ -45,17 +45,10 @@ export const useCreateEditDeal = () => {
         const createdDeal = await DealService.createDeal(deal);
         const camelCaseDeal = camelcaseKeys(createdDeal, { deep: true }) as DealModel;
 
-        // Upload the documents on the storage.
-        const uploadResults = await handleUploadDocuments(camelCaseDeal.id, deal.organizationId, documents);
-        // Need to convert the documents and members to the correct format.
-        const dealDocuments: Partial<DealDocument>[] = uploadResults.map((result) => ({
-          dealId: camelCaseDeal.id,
-          uploadedBy: user.id,
-          signatureStatus: SignatureStatus.UNSIGNED,
-          filePath: result.path,
-          fileName: result.fileName,
-          mimeType: result.mimeType,
-        }));
+        // Upload the documents on the storage and create deal documents.
+        if (documents.length > 0) {
+          await createDealDocuments(camelCaseDeal.id, documents, deal.organizationId);
+        }
         
         // Need to convert the members to the correct format.
         const dealMembers: Partial<DealMemberModel>[] = members.map((member) => ({
@@ -64,11 +57,6 @@ export const useCreateEditDeal = () => {
           role: member.role as DealMemberRole,
           addedBy: user.id,
         }));
-
-        // add the documents to the deal documents table.
-        if (dealDocuments.length > 0) {
-          await DealDocumentService.createDealDocuments(dealDocuments);
-        }
         // add the members to the deal members table.
         if (dealMembers.length > 0) {
           await DealMemberService.createDealMembers(dealMembers);
@@ -85,21 +73,7 @@ export const useCreateEditDeal = () => {
     }
   }
 
-  const handleUploadDocuments = async (dealId: string, organizationId: string, documents: UploadDocumentForm[]) => {
-    if (!user?.id) {
-      setApiError("User not authenticated");
-      return;
-    }
-    // convert documents to File[]
-    const fileDocuments = documents.map((document) => document.file);
-    try {
-      // get the organization
-      const uploadedDocuments = await DocumentStorageService.uploadDocument(dealId, organizationId, fileDocuments);
-      return uploadedDocuments;
-    } catch (error) {
-      setApiError(error.message);
-    }
-  }
+
 
   const handleEditDeal = async (deal: Partial<DealModel>, documents: UploadDocumentForm[], members: InviteMemberForm[]): Promise<DealModel | null> => {
     
@@ -139,20 +113,8 @@ export const useCreateEditDeal = () => {
       // having a filePath.
       const documentsToUpload = documents.filter((document) => !document.filePath);
       if (documentsToUpload.length > 0) {
-        const uploadResults = await handleUploadDocuments(camelCaseDeal.id, deal.organizationId, documentsToUpload);
-        // Need to convert the documents and members to the correct format.
-        const dealDocuments: Partial<DealDocument>[] = uploadResults.map((result) => ({
-          dealId: camelCaseDeal.id,
-          uploadedBy: user.id,
-          signatureStatus: SignatureStatus.UNSIGNED,
-          filePath: result.path,
-          fileName: result.fileName,
-          mimeType: result.mimeType,
-        }));
-
-        // add the documents to the deal documents table.
-        if (dealDocuments.length > 0) {
-          const createdDocuments = await DealDocumentService.createDealDocuments(dealDocuments);
+        const createdDocuments = await updateDealDocuments(camelCaseDeal.id, documentsToUpload, deal.organizationId);
+        if (createdDocuments.length > 0) {
           const createdDocumentsMetaData = createdDocuments.map((document) => ({
             id: document.id,
             isUploaded: true,
@@ -185,24 +147,7 @@ export const useCreateEditDeal = () => {
     }
   }
 
-  const handleDeleteDocument = async (dealId: string, documentId: string, filePath: string) => {
-    try {
-      // First remove the document from the storage.
-      await DocumentStorageService.deleteDocument(filePath);
-      // Then remove the document from the deal documents table.
-      await DealDocumentService.deleteDealDocument([documentId]);
-      // update the deal logs.
-      await createDealLogs(user.id, dealId, {
-        documents: {
-          id: documentId,
-          isDeleted: true,
-          action: 'document deleted',
-        },
-      }, LogType.DELETED);
-    } catch (error) {
-      setApiError(error.message);
-    }
-  }
+
 
 
 
@@ -211,7 +156,7 @@ export const useCreateEditDeal = () => {
     apiError, 
     handleCreateDeal, 
     handleEditDeal, 
-    handleDeleteDocument
+    handleDeleteDocument: deleteDocument
   };
 }
 

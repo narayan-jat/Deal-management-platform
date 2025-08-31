@@ -9,11 +9,11 @@ import { DealMemberService } from "@/services/deals/DealMemberService";
 import { ProfileService } from "@/services/ProfileService";
 import { ProfileStorageService } from "@/services/ProfileStorageService";
 import { ErrorService } from "@/services/ErrorService";
-import { DealDocumentService } from "@/services/deals/DealDocumentService";
 import { toast } from "sonner";
 import { useDashboard } from "./useDashboard";
 import { useCreateEditDeal } from "./useCreateEditDeal";
 import { useComment } from "./useComment";
+import { useDocumentUpload } from "./useDocumentUpload";
 import { UploadDocumentForm } from "@/types/deal/Deal.documents";
 import { InviteMemberForm } from "@/types/deal/Deal.members";
 import camelcaseKeys from "camelcase-keys";
@@ -27,13 +27,14 @@ export const useViewDealPage = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isFetchingDealLogs, setIsFetchingDealLogs] = useState(false);
   const [dealLogs, setDealLogs] = useState<DealLogModel[]>([]);
-  const { handleEditDeal, handleDeleteDocument } = useCreateEditDeal();
+  const { handleEditDeal } = useCreateEditDeal();
   const { 
     comments: dealComments, 
     isFetchingComments: isFetchingDealComments,
     handleCreateComment,
     handleUpdateComment
   } = useComment();
+  const { getDealDocuments, handleDeleteDocument } = useDocumentUpload();
 
   useEffect(() => {
     const fetchDealCardDetails = async () => {
@@ -133,7 +134,7 @@ export const useViewDealPage = () => {
   
         // Get the documents of the deals to show on the card.
         await Promise.all(deals.map(async (deal) => {
-          const dealDocuments = await DealDocumentService.getDealDocuments(deal.id);
+          const dealDocuments = await getDealDocuments(deal.id);
           deal.documents = dealDocuments.map((document) => ({
             id: document.id,
             fileName: document.file_name,
@@ -171,6 +172,13 @@ export const useViewDealPage = () => {
     setIsEditModalOpen(false);
   };
 
+  // Wrapper function to refresh deal data without requiring dealId parameter
+  const refreshDeal = async () => {
+    if (dealId) {
+      await refreshDealCardDetails(dealId);
+    }
+  };
+
   return {
     dealId,
     deal,
@@ -187,5 +195,6 @@ export const useViewDealPage = () => {
     handleCloseEditModal,
     handleCreateComment,
     handleUpdateComment,
+    refreshDeal,
   };
 };

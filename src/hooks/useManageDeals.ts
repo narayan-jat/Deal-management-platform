@@ -3,11 +3,11 @@ import { DealCardType } from '@/types/deal/DealCard';
 import { DealStatus } from '@/types/deal/Deal.enums';
 import { DealService } from '@/services/deals/DealService';
 import { DealMemberService } from '@/services/deals/DealMemberService';
-import { DealDocumentService } from '@/services/deals/DealDocumentService';
 import { ProfileService } from '@/services/ProfileService';
 import { ErrorService } from '@/services/ErrorService';
 import { useAuth } from '@/context/AuthProvider';
 import { useUserProfile } from '@/context/UserProfileProvider';
+import { useDocumentUpload } from './useDocumentUpload';
 import camelcaseKeys from 'camelcase-keys';
 import { getSignedProfileImageUrl } from '@/utility/Utility';
 
@@ -17,6 +17,7 @@ export const useManageDeals = () => {
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
   const { userProfile } = useUserProfile();
+  const { getDealDocuments } = useDocumentUpload();
 
   const fetchDraftDeals = async () => {
     if (!user?.id) {
@@ -62,7 +63,7 @@ export const useManageDeals = () => {
             );
 
             // Get deal documents
-            const dealDocuments = await DealDocumentService.getDealDocuments(deal.id);
+            const dealDocuments = await getDealDocuments(deal.id);
             const documents = dealDocuments.map((document) => ({
               id: document.id,
               fileName: document.file_name,

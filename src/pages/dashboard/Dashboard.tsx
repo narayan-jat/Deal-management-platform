@@ -10,6 +10,7 @@ import KanbanBoard from "@/components/builder-dashboard/KanbanBoard";
 import CreateEditDealCard from "@/components/builder-dashboard/CreateEditDealCard";
 import { useDashboard } from "@/hooks/useDashboard";
 import useCreateEditDeal from "@/hooks/useCreateEditDeal";
+import { useDocumentUpload } from "@/hooks/useDocumentUpload";
 import { DealModel } from "@/types/deal/Deal.model";
 import { columnKeyToEnum } from "@/Constants";
 import { DealCardType } from "@/types/deal/DealCard";
@@ -32,7 +33,8 @@ export default function Dashboard() {
   const { initialDeals: originalDeals, loading, apiError: getDealsError, handleUpdateDeals, handleUpdateDealStatus } = useDashboard();
   const { filteredDeals, searchQuery, clearSearch } = useSearch();
   const [dealId, setDealId] = useState<string | null>(null);
-  const { handleCreateDeal, handleEditDeal, handleDeleteDocument, apiError: createDealError} = useCreateEditDeal();
+  const { handleCreateDeal, handleEditDeal, apiError: createDealError} = useCreateEditDeal();
+  const { handleDeleteDocument } = useDocumentUpload();
   const [isCreateEditFormOpen, setIsCreateEditFormOpen] = useState<boolean>(false);
   const [columnSelected, setColumnSelected] = useState<string>("new");
   const [activeId, setActiveId] = useState<string | null>(null);

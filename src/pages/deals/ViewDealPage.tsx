@@ -1,26 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import ViewDeal from '@/components/builder-dashboard/ViewDeal';
 import CreateEditDealCard from '@/components/builder-dashboard/CreateEditDealCard';
-import { DealCardType } from '@/types/deal/DealCard';
-import { DealModel } from '@/types/deal/Deal.model';
-import { UploadDocumentForm } from '@/types/deal/Deal.documents';
-import { InviteMemberForm } from '@/types/deal/Deal.members';
-import { useCreateEditDeal } from '@/hooks/useCreateEditDeal';
-import { DealService } from '@/services/deals/DealService';
-import { DealMemberService } from '@/services/deals/DealMemberService';
-import { DealDocumentService } from '@/services/deals/DealDocumentService';
-import { ProfileService } from '@/services/ProfileService';
-import { ProfileStorageService } from '@/services/ProfileStorageService';
-import { ErrorService } from '@/services/ErrorService';
-import { toast } from 'sonner';
 import DotLoader from '@/components/ui/loader';
 import { useViewDealPage } from '@/hooks/useViewDealPage';
 
 export default function ViewDealPage() {
   const navigate = useNavigate();
   const { 
-    dealId, 
     deal, 
     loading, 
     isEditModalOpen, 
@@ -30,7 +17,8 @@ export default function ViewDealPage() {
     handleEditSubmit, 
     handleCloseEditModal, 
     dealLogs, 
-    isFetchingDealLogs
+    isFetchingDealLogs,
+    refreshDeal
   } = useViewDealPage();
 
   if (loading) {
@@ -66,6 +54,7 @@ export default function ViewDealPage() {
         deal={deal} 
         onEdit={handleEdit} 
         onClose={handleClose}
+        onRefreshDeal={refreshDeal}
       />
       
       {isEditModalOpen && (
