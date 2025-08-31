@@ -17,6 +17,7 @@ import { useCreateDeal } from '@/context/CreateDealProvider';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/config/routes';
 import logo from '@/assets/godex-logo.png';
+import { useNotifications } from '@/hooks/useNotifications';
 
 interface AppBarProps {
   onMenuClick: () => void;
@@ -32,6 +33,7 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
     isSearchActive, 
     setIsSearchActive 
   } = useSearch();
+  const { unreadCount } = useNotifications();
   const { openCreateDealModal } = useCreateDeal();
 
   const handleSearchToggle = () => {
@@ -136,9 +138,9 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
 
           <button className="p-2 rounded-md hover:bg-gray-100 transition-colors relative" onClick={() => navigate(ROUTES.NOTIFICATIONS)}>
             <Bell className="h-5 w-5 text-gray-600" />
-            <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-xs font-medium">1</span>
-            </div>
+            {unreadCount > 0 && <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+              <span className="text-white text-xs font-medium">{unreadCount}</span>
+            </div>}
           </button>
 
           {/* Logout button */}
@@ -187,7 +189,9 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
                 <button className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 relative" onClick={() => navigate(ROUTES.NOTIFICATIONS)}>
                   <Bell className="h-4 w-4" />
                   <span>Notifications</span>
-                  <div className="ml-auto w-3 h-3 bg-red-500 rounded-full"></div>
+                  {unreadCount > 0 && <div className="ml-auto w-3 h-3 bg-red-500 rounded-full">
+                    <span className="text-white text-xs font-medium">{unreadCount}</span>
+                  </div>}
                 </button>
                 {/* Logout button */}
                 {user && (
