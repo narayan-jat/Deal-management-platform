@@ -2,8 +2,8 @@ export interface NotificationModel {
   id: string;
   userId: string;
   type: string;
-  data: JSON;
+  data: JSON | Record<string, any>;
   read: boolean;
-  createdAt: Date;
+  createdAt: string;
 }
 

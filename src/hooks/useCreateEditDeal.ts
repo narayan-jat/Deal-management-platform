@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { DealModel, DealMemberModel, DealDocumentModel, DealCommentModel } from '../types/deal/Deal.model';
+import { DealModel, DealMemberModel, DealDocumentModel } from '../types/deal/Deal.model';
 import { UploadDocumentForm, DealDocument } from '@/types/deal/Deal.documents';
 import { DealService } from '@/services/deals/DealService';
 import { ErrorService } from '@/services/ErrorService';
@@ -12,7 +12,7 @@ import { DealMemberRole } from '@/types/deal/Deal.enums';
 import { getDateString } from '@/utility/Utility';
 import { DealDocumentService } from '@/services/deals/DealDocumentService';
 import { DealMemberService } from '@/services/deals/DealMemberService';
-import { DealCommentService } from '@/services/deals/DealCommentService';
+
 import { createDealLogs } from './utils';
 import { useUserProfile } from '@/context/UserProfileProvider';
 
@@ -204,68 +204,14 @@ export const useCreateEditDeal = () => {
     }
   }
 
-  // Create a new deal comment
-  const handleCreateComment = async (dealId: string, comment: string): Promise<DealCommentModel | null> => {
-    if (!user?.id) {
-      setApiError("User not authenticated");
-      return null;
-    }
-    
-    try {
-      setLoading(true);
-      const dealComment: Partial<DealCommentModel> = {
-        dealId,
-        memberId: user.id,
-        comment,
-      };
-      
-      const createdComment = await DealCommentService.createDealComment(dealComment);
-      const camelCaseComment = camelcaseKeys(createdComment, { deep: true }) as DealCommentModel;
-      return camelCaseComment;
-    } catch (error) {
-      console.error('Error creating comment:', error);
-      setApiError(error.message);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }
 
-  // Update an existing deal comment
-  const handleUpdateComment = async (commentId: string, dealId: string, comment: string): Promise<DealCommentModel | null> => {
-    if (!user?.id) {
-      setApiError("User not authenticated");
-      return null;
-    }
-    
-    try {
-      setLoading(true);
-      const dealComment: Partial<DealCommentModel> = {
-        id: commentId,
-        comment,
-      };
-      
-      const updatedComment = await DealCommentService.updateDealComment(dealComment);
-      const camelCaseComment = camelcaseKeys(updatedComment, { deep: true }) as DealCommentModel;
-      
-      return camelCaseComment;
-    } catch (error) {
-      console.error('Error updating comment:', error);
-      setApiError(error.message);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }
 
   return { 
     loading, 
     apiError, 
     handleCreateDeal, 
     handleEditDeal, 
-    handleDeleteDocument,
-    handleCreateComment,
-    handleUpdateComment
+    handleDeleteDocument
   };
 }
 

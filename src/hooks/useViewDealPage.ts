@@ -1,11 +1,10 @@
 import { DealCardType } from "@/types/deal/DealCard";
-import { DealLogModel, DealModel, DealCommentModel } from "@/types/deal/Deal.model";
+import { DealLogModel, DealModel } from "@/types/deal/Deal.model";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { DealService } from "@/services/deals/DealService";
 import { DealLogService } from "@/services/deals/DealLogService";
-import { DealCommentService } from "@/services/deals/DealCommentService";
 import { DealMemberService } from "@/services/deals/DealMemberService";
 import { ProfileService } from "@/services/ProfileService";
 import { ProfileStorageService } from "@/services/ProfileStorageService";
@@ -14,6 +13,7 @@ import { DealDocumentService } from "@/services/deals/DealDocumentService";
 import { toast } from "sonner";
 import { useDashboard } from "./useDashboard";
 import { useCreateEditDeal } from "./useCreateEditDeal";
+import { useComment } from "./useComment";
 import { UploadDocumentForm } from "@/types/deal/Deal.documents";
 import { InviteMemberForm } from "@/types/deal/Deal.members";
 import camelcaseKeys from "camelcase-keys";
@@ -26,10 +26,14 @@ export const useViewDealPage = () => {
   const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isFetchingDealLogs, setIsFetchingDealLogs] = useState(false);
-  const [isFetchingDealComments, setIsFetchingDealComments] = useState(false);
   const [dealLogs, setDealLogs] = useState<DealLogModel[]>([]);
-  const [dealComments, setDealComments] = useState<DealCommentModel[]>([]);
-  const { handleEditDeal, handleDeleteDocument, handleCreateComment: createComment, handleUpdateComment: updateComment } = useCreateEditDeal();
+  const { handleEditDeal, handleDeleteDocument } = useCreateEditDeal();
+  const { 
+    comments: dealComments, 
+    isFetchingComments: isFetchingDealComments,
+    handleCreateComment,
+    handleUpdateComment
+  } = useComment();
 
   useEffect(() => {
     const fetchDealCardDetails = async () => {
@@ -43,27 +47,20 @@ export const useViewDealPage = () => {
             if (dealData.id === dealId) {
               setDeal(dealData);
   
-              // Fetch the deal logs and comments
+              // Fetch the deal logs
               setIsFetchingDealLogs(true);
-              setIsFetchingDealComments(true);
               
-              const [dealLogs, dealComments] = await Promise.all([
-                DealLogService.getDealLogs(dealId),
-                DealCommentService.getDealComments(dealId)
-              ]);
+              const dealLogs = await DealLogService.getDealLogs(dealId);
               
               const camelCaseDealLogs = camelcaseKeys(dealLogs, { deep: true });
-              const camelCaseDealComments = camelcaseKeys(dealComments, { deep: true });
               
               setDealLogs(camelCaseDealLogs);
-              setDealComments(camelCaseDealComments);
             }
           } catch (error) {
             console.error('Error parsing stored deal data:', error);
           } finally {
             setLoading(false);
             setIsFetchingDealLogs(false);
-            setIsFetchingDealComments(false);
           }
         }
         else {
@@ -100,54 +97,7 @@ export const useViewDealPage = () => {
     }
   };
 
-  const handleCreateComment = async (comment: string): Promise<DealCommentModel | null> => {
-    if (!dealId) return null;
-    
-    try {
-      const createdComment = await createComment(dealId, comment);
-      if (createdComment) {
-        toast.success('Comment added successfully');
-        // Refresh comments
-        await refreshDealComments(dealId);
-      }
-      return createdComment;
-    } catch (error) {
-      console.error('Error creating comment:', error);
-      toast.error('Failed to add comment');
-      return null;
-    }
-  };
 
-  const handleUpdateComment = async (commentId: string, comment: string): Promise<DealCommentModel | null> => {
-    if (!dealId) return null;
-    
-    try {
-      const updatedComment = await updateComment(commentId, dealId, comment);
-      if (updatedComment) {
-        toast.success('Comment updated successfully');
-        // Refresh comments
-        await refreshDealComments(dealId);
-      }
-      return updatedComment;
-    } catch (error) {
-      console.error('Error updating comment:', error);
-      toast.error('Failed to update comment');
-      return null;
-    }
-  };
-
-  const refreshDealComments = async (dealId: string) => {
-    try {
-      setIsFetchingDealComments(true);
-      const comments = await DealCommentService.getDealComments(dealId);
-      const camelCaseComments = camelcaseKeys(comments, { deep: true });
-      setDealComments(camelCaseComments);
-    } catch (error) {
-      ErrorService.handleApiError(error, "useViewDealPage");
-    } finally {
-      setIsFetchingDealComments(false);
-    }
-  };
 
   const refreshDealCardDetails = async (dealId: string) => {
       try {
@@ -201,26 +151,19 @@ export const useViewDealPage = () => {
           setDeal(camelCaseDeals[0]);
         }
         
-        // Fetch the deal logs and comments
+        // Fetch the deal logs
         setIsFetchingDealLogs(true);
-        setIsFetchingDealComments(true);
         
-        const [dealLogs, dealComments] = await Promise.all([
-          DealLogService.getDealLogs(dealId),
-          DealCommentService.getDealComments(dealId)
-        ]);
+        const dealLogs = await DealLogService.getDealLogs(dealId);
         
         const camelCaseDealLogs = camelcaseKeys(dealLogs, { deep: true });
-        const camelCaseDealComments = camelcaseKeys(dealComments, { deep: true });
         
         setDealLogs(camelCaseDealLogs);
-        setDealComments(camelCaseDealComments);
       } catch (error) {
         ErrorService.handleApiError(error, "useDashboard");
       } finally {
         setLoading(false);
         setIsFetchingDealLogs(false);
-        setIsFetchingDealComments(false);
       }
     };
 
@@ -236,7 +179,6 @@ export const useViewDealPage = () => {
     handleEdit,
     handleClose,
     isFetchingDealLogs,
-    isFetchingDealComments,
     dealLogs,
     dealComments,
     handleEditDeal,

@@ -30,11 +30,7 @@ export default function ViewDealPage() {
     handleEditSubmit, 
     handleCloseEditModal, 
     dealLogs, 
-    isFetchingDealLogs,
-    dealComments,
-    isFetchingDealComments,
-    handleCreateComment,
-    handleUpdateComment
+    isFetchingDealLogs
   } = useViewDealPage();
 
   if (loading) {
@@ -67,13 +63,9 @@ export default function ViewDealPage() {
       <ViewDeal
         dealLogs={dealLogs}
         isFetchingDealLogs={isFetchingDealLogs}
-        dealComments={dealComments}
-        isFetchingDealComments={isFetchingDealComments}
         deal={deal} 
         onEdit={handleEdit} 
         onClose={handleClose}
-        onCreateComment={handleCreateComment}
-        onUpdateComment={handleUpdateComment}
       />
       
       {isEditModalOpen && (

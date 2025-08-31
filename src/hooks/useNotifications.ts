@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { NotificationService } from '@/services/NotificationService';
 import { NotificationModel } from '@/types/Notification';
 import { useAuth } from '@/context/AuthProvider';
+import camelcaseKeys from 'camelcase-keys';
 
 export interface UseNotificationsReturn {
   notifications: NotificationModel[];
@@ -34,8 +35,11 @@ export function useNotifications(): UseNotificationsReturn {
         NotificationService.getUnreadNotifications(user.id)
       ]);
 
-      setNotifications(allNotifications);
-      setUnreadCount(unreadNotifications.length);
+      // convert data to camelCase
+      const camelCaseNotifications = camelcaseKeys(allNotifications, { deep: true });
+      const camelCaseUnreadNotifications = camelcaseKeys(unreadNotifications, { deep: true });
+      setNotifications(camelCaseNotifications);
+      setUnreadCount(camelCaseUnreadNotifications.length);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch notifications');
       console.error('Error fetching notifications:', err);
@@ -102,9 +106,11 @@ export function useNotifications(): UseNotificationsReturn {
         read: false,
       });
 
+      // convert data to camelCase
+      const camelCaseNewNotification = camelcaseKeys(newNotification[0], { deep: true });
       if (newNotification && newNotification[0]) {
         // Add new notification to the beginning of the list
-        setNotifications(prev => [newNotification[0], ...prev]);
+        setNotifications(prev => [camelCaseNewNotification, ...prev]);
         setUnreadCount(prev => prev + 1);
       }
     } catch (err) {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Calendar, 
   MapPin, 
@@ -32,6 +32,8 @@ import { DealLogModel, DealCommentModel } from '@/types/deal/Deal.model';
 import { parseLogData } from '@/utility/LogDataParser';
 import { getLogIcon } from '@/utility/LogIconUtils';
 import DealLogDetailsDialog from './DealLogDetailsDialog';
+import { useComment } from '@/hooks/useComment';
+import { MentionDropdown } from '@/components/ui/MentionDropdown';
 
 interface ViewDealProps {
   deal: DealCardType;
@@ -39,10 +41,6 @@ interface ViewDealProps {
   onClose?: () => void;
   dealLogs: DealLogModel[];
   isFetchingDealLogs: boolean;
-  dealComments: DealCommentModel[];
-  isFetchingDealComments: boolean;
-  onCreateComment: (comment: string) => Promise<DealCommentModel | null>;
-  onUpdateComment: (commentId: string, comment: string) => Promise<DealCommentModel | null>;
 }
 
 export default function ViewDeal({ 
@@ -50,19 +48,39 @@ export default function ViewDeal({
   onEdit, 
   onClose, 
   dealLogs, 
-  isFetchingDealLogs,
-  dealComments,
-  isFetchingDealComments,
-  onCreateComment,
-  onUpdateComment
+  isFetchingDealLogs
 }: ViewDealProps) {
   const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
   const [selectedLog, setSelectedLog] = useState<DealLogModel | null>(null);
   const [isLogDialogOpen, setIsLogDialogOpen] = useState(false);
-  const [newComment, setNewComment] = useState('');
-  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
-  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
-  const [editingCommentText, setEditingCommentText] = useState('');
+
+  // Use the centralized comment hook
+  const { 
+    comments: dealComments, 
+    isFetchingComments: isFetchingDealComments,
+    handleUpdateCommentLocal,
+    handleUpdateCommentLocalWithMembers,
+    handleCancelEdit,
+    handleSubmitComment,
+    handleSubmitCommentWithMembers,
+    handleEditComment,
+    newComment,
+    setNewComment,
+    isSubmittingComment,
+    editingCommentId,
+    editingCommentText,
+    setEditingCommentText,
+    handleMentionDetection,
+    handleMemberSelection,
+    getFilteredMembers,
+  } = useComment();
+
+  // Mention-related state
+  const [isMentionDropdownOpen, setIsMentionDropdownOpen] = useState(false);
+  const [mentionQuery, setMentionQuery] = useState('');
+  const [selectedMentionIndex, setSelectedMentionIndex] = useState(0);
+  const [mentionStartIndex, setMentionStartIndex] = useState(-1);
+  const commentInputRef = useRef<HTMLTextAreaElement>(null);
 
   const statusInfo = getStatusInfo(deal.status);
 
@@ -94,44 +112,90 @@ export default function ViewDeal({
     // TODO: Implement document preview logic
   };
 
-  // Handle comment submission
-  const handleSubmitComment = async () => {
-    if (!newComment.trim()) return;
+  // Handle mention input changes
+  const handleCommentInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>, isEditing: boolean = false) => {
+    const value = e.target.value;
+    const cursorPosition = e.target.selectionStart || 0;
     
-    setIsSubmittingComment(true);
-    try {
-      await onCreateComment(newComment.trim());
-      setNewComment('');
-    } catch (error) {
-      console.error('Error submitting comment:', error);
-    } finally {
-      setIsSubmittingComment(false);
+    if (isEditing) {
+      setEditingCommentText(value);
+    } else {
+      setNewComment(value);
+    }
+
+    // Check for mention detection
+    const mentionInfo = handleMentionDetection(value, cursorPosition);
+    
+    if (mentionInfo.isMentioning) {
+      setIsMentionDropdownOpen(true);
+      setMentionQuery(mentionInfo.query);
+      setMentionStartIndex(mentionInfo.startIndex);
+      setSelectedMentionIndex(0);
+    } else {
+      setIsMentionDropdownOpen(false);
+      setMentionQuery('');
+      setMentionStartIndex(-1);
     }
   };
 
-  // Handle comment edit
-  const handleEditComment = (comment: DealCommentModel) => {
-    setEditingCommentId(comment.id);
-    setEditingCommentText(comment.comment);
-  };
-
-  // Handle comment update
-  const handleUpdateComment = async () => {
-    if (!editingCommentId || !editingCommentText.trim()) return;
+  // Handle member selection from mention dropdown
+  const handleMemberSelect = (member: any) => {
+    const currentText = editingCommentId ? editingCommentText : newComment;
+    const cursorPosition = commentInputRef.current?.selectionStart || 0;
     
-    try {
-      await onUpdateComment(editingCommentId, editingCommentText.trim());
-      setEditingCommentId(null);
-      setEditingCommentText('');
-    } catch (error) {
-      console.error('Error updating comment:', error);
+    const updatedText = handleMemberSelection(member, currentText, cursorPosition);
+    
+    if (editingCommentId) {
+      setEditingCommentText(updatedText);
+    } else {
+      setNewComment(updatedText);
     }
+    
+    setIsMentionDropdownOpen(false);
+    setMentionQuery('');
+    setMentionStartIndex(-1);
+    
+    // Focus back to input and set cursor position after the mention
+    setTimeout(() => {
+      if (commentInputRef.current) {
+        const newPosition = mentionStartIndex + member.name.length + 2; // +2 for @ and space
+        commentInputRef.current.focus();
+        commentInputRef.current.setSelectionRange(newPosition, newPosition);
+      }
+    }, 0);
   };
 
-  // Handle cancel comment edit
-  const handleCancelEdit = () => {
-    setEditingCommentId(null);
-    setEditingCommentText('');
+  // Handle keyboard navigation in mention dropdown
+  const handleMentionKeyDown = (e: React.KeyboardEvent) => {
+    if (!isMentionDropdownOpen) return;
+    
+    const filteredMembers = getFilteredMembers(mentionQuery, deal.contributors || []);
+    
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedMentionIndex(prev => 
+          prev < filteredMembers.length - 1 ? prev + 1 : 0
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedMentionIndex(prev => 
+          prev > 0 ? prev - 1 : filteredMembers.length - 1
+        );
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (filteredMembers[selectedMentionIndex]) {
+          handleMemberSelect(filteredMembers[selectedMentionIndex]);
+        }
+        break;
+      case 'Escape':
+        setIsMentionDropdownOpen(false);
+        setMentionQuery('');
+        setMentionStartIndex(-1);
+        break;
+    }
   };
 
   return (
@@ -280,20 +344,31 @@ export default function ViewDeal({
               <div className="p-6">
                 {/* Add Comment Form */}
                 <div className="mb-6">
-                  <div className="flex space-x-3 items-center">
+                  <div className="flex space-x-3 items-center relative">
                     <Textarea
-                      placeholder="Add a comment..."
+                      ref={commentInputRef}
+                      placeholder="Add a comment... Use @ to mention team members"
                       value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
+                      onChange={(e) => handleCommentInputChange(e, false)}
+                      onKeyDown={handleMentionKeyDown}
                       className="flex-1 min-h-[80px] resize-none"
                       disabled={isSubmittingComment}
                     />
                     <Button
-                      onClick={handleSubmitComment}
+                      onClick={() => handleSubmitCommentWithMembers(deal.contributors || [])}
                       disabled={!newComment.trim() || isSubmittingComment}
                     >
                       <Send className="w-4 h-4" />
                     </Button>
+                    
+                    {/* Mention Dropdown */}
+                    <MentionDropdown
+                      isOpen={isMentionDropdownOpen}
+                      members={getFilteredMembers(mentionQuery, deal.contributors || [])}
+                      selectedIndex={selectedMentionIndex}
+                      onSelectMember={handleMemberSelect}
+                      onClose={() => setIsMentionDropdownOpen(false)}
+                    />
                   </div>
                 </div>
 
@@ -326,16 +401,17 @@ export default function ViewDeal({
                           </div>
                           
                           {editingCommentId === comment.id ? (
-                            <div className="space-y-2">
+                            <div className="space-y-2 relative">
                               <Textarea
                                 value={editingCommentText}
-                                onChange={(e) => setEditingCommentText(e.target.value)}
+                                onChange={(e) => handleCommentInputChange(e, true)}
+                                onKeyDown={handleMentionKeyDown}
                                 className="min-h-[60px] resize-none"
                               />
                               <div className="flex space-x-2">
                                 <Button
                                   size="sm"
-                                  onClick={handleUpdateComment}
+                                  onClick={() => handleUpdateCommentLocalWithMembers(deal.contributors || [])}
                                   disabled={!editingCommentText.trim()}
                                 >
                                   Save
@@ -348,6 +424,15 @@ export default function ViewDeal({
                                   Cancel
                                 </Button>
                               </div>
+                              
+                              {/* Mention Dropdown for Edit Mode */}
+                              <MentionDropdown
+                                isOpen={isMentionDropdownOpen && editingCommentId === comment.id}
+                                members={getFilteredMembers(mentionQuery, deal.contributors || [])}
+                                selectedIndex={selectedMentionIndex}
+                                onSelectMember={handleMemberSelect}
+                                onClose={() => setIsMentionDropdownOpen(false)}
+                              />
                             </div>
                           ) : (
                             <div className="flex items-start justify-between">

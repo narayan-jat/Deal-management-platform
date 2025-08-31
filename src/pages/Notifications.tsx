@@ -65,10 +65,10 @@ export default function NotificationsPage() {
     }
   };
 
-  const formatTimeAgo = (date: Date) => {
+  const formatTimeAgo = (date: string) => {
+    //date is database timestamp
     const now = new Date();
     const diffInSeconds = Math.floor((now.getTime() - new Date(date).getTime()) / 1000);
-    
     if (diffInSeconds < 60) return "Just now";
     if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
     if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
@@ -84,9 +84,7 @@ export default function NotificationsPage() {
     { value: "all", label: "All", count: notifications.length },
     { value: "message", label: "Messages", count: notifications.filter(n => n.type.toLowerCase() === "message").length },
     { value: "alert", label: "Alerts", count: notifications.filter(n => n.type.toLowerCase() === "alert").length },
-    { value: "info", label: "Info", count: notifications.filter(n => n.type.toLowerCase() === "info").length },
-    { value: "calendar", label: "Calendar", count: notifications.filter(n => n.type.toLowerCase() === "calendar").length },
-    { value: "user", label: "User", count: notifications.filter(n => n.type.toLowerCase() === "user").length },
+    { value: "Mentions", label: "Mentions", count: notifications.filter(n => n.type.toLowerCase() === "mentions").length },
   ];
 
   if (loading && notifications.length === 0) {
