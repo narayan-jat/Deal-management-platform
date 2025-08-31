@@ -4,6 +4,8 @@ export const ROUTES = {
   HOME: '/',
   SIGNIN: '/signin',
   SIGNUP: '/signup',
+  RESET_PASSWORD: '/reset-password',
+  CHANGE_PASSWORD: '/change-password',
   
   // Protected routes
   DASHBOARD: '/dashboard',
@@ -21,6 +23,8 @@ export const PUBLIC_ROUTES = {
   HOME: ROUTES.HOME,
   SIGNIN: ROUTES.SIGNIN,
   SIGNUP: ROUTES.SIGNUP,
+  RESET_PASSWORD: ROUTES.RESET_PASSWORD,
+  CHANGE_PASSWORD: ROUTES.CHANGE_PASSWORD,
   DEAL_LINK_INVITE: ROUTES.DEAL_LINK_INVITE,
   DEAL_EMAIL_INVITE: ROUTES.DEAL_EMAIL_INVITE,
 } as const;
@@ -50,6 +54,16 @@ export const ROUTE_METADATA = {
     title: 'Sign Up',
     description: 'Create your GoDex account',
     requiresAuth: false,
+  },
+  [ROUTES.RESET_PASSWORD]: {
+    title: 'Reset Password',
+    description: 'Reset your GoDex account password',
+    requiresAuth: false,
+  },
+  [ROUTES.CHANGE_PASSWORD]: {
+    title: 'Change Password',
+    description: 'Set your new password',
+    requiresAuth: false, // This can be accessed via email link without being logged in
   },
   [ROUTES.DASHBOARD]: {
     title: 'Dashboard',

@@ -8,6 +8,8 @@ import { Toaster } from "sonner";
 import Landing from "@/pages/Landing";
 import SignIn from "@/pages/auth/SignIn";
 import SignUp from "@/pages/auth/SignUp";
+import ResetPassword from "@/pages/auth/ResetPassword";
+import ChangePassword from "@/pages/auth/ChangePassword";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfService from "@/pages/TermsOfService";
 
@@ -84,6 +86,14 @@ export default function App() {
               <SignUp />
             </PublicRoute>
           }
+        />
+        <Route
+          path={ROUTES.RESET_PASSWORD}
+          element={<ResetPassword />}
+        />
+        <Route
+          path={ROUTES.CHANGE_PASSWORD}
+          element={<ChangePassword />}
         />
         <Route
           path={ROUTES.DEAL_LINK_INVITE}

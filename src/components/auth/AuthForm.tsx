@@ -221,6 +221,18 @@ const AuthForm: React.FC<AuthFormProps> = ({
             placeholder={isSignup ? "Create a password" : "Enter your password"}
             label="Password"
           />
+
+          {/* Forgot Password Link - Signin only */}
+          {!isSignup && (
+            <div className="text-right">
+              <Link 
+                to="/reset-password" 
+                className="text-sm text-godex-primary hover:text-godex-primary/80 font-medium"
+              >
+                Forgot your password?
+              </Link>
+            </div>
+          )}
         </div>
       )}
 
