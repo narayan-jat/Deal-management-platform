@@ -16,6 +16,7 @@ export const ROUTES = {
   PROFILE: '/profile',
   DEAL_LINK_INVITE: '/deals/deal-link-invite/:token',
   DEAL_EMAIL_INVITE: '/deals/deal-email-invite/:token',
+  ACCOUNT_CHANGE_PASSWORD: '/account/change-password',
 } as const;
 
 // Route groups for easier management
@@ -64,6 +65,11 @@ export const ROUTE_METADATA = {
     title: 'Change Password',
     description: 'Set your new password',
     requiresAuth: false, // This can be accessed via email link without being logged in
+  },
+  [ROUTES.ACCOUNT_CHANGE_PASSWORD]: {
+    title: 'Change Password',
+    description: 'Change your account password',
+    requiresAuth: true,
   },
   [ROUTES.DASHBOARD]: {
     title: 'Dashboard',

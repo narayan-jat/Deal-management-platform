@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthProvider";
 import { ROUTES } from "@/config/routes";
 import DotLoader from "@/components/ui/loader";
@@ -10,6 +10,7 @@ import SignIn from "@/pages/auth/SignIn";
 import SignUp from "@/pages/auth/SignUp";
 import ResetPassword from "@/pages/auth/ResetPassword";
 import ChangePassword from "@/pages/auth/ChangePassword";
+import AccountChangePasswordWrapper from "@/components/auth/AccountChangePasswordWrapper";  
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfService from "@/pages/TermsOfService";
 
@@ -23,7 +24,7 @@ import Messages from "@/pages/messages/Messages";
 // Layouts
 import AppLayout from "@/components/layout/AppLayout";
 import DealInvite from "@/components/builder-dashboard/DealInvite";
-import NotificationsPage from "./pages/Notifications";
+import NotificationsPage from "./pages/Notifications";  
 
 // Route protection components
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -159,6 +160,17 @@ export default function App() {
           }
         >
           <Route index element={<Profile />} />
+        </Route>
+
+        <Route
+          path={ROUTES.ACCOUNT_CHANGE_PASSWORD}
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<AccountChangePasswordWrapper />} />
         </Route>
 
         {/* Fallback Routes */}

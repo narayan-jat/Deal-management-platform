@@ -98,12 +98,12 @@ export default function NotificationsPage() {
             }
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 overflow-x-auto pb-1 -mx-2 px-2">
           {unreadCount > 0 && (
             <Button
               variant="outline"
               onClick={markAllAsRead}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 whitespace-nowrap"
             >
               <CheckCheck className="h-4 w-4" />
               Mark all as read
@@ -112,7 +112,7 @@ export default function NotificationsPage() {
           <Button
             variant="outline"
             onClick={refreshNotifications}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 whitespace-nowrap"
           >
             <RefreshCw className="h-4 w-4" />
             Refresh

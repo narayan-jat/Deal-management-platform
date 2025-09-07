@@ -3,13 +3,54 @@ import { useNavigate } from "react-router-dom";
 import AuthLayout from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Lock, Eye, EyeOff, CheckCircle } from "lucide-react";
+import { Lock, Eye, EyeOff, CheckCircle, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { ROUTES } from "@/config/routes";
 import supabase from "@/lib/supabase";
 import { useAuth } from "@/context/AuthProvider";
 
-export default function ChangePassword() {
+interface ChangePasswordProps {
+  // Layout customization
+  useAuthLayout?: boolean;
+  
+  // Text customization
+  title?: string;
+  subtitle?: string;
+  successTitle?: string;
+  successSubtitle?: string;
+  
+  // Navigation customization
+  showBackButton?: boolean;
+  backButtonText?: string;
+  backButtonAction?: () => void;
+  
+  // Success actions
+  primarySuccessAction?: () => void;
+  primarySuccessButtonText?: string;
+  secondarySuccessAction?: () => void;
+  secondarySuccessButtonText?: string;
+  
+  // Form customization
+  submitButtonText?: string;
+  loadingText?: string;
+}
+
+export default function ChangePassword({
+  useAuthLayout = true,
+  title = "Set new password",
+  subtitle = "Enter your new password below",
+  successTitle = "Password updated",
+  successSubtitle = "Your password has been successfully changed",
+  showBackButton = false,
+  backButtonText = "Back",
+  backButtonAction,
+  primarySuccessAction,
+  primarySuccessButtonText = "Go to Dashboard",
+  secondarySuccessAction,
+  secondarySuccessButtonText = "Sign In",
+  submitButtonText = "Update Password",
+  loadingText = "Updating password..."
+}: ChangePasswordProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [formData, setFormData] = useState({
@@ -23,8 +64,8 @@ export default function ChangePassword() {
 
   // Check if user is authenticated
   useEffect(() => {
-    if (!user) {
-      // If no user, check if there's a session from password reset
+    if (!user && useAuthLayout) {
+      // If no user and using auth layout, check if there's a session from password reset
       const checkSession = async () => {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
@@ -34,8 +75,12 @@ export default function ChangePassword() {
         }
       };
       checkSession();
+    } else if (!user && !useAuthLayout) {
+      // If no user and not using auth layout (account settings), redirect to sign in
+      toast.error("You must be logged in to change your password");
+      navigate(ROUTES.SIGNIN);
     }
-  }, [user, navigate]);
+  }, [user, navigate, useAuthLayout]);
 
   const handleInputChange = (field: keyof typeof formData, value: string) => {
     setFormData(prev => ({
@@ -107,51 +152,81 @@ export default function ChangePassword() {
   };
 
   const handleBackToSignIn = () => {
-    navigate(ROUTES.SIGNIN);
+    if (backButtonAction) {
+      backButtonAction();
+    } else {
+      navigate(ROUTES.SIGNIN);
+    }
   };
 
   const handleGoToDashboard = () => {
-    navigate(ROUTES.DASHBOARD);
+    if (primarySuccessAction) {
+      primarySuccessAction();
+    } else {
+      navigate(ROUTES.DASHBOARD);
+    }
+  };
+
+  const handleSecondaryAction = () => {
+    if (secondarySuccessAction) {
+      secondarySuccessAction();
+    } else {
+      navigate(ROUTES.SIGNIN);
+    }
   };
 
   if (passwordChanged) {
-    return (
-      <AuthLayout
-        title="Password updated"
-        subtitle="Your password has been successfully changed"
-      >
-        <div className="text-center space-y-6">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-            <CheckCircle className="w-8 h-8 text-green-600" />
-          </div>
-          
-          <div className="space-y-2">
-            <h3 className="text-lg font-medium text-gray-900">
-              Password changed successfully!
-            </h3>
-            <p className="text-sm text-gray-600">
-              You can now sign in with your new password.
-            </p>
-          </div>
-
-          <div className="space-y-3">
-            <Button
-              onClick={handleGoToDashboard}
-              className="w-full"
-            >
-              Go to Dashboard
-            </Button>
-            
-            <Button
-              onClick={handleBackToSignIn}
-              variant="outline"
-              className="w-full"
-            >
-              Sign In
-            </Button>
-          </div>
+    const successContent = (
+      <div className="text-center space-y-6">
+        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+          <CheckCircle className="w-8 h-8 text-green-600" />
         </div>
-      </AuthLayout>
+        
+        <div className="space-y-2">
+          <h3 className="text-lg font-medium text-gray-900">
+            {successTitle}
+          </h3>
+          <p className="text-sm text-gray-600">
+            {successSubtitle}
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <Button
+            onClick={handleGoToDashboard}
+            className="w-full"
+          >
+            {primarySuccessButtonText}
+          </Button>
+          
+          <Button
+            onClick={handleSecondaryAction}
+            variant="outline"
+            className="w-full"
+          >
+            {secondarySuccessButtonText}
+          </Button>
+        </div>
+      </div>
+    );
+
+    if (useAuthLayout) {
+      return (
+        <AuthLayout
+          title={successTitle}
+          subtitle={successSubtitle}
+        >
+          {successContent}
+        </AuthLayout>
+      );
+    }
+
+    return (
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+          {successContent}
+        </div>
+      </div>
     );
   }
 
@@ -161,12 +236,8 @@ export default function ChangePassword() {
                      formData.password === formData.confirmPassword &&
                      passwordValidation.isValid;
 
-  return (
-    <AuthLayout
-      title="Set new password"
-      subtitle="Enter your new password below"
-    >
-      <form onSubmit={handleSubmit} className="space-y-6">
+  const formContent = (
+    <form onSubmit={handleSubmit} className="space-y-6">
         {/* New Password */}
         <div className="space-y-2">
           <label htmlFor="password" className="block text-sm font-medium text-gray-700">
@@ -260,23 +331,58 @@ export default function ChangePassword() {
           {loading ? (
             <>
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-              Updating password...
+              {loadingText}
             </>
           ) : (
-            "Update Password"
+            submitButtonText
           )}
         </Button>
 
-        <div className="text-center">
-          <button
-            type="button"
-            onClick={handleBackToSignIn}
-            className="text-sm text-gray-600 hover:text-gray-800 font-medium"
-          >
-            Back to Sign In
-          </button>
-        </div>
+        {useAuthLayout && (
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={handleBackToSignIn}
+              className="text-sm text-gray-600 hover:text-gray-800 font-medium"
+            >
+              Back to Sign In
+            </button>
+          </div>
+        )}
       </form>
-    </AuthLayout>
-  );
-}
+    );
+
+    if (useAuthLayout) {
+      return (
+        <AuthLayout
+          title={title}
+          subtitle={subtitle}
+        >
+          {formContent}
+        </AuthLayout>
+      );
+    }
+
+    return (
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+          {/* Header */}
+          <div className="mb-8">
+            {showBackButton && (
+              <button
+                onClick={handleBackToSignIn}
+                className="flex items-center text-sm text-gray-600 hover:text-gray-800 font-medium mb-4"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                {backButtonText}
+              </button>
+            )}
+            <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
+            <p className="text-gray-600 mt-2">{subtitle}</p>
+          </div>
+
+          {formContent}
+        </div>
+      </div>
+    );
+  }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Menu,
   Search,
@@ -35,6 +35,24 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
   } = useSearch();
   const { unreadCount } = useNotifications();
   const { openCreateDealModal } = useCreateDeal();
+  
+  // Profile dropdown state
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsProfileDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handleSearchToggle = () => {
     setIsSearchActive(!isSearchActive);
@@ -54,12 +72,33 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
 
   const handleProfileClick = () => {
     setIsSearchActive(false);
-    navigate('/profile');
+    setIsProfileDropdownOpen(!isProfileDropdownOpen);
+  };
+
+  const handleProfileNavigation = () => {
+    setIsProfileDropdownOpen(false);
+    navigate(ROUTES.PROFILE);
+  };
+
+  const handlePasswordReset = () => {
+    setIsProfileDropdownOpen(false);
+    navigate(ROUTES.ACCOUNT_CHANGE_PASSWORD);
   };
 
   const handleCreateDeal = () => {
     setIsSearchActive(false);
+    setIsProfileDropdownOpen(false);
     openCreateDealModal();
+  };
+
+  const handleNotifications = () => {
+    setIsProfileDropdownOpen(false);
+    navigate(ROUTES.NOTIFICATIONS);
+  };
+
+  const handleLogout = () => {
+    setIsProfileDropdownOpen(false);
+    signOut();
   };
 
   // Mobile search view
@@ -136,25 +175,24 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
             <Plus className="h-5 w-5 text-gray-600" />
           </button>
 
-          <button className="p-2 rounded-md hover:bg-gray-100 transition-colors relative" onClick={() => navigate(ROUTES.NOTIFICATIONS)}>
+          <button 
+            className="p-2 rounded-md hover:bg-gray-100 transition-colors relative" 
+            onClick={handleNotifications}
+            title="Notifications"
+          >
             <Bell className="h-5 w-5 text-gray-600" />
             {unreadCount > 0 && <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
               <span className="text-white text-xs font-medium">{unreadCount}</span>
             </div>}
           </button>
 
-          {/* Logout button */}
-          {user && (
-            <div className="p-4 border-t border-gray-200">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                  <button onClick={signOut} className="text-red-500 text-sm font-medium">
-                    <LogOut className="h-4 w-4 text-red-500" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+          <button 
+            className="p-2 rounded-md hover:bg-gray-100 transition-colors"
+            onClick={handleLogout}
+            title="Logout"
+          >
+            <LogOut className="h-5 w-5 text-gray-600" />
+          </button>
         </div>
 
         {/* Mobile search icon */}
@@ -166,68 +204,85 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
         </button>
 
         {/* Profile dropdown */}
-        <div className="relative">
+        <div className="relative" ref={dropdownRef}>
           <button
-            onClick={() => handleProfileClick()}
+            onClick={handleProfileClick}
             className="p-2 rounded-md hover:bg-gray-100 transition-colors flex items-center gap-1"
           >
             <User className="h-5 w-5 text-gray-600" />
-            <ChevronDown className="h-3 w-3 text-gray-600 lg:hidden" />
+            <ChevronDown className="h-3 w-3 text-gray-600" />
           </button>
 
-          {/* Mobile dropdown menu */}
-          {false && (
-            <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 lg:hidden">
+          {/* Dropdown menu */}
+          {isProfileDropdownOpen && (
+            <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
               <div className="py-2">
-                <button 
-                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
-                  onClick={handleCreateDeal}
-                >
-                  <Plus className="h-4 w-4" />
-                  <span>Create New Deal</span>
-                </button>
-                <button className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 relative" onClick={() => navigate(ROUTES.NOTIFICATIONS)}>
-                  <Bell className="h-4 w-4" />
-                  <span>Notifications</span>
-                  {unreadCount > 0 && <div className="ml-auto w-3 h-3 bg-red-500 rounded-full">
-                    <span className="text-white text-xs font-medium">{unreadCount}</span>
-                  </div>}
-                </button>
-                {/* Logout button */}
-                {user && (
-                  <div className="p-4 border-t border-gray-200">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                        <button onClick={signOut} className="text-red-500 text-sm font-medium">
-                          <LogOut className="h-4 w-4 text-red-500" />
-                        </button>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <button onClick={signOut} className="text-sm font-medium text-red-600 truncate">
-                          Logout
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                <div className="border-t border-gray-200 my-1"></div>
-                <button className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3" onClick={() => handleProfileClick()}>
-                  <User className="h-4 w-4" />
-                  <span>Profile</span>
-                </button>
+                {/* Desktop only items - Profile and Password Reset */}
+                <div className="hidden lg:block">
+                  <button 
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
+                    onClick={handleProfileNavigation}
+                  >
+                    <User className="h-4 w-4" />
+                    <span>Profile</span>
+                  </button>
+                  <button 
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
+                    onClick={handlePasswordReset}
+                  >
+                    <Lock className="h-4 w-4" />
+                    <span>Change Password</span>
+                  </button>
+                </div>
+
+                {/* Mobile items - All actions */}
+                <div className="lg:hidden">
+                  <button 
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
+                    onClick={handleCreateDeal}
+                  >
+                    <Plus className="h-4 w-4" />
+                    <span>Create New Deal</span>
+                  </button>
+                  <button 
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 relative" 
+                    onClick={handleNotifications}
+                  >
+                    <Bell className="h-4 w-4" />
+                    <span>Notifications</span>
+                    {unreadCount > 0 && <div className="ml-auto w-3 h-3 bg-red-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs font-medium">{unreadCount}</span>
+                    </div>}
+                  </button>
+                  <button 
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
+                    onClick={handleProfileNavigation}
+                  >
+                    <User className="h-4 w-4" />
+                    <span>Profile</span>
+                  </button>
+                  <button 
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
+                    onClick={handlePasswordReset}
+                  >
+                    <Lock className="h-4 w-4" />
+                    <span>Change Password</span>
+                  </button>
+                  <div className="border-t border-gray-200 my-1"></div>
+                  <button 
+                    className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-3"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>Logout</span>
+                  </button>
+                </div>
               </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* Backdrop for mobile dropdown */}
-      {false && (
-        <div
-          className="fixed inset-0 z-40 lg:hidden"
-          onClick={() => setIsSearchActive(false)}
-        />
-      )}
     </header>
   );
 } 
