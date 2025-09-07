@@ -6,8 +6,10 @@ import NewMessageModal from "@/components/messages/NewMessageModal";
 import { Button } from "@/components/ui/button";
 import { useMessages } from "@/hooks/useMessages";
 import { useDirectChats } from "@/hooks/useDirectChats";
+import { useMatrix } from "@/hooks/useMatrix";
 import { MatrixRoom } from "@/types/Matrix";
 import { MatrixService } from "@/services/MatrixService";
+import { MatrixRegistrationPopup } from "@/components/messages/MatrixRegistrationPopup";
 import { toast } from "sonner";
 
 export default function Messages() {
@@ -29,6 +31,15 @@ export default function Messages() {
   } = useMessages();
 
   const { startDirectChat } = useDirectChats();
+
+  // Matrix registration and login flow
+  const { 
+    isMatrixRegistrationPopupOpen, 
+    setIsMatrixRegistrationPopupOpen, 
+    setMatrixUserId, 
+    setMatrixPassword, 
+    onRegister 
+  } = useMatrix();
 
   // The activeId is the selected roomId
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -194,6 +205,17 @@ export default function Messages() {
           allowMultiple
         />
       </div>
+
+      {/* Matrix Registration Popup */}
+      {isMatrixRegistrationPopupOpen && (
+        <MatrixRegistrationPopup
+          isOpen={isMatrixRegistrationPopupOpen}
+          onClose={() => setIsMatrixRegistrationPopupOpen(false)}
+          setMatrixUserId={setMatrixUserId}
+          setMatrixPassword={setMatrixPassword}
+          onRegister={onRegister}
+        />
+      )}
     </>
   );
 }
