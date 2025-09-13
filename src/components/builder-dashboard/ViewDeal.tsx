@@ -34,6 +34,8 @@ import { DocumentUploadButton } from './DocumentUploadButton';
 import { useDocumentUpload } from '@/hooks/useDocumentUpload';
 import { toast } from 'sonner';
 import { DocumentStorageService } from '@/services/DocumentStorageService';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '@/config/routes';
 
 interface ViewDealProps {
   deal: DealCardType;
@@ -52,6 +54,7 @@ export default function ViewDeal({
   isFetchingDealLogs,
   onRefreshDeal
 }: ViewDealProps) {
+  const navigate = useNavigate();
   const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
   const [selectedLog, setSelectedLog] = useState<DealLogModel | null>(null);
   const [isLogDialogOpen, setIsLogDialogOpen] = useState(false);
@@ -278,7 +281,7 @@ export default function ViewDeal({
 
               {/* Edit Deal Button */}
               <Button
-                onClick={onEdit}
+                onClick={() => navigate(ROUTES.EDIT_DEAL.replace(':dealId', deal.id))}
                 className="flex items-center space-x-2"
               >
                 <Edit className="w-4 h-4" />

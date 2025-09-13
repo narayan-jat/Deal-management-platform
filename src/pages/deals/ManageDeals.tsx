@@ -24,16 +24,10 @@ import { DealStatus } from "@/types/deal/Deal.enums";
 import { formatCurrency, formatDate } from "@/utility/Utility";
 import { useNavigate } from "react-router-dom";
 import { useManageDeals } from "@/hooks/useManageDeals";
-import CreateEditDealCard from "@/components/builder-dashboard/CreateEditDealCard";
-import { DealModel } from "@/types/deal/Deal.model";
-import { UploadDocumentForm } from "@/types/deal/Deal.documents";
-import { InviteMemberForm } from "@/types/deal/Deal.members";
-import { useCreateEditDeal } from "@/hooks/useCreateEditDeal";
 import DotLoader from "@/components/ui/loader";
 
 export default function ManageDeals() {
   const navigate = useNavigate();
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   
   const { 
@@ -42,8 +36,6 @@ export default function ManageDeals() {
     error, 
     refreshDeals 
   } = useManageDeals();
-  
-  const { handleCreateDeal } = useCreateEditDeal();
 
   // Filter deals based on search query
   const filteredDeals = draftDeals.filter(deal => {
@@ -51,24 +43,6 @@ export default function ManageDeals() {
                          deal.industry.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSearch;
   });
-
-  const handleCreateDealSubmit = async (
-    deal: Partial<DealModel>, 
-    documents: UploadDocumentForm[], 
-    members: InviteMemberForm[]
-  ): Promise<DealModel | null> => {
-    try {
-      const createdDeal = await handleCreateDeal(deal, documents, members);
-      if (createdDeal) {
-        setIsCreateModalOpen(false);
-        refreshDeals(); // Refresh the deals list
-      }
-      return createdDeal;
-    } catch (error) {
-      console.error('Error creating deal:', error);
-      return null;
-    }
-  };
 
   const handleViewDeal = (deal: DealCardType) => {
     // Store the deal data temporarily so ViewDealPage can access it
@@ -102,7 +76,7 @@ export default function ManageDeals() {
                 </p>
               </div>
               <Button 
-                onClick={() => setIsCreateModalOpen(true)}
+                onClick={() => navigate(ROUTES.CREATE_DEAL)}
                 className="flex items-center gap-2 w-full sm:w-auto"
                 size="lg"
               >
@@ -235,16 +209,6 @@ export default function ManageDeals() {
         </div>
       </div>
 
-      {/* Create Deal Modal */}
-      <CreateEditDealCard
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        mode="create"
-        onSubmit={handleCreateDealSubmit}
-        handleDeleteDocument={async () => {
-          // This won't be used in create mode, but required by the interface
-        }}
-      />
     </div>
   );
 }

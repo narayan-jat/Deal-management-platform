@@ -7,16 +7,9 @@ import {
 } from "@dnd-kit/core";
 import { toast } from "sonner";
 import KanbanBoard from "@/components/builder-dashboard/KanbanBoard";
-import CreateEditDealCard from "@/components/builder-dashboard/CreateEditDealCard";
 import { useDashboard } from "@/hooks/useDashboard";
-import useCreateEditDeal from "@/hooks/useCreateEditDeal";
-import { useDocumentUpload } from "@/hooks/useDocumentUpload";
-import { DealModel } from "@/types/deal/Deal.model";
-import { columnKeyToEnum } from "@/Constants";
 import { DealCardType } from "@/types/deal/DealCard";
 import DotLoader from "@/components/ui/loader";
-import { UploadDocumentForm } from "@/types/deal/Deal.documents";
-import { InviteMemberForm } from "@/types/deal/Deal.members";
 import { ROUTES } from "@/config/routes";
 import { useSearch } from "@/context/SearchProvider";
 import { useCreateDeal } from "@/context/CreateDealProvider";
@@ -30,14 +23,8 @@ const columnNames = {
 export default function Dashboard() {
   const { initialDeals: originalDeals, loading, apiError: getDealsError, handleUpdateDeals, handleUpdateDealStatus } = useDashboard();
   const { filteredDeals, searchQuery, clearSearch } = useSearch();
-  const [dealId, setDealId] = useState<string | null>(null);
-  const { handleCreateDeal, handleEditDeal, apiError: createDealError} = useCreateEditDeal();
-  const { handleDeleteDocument } = useDocumentUpload();
-  const [isCreateEditFormOpen, setIsCreateEditFormOpen] = useState<boolean>(false);
-  const [columnSelected, setColumnSelected] = useState<string>("new");
   const [activeId, setActiveId] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
-  const [mode, setMode] = useState<"create" | "edit">("create");
   const navigate = useNavigate();
   const { setRefreshCallback } = useCreateDeal();
   const [dragTimeout, setDragTimeout] = useState<NodeJS.Timeout | null>(null);
@@ -91,43 +78,6 @@ export default function Dashboard() {
     setOverId(event.over?.id as string || null);
   };
 
-  const handleCreatedEditForm = (dealId: string | null) => {
-    if (dealId) {
-      // Get the deal from deal who's id is dealId
-      const deal = Object.values(deals)
-        .flat()
-        .find((deal) => deal.id === dealId);
-      if (deal) {
-        return {
-          ...deal,
-          members: deal.contributors || []
-        }
-      }
-    }
-    else {
-      return {
-        status: columnKeyToEnum[columnSelected as keyof typeof columnKeyToEnum],
-        documents: [],
-        members: []
-      }
-    }
-  };
-
-  const handleOnSubmit = async (deal: Partial<DealModel>, documents: UploadDocumentForm[], members: InviteMemberForm[]) => {
-    if (mode === "create") {
-      const createdDeal = await handleCreateDeal(deal, documents, members);
-      if (createdDeal) {
-        handleUpdateDeals(null);
-      }
-      return createdDeal;
-    } else {
-      const updatedDeal = await handleEditDeal(deal, documents, members);
-      if (updatedDeal) {
-        handleUpdateDeals(null);
-      }
-      return updatedDeal;
-    }
-  }
 
   const handleViewDeal = (deal: DealCardType) => {
     // Store the deal data temporarily so ViewDealPage can access it
@@ -235,23 +185,11 @@ export default function Dashboard() {
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
         onEdit={(dealId: string) => {
-          setDealId(dealId);
-          setMode("edit");
-          setIsCreateEditFormOpen(true);
+          navigate(`${ROUTES.EDIT_DEAL.replace(':dealId', dealId)}`);
         }}
         onView={handleViewDeal}
       />
 
-      {isCreateEditFormOpen && (
-        <CreateEditDealCard
-          isOpen={isCreateEditFormOpen}
-          onClose={() => setIsCreateEditFormOpen(false)}
-          mode={mode}
-          initialBaseFormData={handleCreatedEditForm(dealId)}
-          onSubmit={handleOnSubmit}
-          handleDeleteDocument={handleDeleteDocument}
-        />
-      )}
     </div>
   );
 }

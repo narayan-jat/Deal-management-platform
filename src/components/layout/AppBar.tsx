@@ -88,7 +88,7 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
   const handleCreateDeal = () => {
     setIsSearchActive(false);
     setIsProfileDropdownOpen(false);
-    openCreateDealModal();
+    navigate(ROUTES.CREATE_DEAL);
   };
 
   const handleNotifications = () => {

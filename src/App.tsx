@@ -18,6 +18,8 @@ import TermsOfService from "@/pages/TermsOfService";
 import Dashboard from "@/pages/dashboard/Dashboard";
 import ManageDeals from "@/pages/deals/ManageDeals";
 import ViewDealPage from "@/pages/deals/ViewDealPage";
+import { CreateDealPage } from "@/pages/deals/CreateDealPage";
+import { EditDealPage } from "@/pages/deals/EditDealPage";
 import Profile from "@/pages/Profile";
 import Messages from "@/pages/messages/Messages";
 
@@ -116,6 +118,24 @@ export default function App() {
         >
           <Route index element={<Dashboard />} />
         </Route>
+
+        <Route
+          path={ROUTES.CREATE_DEAL}
+          element={
+            <ProtectedRoute>
+              <CreateDealPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path={ROUTES.EDIT_DEAL}
+          element={
+            <ProtectedRoute>
+              <EditDealPage />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path={ROUTES.DEALS}

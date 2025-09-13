@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { useDealChat } from "@/hooks/useDealChat";
 import { StatusToTitleMap } from "@/types/deal/DealCard";
 import { formatCurrency, getStatusInfo } from "@/utility/Utility";
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "@/config/routes";
 
 type DealCardProps = {
   deal: DealCardType;
@@ -23,6 +25,7 @@ type DealCardProps = {
 
 export default function DealCard(props: DealCardProps) {
   const { deal, refProps, styles, listeners, attributes, onEdit, onView, hasEditAccess, onInviteCollaborators } = props;
+  const navigate = useNavigate();
   const [isCollaboratorsModalOpen, setIsCollaboratorsModalOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const {handleDealChatClick} = useDealChat();
@@ -91,12 +94,6 @@ export default function DealCard(props: DealCardProps) {
     }
   };
 
-  // Handle edit click
-  const handleEditClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onEdit();
-  };
 
   // Handle view click
   const handleViewClick = (e: React.MouseEvent) => {
@@ -144,7 +141,7 @@ export default function DealCard(props: DealCardProps) {
                 <Eye className="h-4 w-4" />
               </button>
               <button
-                onClick={handleEditClick}
+                onClick={() => navigate(ROUTES.EDIT_DEAL.replace(':dealId', deal.id))}
                 className="absolute top-0 right-3 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
                 title="Edit deal"
                 data-dnd-kit-disabled-draggable

@@ -21,3 +21,6 @@ export * from './Deal.members';
 
 // Export documents
 export * from './Deal.documents';
+
+// Export sections
+export * from './Deal.sections';

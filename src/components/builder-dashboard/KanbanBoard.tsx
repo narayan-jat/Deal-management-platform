@@ -24,6 +24,8 @@ import { DollarSign } from "lucide-react";
 import { formatCurrency } from "@/utility/Utility";
 import { useCreateDeal } from "@/context/CreateDealProvider";
 import { getPlural } from "./utils";
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '@/config/routes';
 
 
 const columnNames = {
@@ -54,6 +56,7 @@ export default function KanbanBoard({
   onEdit,
   onView
 }: KanbanBoardProps) {
+  const navigate = useNavigate();
   const [dropPosition, setDropPosition] = useState<{ columnId: string; index: number } | null>(null);
   const { setSelectedColumn, openCreateDealModal } = useCreateDeal();
 
@@ -202,7 +205,7 @@ export default function KanbanBoard({
               <button
                 onClick={() => {
                   setSelectedColumn(key);
-                  openCreateDealModal();
+                  navigate(ROUTES.CREATE_DEAL);
                 }}
                 className="mt-6 w-full text-sm text-teal-700 border border-teal-600 hover:bg-teal-50 py-3 rounded-xl transition-all duration-200 ease-out hover:scale-[1.02] font-medium shadow-sm"
               >

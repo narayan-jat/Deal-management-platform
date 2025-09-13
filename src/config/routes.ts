@@ -11,6 +11,8 @@ export const ROUTES = {
   DASHBOARD: '/dashboard',
   DEALS: '/deals',
   VIEW_DEAL: '/deals/:dealId',
+  CREATE_DEAL: '/deals/create/new',
+  EDIT_DEAL: '/deals/edit/:dealId',
   MESSAGES: '/messages',
   NOTIFICATIONS: '/notifications',
   PROFILE: '/profile',
@@ -34,6 +36,8 @@ export const PROTECTED_ROUTES = {
   DASHBOARD: ROUTES.DASHBOARD,
   DEALS: ROUTES.DEALS,
   VIEW_DEAL: ROUTES.VIEW_DEAL,
+  CREATE_DEAL: ROUTES.CREATE_DEAL,
+  EDIT_DEAL: ROUTES.EDIT_DEAL,
   MESSAGES: ROUTES.MESSAGES,
   NOTIFICATIONS: ROUTES.NOTIFICATIONS,
   PROFILE: ROUTES.PROFILE,
@@ -84,6 +88,16 @@ export const ROUTE_METADATA = {
   [ROUTES.VIEW_DEAL]: {
     title: 'Deal Details',
     description: 'View details for a specific deal',
+    requiresAuth: true,
+  },
+  [ROUTES.CREATE_DEAL]: {
+    title: 'Create Deal',
+    description: 'Create a new deal',
+    requiresAuth: true,
+  },
+  [ROUTES.EDIT_DEAL]: {
+    title: 'Edit Deal',
+    description: 'Edit an existing deal',
     requiresAuth: true,
   },
   [ROUTES.MESSAGES]: {
