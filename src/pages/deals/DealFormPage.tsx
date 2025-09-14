@@ -156,10 +156,6 @@ export const DealFormPage: React.FC<DealFormPageProps> = ({ mode }) => {
             isEnabled={isEnabled}
             onToggleEnabled={() => toggleSectionEnabled(DealSectionName.OVERVIEW)}
             isReadOnly={mode === 'edit'}
-            dealId={dealId}
-            organizationId={formData.organizationId}
-            onDocumentUpload={(docs) => updateSectionDocuments(DealSectionName.OVERVIEW, docs)}
-            documents={documents}
           />
         );
       case DealSectionName.PURPOSE:
@@ -241,8 +237,6 @@ export const DealFormPage: React.FC<DealFormPageProps> = ({ mode }) => {
             isReadOnly={mode === 'edit'}
             dealId={dealId}
             organizationId={formData.organizationId}
-            onDocumentUpload={(docs) => updateSectionDocuments(DealSectionName.NEXT_STEPS, docs)}
-            documents={documents}
           />
         );
       default:

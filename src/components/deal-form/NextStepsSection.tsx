@@ -19,8 +19,6 @@ interface NextStepsSectionProps {
   isReadOnly?: boolean;
   dealId?: string;
   organizationId?: string;
-  onDocumentUpload?: (documents: any[]) => void;
-  documents?: any[];
 }
 
 export const NextStepsSection: React.FC<NextStepsSectionProps> = ({
@@ -31,8 +29,6 @@ export const NextStepsSection: React.FC<NextStepsSectionProps> = ({
   isReadOnly = false,
   dealId,
   organizationId,
-  onDocumentUpload,
-  documents = []
 }) => {
   const handleInputChange = (field: keyof DealNextStepsForm, value: string) => {
     onChange({
@@ -138,67 +134,6 @@ export const NextStepsSection: React.FC<NextStepsSectionProps> = ({
               rows={4}
               className="resize-none"
             />
-          </div>
-
-          {/* Document Upload */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium text-gray-700">
-              Supporting Documents
-            </Label>
-            {!isReadOnly && dealId && organizationId && (
-              <DocumentUploadButton
-                dealId={dealId}
-                organizationId={organizationId}
-                onUpload={async (uploadedDocuments) => {
-                  if (onDocumentUpload) {
-                    onDocumentUpload([...documents, ...uploadedDocuments]);
-                  }
-                  return uploadedDocuments;
-                }}
-                onSuccess={(uploadedDocuments) => {
-                  console.log('Next steps documents uploaded:', uploadedDocuments);
-                }}
-                className="w-full"
-                buttonText="Upload Documents"
-                loadingText="Uploading..."
-              />
-            )}
-            
-            {/* Document List */}
-            {documents.length > 0 && (
-              <div className="space-y-2">
-                <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                  Uploaded Files ({documents.length})
-                </h4>
-                <div className="space-y-2 max-h-32 overflow-y-auto">
-                  {documents.map((document, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
-                    >
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <FileText className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">
-                            {document.file?.name || document.fileName}
-                          </p>
-                        </div>
-                      </div>
-                      {!isReadOnly && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="text-red-500 hover:text-red-700"
-                        >
-                          Remove
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       )}

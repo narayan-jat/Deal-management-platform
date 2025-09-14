@@ -6,8 +6,6 @@ import {
   Tag,
   Plus,
   X,
-  FileText,
-  Trash2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,7 +18,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { DocumentUploadButton } from '@/components/builder-dashboard/DocumentUploadButton';
-import { DealOverviewForm, PersonTag, Rate } from '@/types/deal/Deal.sections';
+import { DealOverviewForm, PersonTag, PersonTagType, Rate } from '@/types/deal/Deal.sections';
 import { DealStatus } from '@/types/deal/Deal.enums';
 import { createPersonTag, createSingleRate, createRangeRate } from '@/utility/DealFormUtils';
 
@@ -30,10 +28,6 @@ interface OverviewSectionProps {
   isEnabled: boolean;
   onToggleEnabled: () => void;
   isReadOnly?: boolean;
-  documents?: any[];
-  onDocumentUpload?: (documents: any[]) => void;
-  dealId?: string;
-  organizationId?: string;
 }
 
 export const OverviewSection: React.FC<OverviewSectionProps> = ({
@@ -41,14 +35,10 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
   onChange,
   isEnabled,
   onToggleEnabled,
-  isReadOnly = false,
-  documents = [],
-  onDocumentUpload,
-  dealId = "new-deal",
-  organizationId,
+  isReadOnly = false
 }) => {
-  const handlePersonTagAdd = (type: 'sponsors' | 'borrowers' | 'lenders') => {
-    const newTag = createPersonTag('', '', '', '');
+  const handlePersonTagAdd = (type: PersonTagType) => {
+    const newTag = createPersonTag('', '', '', type);
     onChange({
       ...data,
       [type]: [...data[type], newTag]
@@ -56,7 +46,7 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
   };
 
   const handlePersonTagUpdate = (
-    type: 'sponsors' | 'borrowers' | 'lenders',
+    type: PersonTagType,
     index: number,
     field: keyof PersonTag,
     value: string
@@ -69,7 +59,7 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
     });
   };
 
-  const handlePersonTagRemove = (type: 'sponsors' | 'borrowers' | 'lenders', index: number) => {
+  const handlePersonTagRemove = (type: PersonTagType, index: number) => {
     const updatedTags = data[type].filter((_, i) => i !== index);
     onChange({
       ...data,
@@ -101,7 +91,7 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
     });
   };
 
-  const renderPersonTags = (type: 'sponsors' | 'borrowers' | 'lenders', label: string) => (
+  const renderPersonTags = (type: PersonTagType, label: string) => (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <Label className="text-sm font-medium text-gray-700">{label}</Label>
@@ -181,9 +171,9 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
       {isEnabled && (
         <div className="space-y-6 p-4 border border-gray-200 rounded-lg bg-white">
           {/* Person Tags */}
-          {renderPersonTags('sponsors', 'Sponsors')}
-          {renderPersonTags('borrowers', 'Borrowers')}
-          {renderPersonTags('lenders', 'Lenders')}
+          {renderPersonTags(PersonTagType.SPONSORS, 'Sponsors')}
+          {renderPersonTags(PersonTagType.BORROWERS, 'Borrowers')}
+          {renderPersonTags(PersonTagType.LENDERS, 'Lenders')}
 
           {/* Loan Request */}
           <div className="space-y-2">
@@ -289,76 +279,6 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
                 ))}
               </SelectContent>
             </Select>
-          </div>
-        </div>
-      )}
-
-      {/* Document Upload */}
-      {isEnabled && (
-        <div className="space-y-4">
-          <div className="border-t border-gray-200 pt-4">
-            <Label className="text-sm font-medium text-gray-700">
-              Documents
-            </Label>
-            <div className="mt-2">
-              <DocumentUploadButton
-                dealId={dealId}
-                organizationId={organizationId}
-                onUpload={async (uploadedDocuments) => {
-                  if (onDocumentUpload) {
-                    onDocumentUpload([...documents, ...uploadedDocuments]);
-                  }
-                  return uploadedDocuments;
-                }}
-                onSuccess={(uploadedDocuments) => {
-                  console.log('Overview documents uploaded:', uploadedDocuments);
-                }}
-                className="w-full"
-                buttonText="Upload Documents"
-                loadingText="Uploading..."
-              />
-            </div>
-
-            {/* Document List */}
-            {documents.length > 0 && (
-              <div className="mt-4 space-y-2">
-                <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                  Uploaded Files ({documents.length})
-                </h4>
-                <div className="space-y-2 max-h-32 overflow-y-auto">
-                  {documents.map((document, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
-                    >
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <FileText className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">
-                            {document.file?.name || document.fileName}
-                          </p>
-                        </div>
-                      </div>
-                      {!isReadOnly && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const newDocuments = documents.filter((_, i) => i !== index);
-                            if (onDocumentUpload) {
-                              onDocumentUpload(newDocuments);
-                            }
-                          }}
-                          className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors flex-shrink-0"
-                          aria-label={`Remove document ${document.file?.name || document.id}`}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       )}

@@ -16,11 +16,16 @@ export enum DealSectionName {
 }
 
 // Person Tag Type for tagging people in different roles
+export enum PersonTagType {
+  SPONSORS = 'sponsors',
+  BORROWERS = 'borrowers',
+  LENDERS = 'lenders'
+}
 export interface PersonTag {
   id: string;
   name: string;
   email: string;
-  role: string;
+  role: PersonTagType;
 }
 
 // Rate Type - can be a single number or range
@@ -112,6 +117,8 @@ export interface DealNextStepsModel {
   dealId: string;
   expectedCloseDate: string;
   notes: string;
+  startDate: string;
+  nextMeetingDate: string;
   createdAt: string;
 }
 
@@ -163,10 +170,10 @@ export interface DealSeniorDebtForm {
 }
 
 export interface DealNextStepsForm {
-  startDate: string;
-  nextMeetingDate: string;
   expectedCloseDate: string;
   notes: string;
+  startDate: string;
+  nextMeetingDate: string;
 }
 
 // Complete Deal Form Data
@@ -203,49 +210,47 @@ export interface CompleteDealForm {
   
   // Documents for each section
   documents: {
-    [DealSectionName.OVERVIEW]: any[];
     [DealSectionName.PURPOSE]: any[];
     [DealSectionName.COLLATERAL]: any[];
     [DealSectionName.FINANCIALS]: any[];
     [DealSectionName.SENIOR_DEBT]: any[];
-    [DealSectionName.NEXT_STEPS]: any[];
   };
 }
 
 // Property Type Options
 export const PROPERTY_TYPE_OPTIONS = [
-  { value: 'office', label: 'Office' },
-  { value: 'multifamily', label: 'Multifamily' },
-  { value: 'retail', label: 'Retail' },
-  { value: 'industrial', label: 'Industrial' },
-  { value: 'hospitality', label: 'Hospitality' },
-  { value: 'mixed_use', label: 'Mixed Use' },
-  { value: 'land', label: 'Land' },
-  { value: 'other', label: 'Other' }
+  { value: 'OFFICE', label: 'Office' },
+  { value: 'MULTIFAMILY', label: 'Multifamily' },
+  { value: 'RETAIL', label: 'Retail' },
+  { value: 'INDUSTRIAL', label: 'Industrial' },
+  { value: 'HOSPITALITY', label: 'Hospitality' },
+  { value: 'MIXED_USE', label: 'Mixed Use' },
+  { value: 'LAND', label: 'Land' },
+  { value: 'OTHER', label: 'Other' }
 ];
 
 // Recourse Options
 export const RECOURSE_OPTIONS = [
-  { value: 'full', label: 'Full Recourse' },
-  { value: 'limited', label: 'Limited Recourse' },
-  { value: 'non_recourse', label: 'Non-Recourse' }
+  { value: 'FULL', label: 'Full Recourse' },
+  { value: 'LIMITED', label: 'Limited Recourse' },
+  { value: 'NON_RECOURSE', label: 'Non-Recourse' }
 ];
 
 // Condition Options
 export const CONDITION_OPTIONS = [
-  { value: 'excellent', label: 'Excellent' },
-  { value: 'good', label: 'Good' },
-  { value: 'fair', label: 'Fair' },
-  { value: 'poor', label: 'Poor' },
-  { value: 'needs_renovation', label: 'Needs Renovation' }
+  { value: 'EXCELLENT', label: 'Excellent' },
+  { value: 'GOOD', label: 'Good' },
+  { value: 'FAIR', label: 'Fair' },
+  { value: 'POOR', label: 'Poor' },
+  { value: 'NEEDS_RENOVATION', label: 'Needs Renovation' }
 ];
 
 // Timeline Options
 export const TIMELINE_OPTIONS = [
-  { value: '1-3_months', label: '1-3 Months' },
-  { value: '3-6_months', label: '3-6 Months' },
-  { value: '6-12_months', label: '6-12 Months' },
-  { value: '1-2_years', label: '1-2 Years' },
-  { value: '2-5_years', label: '2-5 Years' },
-  { value: '5+_years', label: '5+ Years' }
+  { value: '1-3_MONTHS', label: '1-3 Months' },
+  { value: '3-6_MONTHS', label: '3-6 Months' },
+  { value: '6-12_MONTHS', label: '6-12 Months' },
+  { value: '1-2_YEARS', label: '1-2 Years' },
+  { value: '2-5_YEARS', label: '2-5 Years' },
+  { value: '5+_YEARS', label: '5+ Years' }
 ];

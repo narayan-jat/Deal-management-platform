@@ -14,6 +14,7 @@ import {
   DealSeniorDebtForm,
   DealNextStepsForm,
   PersonTag,
+  PersonTagType,
   Rate
 } from '@/types/deal/Deal.sections';
 import { DealModel } from '@/types/deal/Deal.model';
@@ -117,12 +118,10 @@ export const createInitialDealForm = (): CompleteDealForm => {
     
     // Documents for each section
     documents: {
-      [DealSectionName.OVERVIEW]: [],
       [DealSectionName.PURPOSE]: [],
       [DealSectionName.COLLATERAL]: [],
       [DealSectionName.FINANCIALS]: [],
       [DealSectionName.SENIOR_DEBT]: [],
-      [DealSectionName.NEXT_STEPS]: [],
     }
   };
 };
@@ -204,7 +203,9 @@ export const createInitialSeniorDebtForm = (): DealSeniorDebtForm => {
 export const createInitialNextStepsForm = (): DealNextStepsForm => {
   return {
     expectedCloseDate: '',
-    notes: ''
+    notes: '',
+    startDate: '',
+    nextMeetingDate: ''
   };
 };
 
@@ -330,7 +331,7 @@ export const validateCompleteForm = (formData: CompleteDealForm): { isValid: boo
 /**
  * Creates a new person tag
  */
-export const createPersonTag = (id: string, name: string, email: string, role: string): PersonTag => {
+export const createPersonTag = (id: string, name: string, email: string, role: PersonTagType): PersonTag => {
   return { id, name, email, role };
 };
 

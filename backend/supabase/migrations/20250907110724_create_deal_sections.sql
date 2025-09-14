@@ -7,6 +7,7 @@
 -- =====================================================
 
 DROP TABLE IF EXISTS deal_sections CASCADE;
+DROP TABLE IF EXISTS deal_overview CASCADE;
 DROP TABLE IF EXISTS deal_purpose CASCADE;
 DROP TABLE IF EXISTS deal_collateral CASCADE;
 DROP TABLE IF EXISTS deal_financials CASCADE;
@@ -35,6 +36,19 @@ CREATE TABLE deal_sections (
   deal_id uuid REFERENCES deals(id) ON DELETE CASCADE,
   section_name deal_section_name NOT NULL,
   enabled boolean NOT NULL DEFAULT true,
+  created_at timestamptz DEFAULT now()
+);
+
+-- Deal overview table
+CREATE TABLE deal_overview (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  deal_id uuid REFERENCES deals(id) ON DELETE CASCADE,
+  sponsors TEXT,
+  borrowers TEXT,
+  lenders TEXT,
+  loan_request NUMERIC,
+  rate TEXT,
+  status TEXT,
   created_at timestamptz DEFAULT now()
 );
 
@@ -97,6 +111,8 @@ CREATE TABLE deal_next_steps (
   deal_id uuid REFERENCES deals(id) ON DELETE CASCADE,
   expected_close_date DATE,
   notes TEXT,
+  start_date DATE,
+  next_meeting_date DATE,
   created_at timestamptz DEFAULT now()
 );
 
@@ -105,6 +121,7 @@ CREATE TABLE deal_next_steps (
 -- =====================================================
 
 ALTER TABLE deal_sections ENABLE ROW LEVEL SECURITY;
+ALTER TABLE deal_overview ENABLE ROW LEVEL SECURITY;
 ALTER TABLE deal_purpose ENABLE ROW LEVEL SECURITY;
 ALTER TABLE deal_collateral ENABLE ROW LEVEL SECURITY;
 ALTER TABLE deal_financials ENABLE ROW LEVEL SECURITY;
@@ -124,6 +141,10 @@ DROP POLICY IF EXISTS "Allow deal members to read their own deal sections" ON de
 DROP POLICY IF EXISTS "Allow deal members to insert their own deal sections" ON deal_sections;
 DROP POLICY IF EXISTS "Allow deal members to update their own deal sections" ON deal_sections;
 DROP POLICY IF EXISTS "Allow deal members to delete their own deal sections" ON deal_sections;
+DROP POLICY IF EXISTS "Allow deal members to read their own deal overview" ON deal_overview;
+DROP POLICY IF EXISTS "Allow deal members to insert their own deal overview" ON deal_overview;
+DROP POLICY IF EXISTS "Allow deal members to update their own deal overview" ON deal_overview;
+DROP POLICY IF EXISTS "Allow deal members to delete their own deal overview" ON deal_overview;
 DROP POLICY IF EXISTS "Allow deal members to read their own deal purpose" ON deal_purpose;
 DROP POLICY IF EXISTS "Allow deal members to insert their own deal purpose" ON deal_purpose;
 DROP POLICY IF EXISTS "Allow deal members to update their own deal purpose" ON deal_purpose;
@@ -214,6 +235,66 @@ USING (
     OR
     deal_id IN (
         SELECT deal_id FROM deal_members WHERE member_id = auth.uid() AND role IN ('EDITOR', 'OWNER', 'ADMIN')
+    )
+);
+
+-- =====================================================
+-- CREATE DEAL OVERVIEW POLICIES
+-- =====================================================
+CREATE POLICY "Allow deal members to read their own deal overview"
+ON deal_overview
+FOR SELECT
+USING (
+    auth.uid() IN (
+        SELECT created_by FROM deals WHERE id = deal_overview.deal_id
+    )
+    OR
+    deal_id IN (
+        SELECT deal_id FROM deal_members WHERE member_id = auth.uid()
+    )
+);
+
+-- =====================================================
+-- DEAL OVERVIEW - INSERT POLICY
+-- =====================================================
+-- Only current authenticated user can create a deal.
+CREATE POLICY "Allow deal members to insert their own deal overview"
+ON deal_overview
+FOR INSERT
+WITH CHECK (
+    auth.uid() IN (
+        SELECT created_by FROM deals WHERE id = deal_overview.deal_id
+    )
+);
+
+-- =====================================================
+-- DEAL OVERVIEW - UPDATE POLICY
+-- =====================================================
+-- Only EDITOR, OWNER and ADMIN can update the deal.
+CREATE POLICY "Allow deal members to update the deal overview for elevated roles"
+ON deal_overview
+FOR UPDATE
+USING (
+    auth.uid() IN (
+        SELECT created_by FROM deals WHERE id = deal_overview.deal_id
+    )
+);
+WITH CHECK (
+    auth.uid() IN (
+        SELECT created_by FROM deals WHERE id = deal_overview.deal_id
+    )
+);
+
+-- =====================================================
+-- DEAL OVERVIEW - DELETE POLICY
+-- =====================================================
+-- Only EDITOR, OWNER and ADMIN can delete the deal.
+CREATE POLICY "Allow deal members to delete the deal overview for elevated roles"
+ON deal_overview
+FOR DELETE
+USING (
+    auth.uid() IN (
+        SELECT created_by FROM deals WHERE id = deal_overview.deal_id
     )
 );
 

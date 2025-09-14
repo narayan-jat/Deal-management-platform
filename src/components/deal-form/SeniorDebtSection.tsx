@@ -207,7 +207,7 @@ export const SeniorDebtSection: React.FC<SeniorDebtSectionProps> = ({
             <Label className="text-sm font-medium text-gray-700">
               Supporting Documents
             </Label>
-            {!isReadOnly && dealId && organizationId && (
+            {(
               <DocumentUploadButton
                 dealId={dealId}
                 organizationId={organizationId}

@@ -120,7 +120,7 @@ export const useDealForm = ({
   ) => {
     updateFormData({
       [sectionName.toLowerCase()]: {
-        ...formData[sectionName.toLowerCase() as keyof CompleteDealForm],
+        ...formData[sectionName.toLowerCase() as keyof CompleteDealForm] as object,
         ...data
       }
     });
