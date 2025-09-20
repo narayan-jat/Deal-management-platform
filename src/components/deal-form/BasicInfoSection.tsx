@@ -28,6 +28,7 @@ interface BasicInfoSectionProps {
     organizationId: string;
     location: string;
     notes: string;
+    status: string;
   };
   onChange: (data: any) => void;
   isReadOnly?: boolean;
@@ -57,7 +58,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
         {/* Deal Title */}
         <div className="space-y-2">
           <Label htmlFor="title" className="text-sm font-medium text-gray-700">
-            Deal Title <span className="text-red-500">*</span>
+            Title <span className="text-red-500">*</span>
           </Label>
           <Input
             id="title"
@@ -94,6 +95,36 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
           </Select>
         </div>
 
+        {/* Status */}
+        <div className="space-y-2">
+          <Label htmlFor="status" className="text-sm font-medium text-gray-700">
+            Status <span className="text-red-500">*</span>
+          </Label>
+          <Select
+            value={data.status}
+            onValueChange={(value) => handleInputChange('status', value)}
+            disabled={isReadOnly}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select a status" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.values(DealStatus).map((status) => {
+                let displayStatus = status.replace('_', ' ').toLowerCase();
+                displayStatus = displayStatus.charAt(0).toUpperCase() + displayStatus.slice(1);
+                if (status === 'NEGOTIATION') {
+                  displayStatus = 'In Negotiation';
+                }
+                return (
+                  <SelectItem key={status} value={status}>
+                    {displayStatus}
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
+        </div>
+
 
         {/* Location */}
         <div className="space-y-2">
@@ -115,14 +146,14 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
         </div>
 
 
-        {/* Notes */}
+        {/* Highlights */}
         <div className="space-y-2">
           <Label htmlFor="notes" className="text-sm font-medium text-gray-700">
-            Notes
+            Highlights
           </Label>
           <Textarea
             id="notes"
-            placeholder="Add any additional notes about this deal..."
+            placeholder="Add key takeaways"
             value={data.notes}
             onChange={(e) => handleInputChange('notes', e.target.value)}
             disabled={isReadOnly}

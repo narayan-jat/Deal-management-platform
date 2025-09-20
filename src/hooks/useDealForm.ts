@@ -12,20 +12,21 @@ import {
   DealPurposeForm,
   DealCollateralForm,
   DealFinancialsForm,
-  DealSeniorDebtForm,
   DealNextStepsForm
 } from '@/types/deal/Deal.sections';
+import { getSectionFormKey } from '@/utility/SectionMappingUtils';
 import { DealModel } from '@/types/deal/Deal.model';
 import { 
   createInitialDealForm,
   saveDealFormToStorage,
   loadDealFormFromStorage,
   clearDealFormFromStorage,
-  convertDealModelToForm,
   validateCompleteForm,
   toggleSection,
   getEnabledSectionsCount
 } from '@/utility/DealFormUtils';
+import { DealService } from '@/services/deals/DealService';
+import { ErrorService } from '@/services/ErrorService';
 
 interface UseDealFormProps {
   mode: 'create' | 'edit';
@@ -42,31 +43,81 @@ export const useDealForm = ({
   autoSave = true,
   autoSaveInterval = 30000 // 30 seconds
 }: UseDealFormProps) => {
-  const [formData, setFormData] = useState<CompleteDealForm>(() => {
-    if (mode === 'edit' && initialDealData) {
-      return {
-        ...createInitialDealForm(),
-        ...convertDealModelToForm(initialDealData)
-      };
-    }
-    return createInitialDealForm();
-  });
+  const [formData, setFormData] = useState<CompleteDealForm>(createInitialDealForm());
   
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
 
-  // Load data from localStorage on mount for create mode
-  useEffect(() => {
+  // Load data from localStorage on mount for create mode, or from server for edit mode
+  const loadInitialData = async () => {
     if (mode === 'create') {
       const savedData = loadDealFormFromStorage(false);
       if (savedData) {
-        setFormData(savedData);
+        setFormData(savedData as CompleteDealForm);
         setIsDirty(true);
+        return;
+      }
+      setFormData(createInitialDealForm() as CompleteDealForm);
+      setIsDirty(true);
+      return;
+    } else if (mode === 'edit' && dealId) {
+      try {
+        setLoading(true);
+        const completeDeal = await DealService.getCompleteDeal(dealId);
+        
+        console.log('completeDeal', completeDeal);
+        // Convert the complete deal data to form format
+        const formData = {
+          // Basic deal info
+          title: completeDeal.deal.title,
+          industry: completeDeal.deal.industry || '',
+          organizationId: completeDeal.deal.organizationId || '',
+          status: completeDeal.deal.status,
+          location: completeDeal.deal.location || '',
+          notes: completeDeal.deal.notes || '',
+          
+          // Sections
+          overview: completeDeal.sections.overview || createInitialDealForm().overview,
+          purpose: completeDeal.sections.purpose || createInitialDealForm().purpose,
+          collateral: completeDeal.sections.collateral || createInitialDealForm().collateral,
+          financials: completeDeal.sections.financials || createInitialDealForm().financials,
+          nextSteps: completeDeal.sections.nextSteps || createInitialDealForm().nextSteps,
+          
+          // Section enablement - create from sections array
+          sectionsEnabled: {
+            [DealSectionName.BASIC_INFO]: true,
+            [DealSectionName.OVERVIEW]: completeDeal.sections.sections?.find(s => s.sectionName === DealSectionName.OVERVIEW.toLowerCase())?.enabled || false,
+            [DealSectionName.PURPOSE]: completeDeal.sections.sections?.find(s => s.sectionName === DealSectionName.PURPOSE.toLowerCase())?.enabled || false,
+            [DealSectionName.COLLATERAL]: completeDeal.sections.sections?.find(s => s.sectionName === DealSectionName.COLLATERAL.toLowerCase())?.enabled || false,
+            [DealSectionName.FINANCIALS]: completeDeal.sections.sections?.find(s => s.sectionName === DealSectionName.FINANCIALS.toLowerCase())?.enabled || false,
+            [DealSectionName.NEXT_STEPS]: completeDeal.sections.sections?.find(s => s.sectionName === DealSectionName.NEXT_STEPS.toLowerCase())?.enabled || true,
+          },
+          
+          // Documents
+          documents: {
+            [DealSectionName.PURPOSE]: completeDeal.documents[DealSectionName.PURPOSE] || [],
+            [DealSectionName.COLLATERAL]: completeDeal.documents[DealSectionName.COLLATERAL] || [],
+            [DealSectionName.FINANCIALS]: completeDeal.documents[DealSectionName.FINANCIALS] || [],
+          }
+        } as CompleteDealForm;
+        
+        setFormData(formData as CompleteDealForm);
+        setIsDirty(false);
+      } catch (error) {
+        console.error('Error loading deal data:', error);
+        ErrorService.handleApiError(error, "useDealForm.loadInitialData");
+      } finally {
+        setLoading(false);
       }
     }
-  }, [mode]);
+  };
+
+  useEffect(() => {
+    loadInitialData();
+  }, [mode, dealId, createInitialDealForm]);
 
   // Auto-save functionality
   useEffect(() => {
@@ -113,14 +164,16 @@ export const useDealForm = ({
     updateFormData(updates);
   }, [updateFormData]);
 
+
   // Update section data
   const updateSectionData = useCallback((
     sectionName: DealSectionName,
-    data: Partial<DealOverviewForm | DealPurposeForm | DealCollateralForm | DealFinancialsForm | DealSeniorDebtForm | DealNextStepsForm>
+    data: Partial<DealOverviewForm | DealPurposeForm | DealCollateralForm | DealFinancialsForm | DealNextStepsForm>
   ) => {
+    const formKey = getSectionFormKey(sectionName);
     updateFormData({
-      [sectionName.toLowerCase()]: {
-        ...formData[sectionName.toLowerCase() as keyof CompleteDealForm] as object,
+      [formKey]: {
+        ...formData[formKey] as object,
         ...data
       }
     });
@@ -160,7 +213,7 @@ export const useDealForm = ({
   const loadFromStorage = useCallback((isDraft: boolean = false) => {
     const data = loadDealFormFromStorage(isDraft);
     if (data) {
-      setFormData(data);
+      setFormData(data as CompleteDealForm);
       setIsDirty(true);
       return true;
     }
@@ -186,7 +239,7 @@ export const useDealForm = ({
 
   // Reset form
   const resetForm = useCallback(() => {
-    setFormData(createInitialDealForm());
+    setFormData(createInitialDealForm() as CompleteDealForm);
     setIsDirty(false);
     setLastSaved(null);
     setErrors([]);
@@ -211,7 +264,8 @@ export const useDealForm = ({
 
   // Check if section has data
   const hasSectionData = useCallback((sectionName: DealSectionName) => {
-    const sectionData = formData[sectionName.toLowerCase() as keyof CompleteDealForm];
+    const formKey = getSectionFormKey(sectionName);
+    const sectionData = formData[formKey];
     if (!sectionData) return false;
     
     return Object.values(sectionData).some(value => {
@@ -226,7 +280,7 @@ export const useDealForm = ({
       }
       return value !== null && value !== undefined;
     });
-  }, [formData]);
+  }, [formData, getSectionFormKey]);
 
   return {
     // Form data
@@ -236,6 +290,7 @@ export const useDealForm = ({
     // State
     isDirty,
     isSaving,
+    loading,
     lastSaved,
     errors,
     

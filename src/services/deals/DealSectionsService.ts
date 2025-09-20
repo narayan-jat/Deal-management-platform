@@ -5,19 +5,18 @@ import {
   DealPurposeModel, 
   DealCollateralModel, 
   DealFinancialsModel, 
-  DealSeniorDebtModel, 
   DealNextStepsModel,
   DealSectionName,
   DealOverviewForm,
   DealPurposeForm,
   DealCollateralForm,
   DealFinancialsForm,
-  DealSeniorDebtForm,
   DealNextStepsForm
 } from "@/types/deal/Deal.sections";
 import { ErrorService } from "../ErrorService";
 import snakecaseKeys from 'snakecase-keys';
 import camelcaseKeys from 'camelcase-keys';
+import { formatDateForDatabase } from '@/utility/DealFormUtils';
 
 export class DealSectionsService {
   // =====================================================
@@ -86,12 +85,14 @@ export class DealSectionsService {
     try {
       const dataToInsert = {
         deal_id: dealId,
-        sponsors: overviewData.sponsors,
         borrowers: overviewData.borrowers,
         lenders: overviewData.lenders,
+        other_parties: overviewData.otherParties,
         loan_request: overviewData.loanRequest,
+        total_project_cost: overviewData.totalProjectCost,
         rate: overviewData.rate,
-        status: overviewData.status
+        ltv: overviewData.ltv,
+        dscr: overviewData.dscr
       };
 
       const { data, error } = await supabase
@@ -101,13 +102,12 @@ export class DealSectionsService {
           ignoreDuplicates: false 
         })
         .select()
-        .single();
 
       if (error) {
         throw error;
       }
 
-      return camelcaseKeys(data, { deep: true }) as DealOverviewModel;
+      return camelcaseKeys(data[0], { deep: true }) as DealOverviewModel;
     } catch (error) {
       ErrorService.handleApiError(error, "DealSectionsService.createOrUpdateDealOverview");
       throw error;
@@ -158,13 +158,12 @@ export class DealSectionsService {
           ignoreDuplicates: false 
         })
         .select()
-        .single();
 
       if (error) {
         throw error;
       }
 
-      return camelcaseKeys(data, { deep: true }) as DealPurposeModel;
+      return camelcaseKeys(data[0], { deep: true }) as DealPurposeModel;
     } catch (error) {
       ErrorService.handleApiError(error, "DealSectionsService.createOrUpdateDealPurpose");
       throw error;
@@ -202,8 +201,10 @@ export class DealSectionsService {
    */
   static async createOrUpdateDealCollateral(dealId: string, collateralData: DealCollateralForm) {
     try {
-      const dataToInsert = snakecaseKeys(collateralData, { deep: true });
-      dataToInsert.deal_id = dealId;
+      const dataToInsert = {
+        deal_id: dealId,
+        collateral_data: collateralData
+      };
 
       const { data, error } = await supabase
         .from("deal_collateral")
@@ -212,13 +213,12 @@ export class DealSectionsService {
           ignoreDuplicates: false 
         })
         .select()
-        .single();
 
       if (error) {
         throw error;
       }
 
-      return camelcaseKeys(data, { deep: true }) as DealCollateralModel;
+      return camelcaseKeys(data[0], { deep: true }) as DealCollateralModel;
     } catch (error) {
       ErrorService.handleApiError(error, "DealSectionsService.createOrUpdateDealCollateral");
       throw error;
@@ -236,11 +236,16 @@ export class DealSectionsService {
         .eq("deal_id", dealId)
         .single();
 
-      if (error && error.code !== 'PGRST116') {
+      if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
         throw error;
       }
 
-      return data ? camelcaseKeys(data, { deep: true }) as DealCollateralModel : null;
+      if (data) {
+        // Return the collateral data directly
+        return data.collateral_data as DealCollateralForm;
+      }
+
+      return { items: [] } as DealCollateralForm;
     } catch (error) {
       ErrorService.handleApiError(error, "DealSectionsService.getDealCollateral");
       throw error;
@@ -256,8 +261,11 @@ export class DealSectionsService {
    */
   static async createOrUpdateDealFinancials(dealId: string, financialsData: DealFinancialsForm) {
     try {
-      const dataToInsert = snakecaseKeys(financialsData, { deep: true });
-      dataToInsert.deal_id = dealId;
+      const dataToInsert = {
+        deal_id: dealId,
+        sources_of_funds: financialsData.sourcesOfFunds,
+        uses_of_funds: financialsData.usesOfFunds
+      };
 
       const { data, error } = await supabase
         .from("deal_financials")
@@ -266,13 +274,12 @@ export class DealSectionsService {
           ignoreDuplicates: false 
         })
         .select()
-        .single();
 
       if (error) {
         throw error;
       }
 
-      return camelcaseKeys(data, { deep: true }) as DealFinancialsModel;
+      return camelcaseKeys(data[0], { deep: true }) as DealFinancialsModel;
     } catch (error) {
       ErrorService.handleApiError(error, "DealSectionsService.createOrUpdateDealFinancials");
       throw error;
@@ -301,59 +308,6 @@ export class DealSectionsService {
     }
   }
 
-  // =====================================================
-  // DEAL SENIOR DEBT SECTION
-  // =====================================================
-
-  /**
-   * Creates or updates deal senior debt section
-   */
-  static async createOrUpdateDealSeniorDebt(dealId: string, seniorDebtData: DealSeniorDebtForm) {
-    try {
-      const dataToInsert = snakecaseKeys(seniorDebtData, { deep: true });
-      dataToInsert.deal_id = dealId;
-
-      const { data, error } = await supabase
-        .from("deal_senior_debt")
-        .upsert(dataToInsert, { 
-          onConflict: 'deal_id',
-          ignoreDuplicates: false 
-        })
-        .select()
-        .single();
-
-      if (error) {
-        throw error;
-      }
-
-      return camelcaseKeys(data, { deep: true }) as DealSeniorDebtModel;
-    } catch (error) {
-      ErrorService.handleApiError(error, "DealSectionsService.createOrUpdateDealSeniorDebt");
-      throw error;
-    }
-  }
-
-  /**
-   * Gets deal senior debt section
-   */
-  static async getDealSeniorDebt(dealId: string) {
-    try {
-      const { data, error } = await supabase
-        .from("deal_senior_debt")
-        .select("*")
-        .eq("deal_id", dealId)
-        .single();
-
-      if (error && error.code !== 'PGRST116') {
-        throw error;
-      }
-
-      return data ? camelcaseKeys(data, { deep: true }) as DealSeniorDebtModel : null;
-    } catch (error) {
-      ErrorService.handleApiError(error, "DealSectionsService.getDealSeniorDebt");
-      throw error;
-    }
-  }
 
   // =====================================================
   // DEAL NEXT STEPS SECTION
@@ -364,8 +318,13 @@ export class DealSectionsService {
    */
   static async createOrUpdateDealNextSteps(dealId: string, nextStepsData: DealNextStepsForm) {
     try {
-      const dataToInsert = snakecaseKeys(nextStepsData, { deep: true });
-      dataToInsert.deal_id = dealId;
+      const dataToInsert = {
+        deal_id: dealId,
+        expected_close_date: formatDateForDatabase(nextStepsData.expectedCloseDate),
+        notes: nextStepsData.notes,
+        start_date: formatDateForDatabase(nextStepsData.startDate),
+        next_meeting_date: formatDateForDatabase(nextStepsData.nextMeetingDate)
+      };
 
       const { data, error } = await supabase
         .from("deal_next_steps")
@@ -374,13 +333,12 @@ export class DealSectionsService {
           ignoreDuplicates: false 
         })
         .select()
-        .single();
 
       if (error) {
         throw error;
       }
 
-      return camelcaseKeys(data, { deep: true }) as DealNextStepsModel;
+      return camelcaseKeys(data[0], { deep: true }) as DealNextStepsModel;
     } catch (error) {
       ErrorService.handleApiError(error, "DealSectionsService.createOrUpdateDealNextSteps");
       throw error;
@@ -424,7 +382,6 @@ export class DealSectionsService {
         purpose,
         collateral,
         financials,
-        seniorDebt,
         nextSteps
       ] = await Promise.all([
         this.getDealSections(dealId),
@@ -432,7 +389,6 @@ export class DealSectionsService {
         this.getDealPurpose(dealId),
         this.getDealCollateral(dealId),
         this.getDealFinancials(dealId),
-        this.getDealSeniorDebt(dealId),
         this.getDealNextSteps(dealId)
       ]);
 
@@ -442,7 +398,6 @@ export class DealSectionsService {
         purpose,
         collateral,
         financials,
-        seniorDebt,
         nextSteps
       };
     } catch (error) {
@@ -462,7 +417,6 @@ export class DealSectionsService {
       purpose?: DealPurposeForm;
       collateral?: DealCollateralForm;
       financials?: DealFinancialsForm;
-      seniorDebt?: DealSeniorDebtForm;
       nextSteps?: DealNextStepsForm;
     }
   ) {
@@ -472,29 +426,52 @@ export class DealSectionsService {
       // Update sections enabled status
       results.sections = await this.createOrUpdateDealSections(dealId, sectionsEnabled);
 
-      // Update each section if data is provided
-      if (sectionsData.overview) {
+      // Update each section only if it's enabled and data is provided
+      if (sectionsEnabled[DealSectionName.OVERVIEW] && sectionsData.overview) {
         results.overview = await this.createOrUpdateDealOverview(dealId, sectionsData.overview);
       }
-      if (sectionsData.purpose) {
+      if (sectionsEnabled[DealSectionName.PURPOSE] && sectionsData.purpose) {
         results.purpose = await this.createOrUpdateDealPurpose(dealId, sectionsData.purpose);
       }
-      if (sectionsData.collateral) {
+      if (sectionsEnabled[DealSectionName.COLLATERAL] && sectionsData.collateral) {
         results.collateral = await this.createOrUpdateDealCollateral(dealId, sectionsData.collateral);
       }
-      if (sectionsData.financials) {
+      if (sectionsEnabled[DealSectionName.FINANCIALS] && sectionsData.financials) {
         results.financials = await this.createOrUpdateDealFinancials(dealId, sectionsData.financials);
       }
-      if (sectionsData.seniorDebt) {
-        results.seniorDebt = await this.createOrUpdateDealSeniorDebt(dealId, sectionsData.seniorDebt);
-      }
-      if (sectionsData.nextSteps) {
+      if (sectionsEnabled[DealSectionName.NEXT_STEPS] && sectionsData.nextSteps) {
         results.nextSteps = await this.createOrUpdateDealNextSteps(dealId, sectionsData.nextSteps);
       }
 
       return results;
     } catch (error) {
       ErrorService.handleApiError(error, "DealSectionsService.createOrUpdateAllDealSections");
+      throw error;
+    }
+  }
+
+  /**
+   * Deletes all sections for a deal
+   * @param dealId - The ID of the deal
+   * @returns Success status
+   */
+  static async deleteAllDealSections(dealId: string) {
+    try {
+      // Delete all section data
+      await Promise.all([
+        supabase.from("deal_overview").delete().eq("deal_id", dealId),
+        supabase.from("deal_purpose").delete().eq("deal_id", dealId),
+        supabase.from("deal_collateral").delete().eq("deal_id", dealId),
+        supabase.from("deal_financials").delete().eq("deal_id", dealId),
+        supabase.from("deal_next_steps").delete().eq("deal_id", dealId)
+      ]);
+
+      // Delete section enablement records
+      await supabase.from("deal_sections").delete().eq("deal_id", dealId);
+
+      return { success: true };
+    } catch (error) {
+      ErrorService.handleApiError(error, "DealSectionsService.deleteAllDealSections");
       throw error;
     }
   }

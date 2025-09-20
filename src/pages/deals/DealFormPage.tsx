@@ -11,7 +11,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useDealForm } from '@/hooks/useDealForm';
-import { DealSectionName } from '@/types/deal/Deal.sections';
+import { DealSectionName, CompleteDealForm } from '@/types/deal/Deal.sections';
+import { getSectionFormKey } from '@/utility/SectionMappingUtils';
 import { DealStatus } from '@/types/deal/Deal.enums';
 import { useCreateEditDeal } from '@/hooks/useCreateEditDeal';
 import { DealSectionsService } from '@/services/deals/DealSectionsService';
@@ -23,7 +24,6 @@ import { OverviewSection } from '@/components/deal-form/OverviewSection';
 import { PurposeSection } from '@/components/deal-form/PurposeSection';
 import { CollateralSection } from '@/components/deal-form/CollateralSection';
 import { FinancialsSection } from '@/components/deal-form/FinancialsSection';
-import { SeniorDebtSection } from '@/components/deal-form/SeniorDebtSection';
 import { NextStepsSection } from '@/components/deal-form/NextStepsSection';
 
 interface DealFormPageProps {
@@ -59,6 +59,29 @@ export const DealFormPage: React.FC<DealFormPageProps> = ({ mode }) => {
 
   const { handleCreateDeal, handleEditDeal } = useCreateEditDeal();
 
+  // Validation function for required fields
+  const validateRequiredFields = () => {
+    const errors: string[] = [];
+    
+    // Basic Info required fields
+    if (!formData.title.trim()) {
+      errors.push('Title is required');
+    }
+    if (!formData.industry.trim()) {
+      errors.push('Industry is required');
+    }
+    if (!formData.status.trim()) {
+      errors.push('Status is required');
+    }
+    
+    // Next Steps required fields
+    if (!formData.nextSteps.startDate.trim()) {
+      errors.push('Origination Date is required');
+    }
+    
+    return errors;
+  };
+
   // Load existing deal data for edit mode
   useEffect(() => {
     if (mode === 'edit' && dealId) {
@@ -87,6 +110,13 @@ export const DealFormPage: React.FC<DealFormPageProps> = ({ mode }) => {
   };
 
   const handleSubmit = async (isDraft: boolean = false) => {
+    // Validate required fields first
+    const validationErrors = validateRequiredFields();
+    if (validationErrors.length > 0 && !isDraft) {
+      toast.error(`Please fill the required fields first: ${validationErrors.join(', ')}`);
+      return;
+    }
+
     const validation = validateForm();
     if (!validation.isValid && !isDraft) {
       toast.error('Please fix the errors before submitting');
@@ -96,26 +126,12 @@ export const DealFormPage: React.FC<DealFormPageProps> = ({ mode }) => {
     setIsSubmitting(true);
     try {
       if (mode === 'create') {
-        await handleCreateDeal(
-          {
-            ...formData,
-            status: formData.status as DealStatus
-          },
-          Object.values(formData.documents).flat(),
-          [] // members - would need to be implemented
-        );
+        await handleCreateDeal(formData);
         clearStorage();
         toast.success('Deal created successfully');
         navigate('/deals');
       } else {
-        await handleEditDeal(
-          {
-            ...formData,
-            status: formData.status as DealStatus
-          },
-          Object.values(formData.documents).flat(),
-          [] // members - would need to be implemented
-        );
+        await handleEditDeal(dealId!, formData);
         toast.success('Deal updated successfully');
         navigate('/deals');
       }
@@ -132,19 +148,24 @@ export const DealFormPage: React.FC<DealFormPageProps> = ({ mode }) => {
     { id: DealSectionName.PURPOSE, label: 'Purpose', icon: '📋' },
     { id: DealSectionName.COLLATERAL, label: 'Collateral', icon: '🏢' },
     { id: DealSectionName.FINANCIALS, label: 'Financials', icon: '💰' },
-    { id: DealSectionName.SENIOR_DEBT, label: 'Senior Debt', icon: '💳' },
     { id: DealSectionName.NEXT_STEPS, label: 'Next Steps', icon: '📅' }
   ];
 
   const stats = getFormStats();
+
 
   const renderSection = () => {
     if (activeTab === DealSectionName.BASIC_INFO) {
       return null; // Basic info is handled in the main render
     }
 
-    const sectionData = formData[activeTab.toLowerCase() as keyof typeof formData];
+    const sectionData = formData[getSectionFormKey(activeTab)];
+    console.log('sectionData', sectionData);
+    console.log("formData", formData);
     const isEnabled = formData.sectionsEnabled[activeTab];
+    console.log('type of isEnabled', typeof isEnabled);
+    console.log('isEnabled', isEnabled);
+
     const documents = formData.documents[activeTab];
 
     switch (activeTab) {
@@ -155,7 +176,7 @@ export const DealFormPage: React.FC<DealFormPageProps> = ({ mode }) => {
             onChange={(data) => updateSectionData(DealSectionName.OVERVIEW, data)}
             isEnabled={isEnabled}
             onToggleEnabled={() => toggleSectionEnabled(DealSectionName.OVERVIEW)}
-            isReadOnly={mode === 'edit'}
+            // isReadOnly={mode === 'edit'}
           />
         );
       case DealSectionName.PURPOSE:
@@ -165,7 +186,7 @@ export const DealFormPage: React.FC<DealFormPageProps> = ({ mode }) => {
             onChange={(data) => updateSectionData(DealSectionName.PURPOSE, data)}
             isEnabled={isEnabled}
             onToggleEnabled={() => toggleSectionEnabled(DealSectionName.PURPOSE)}
-            isReadOnly={mode === 'edit'}
+            // isReadOnly={mode === 'edit'}
             dealId={dealId}
             organizationId={formData.organizationId}
             onDocumentUpload={(docs) => updateSectionDocuments(DealSectionName.PURPOSE, docs)}
@@ -179,11 +200,9 @@ export const DealFormPage: React.FC<DealFormPageProps> = ({ mode }) => {
             onChange={(data) => updateSectionData(DealSectionName.COLLATERAL, data)}
             isEnabled={isEnabled}
             onToggleEnabled={() => toggleSectionEnabled(DealSectionName.COLLATERAL)}
-            isReadOnly={mode === 'edit'}
+            // isReadOnly={mode === 'edit'}
             dealId={dealId}
             organizationId={formData.organizationId}
-            onDocumentUpload={(docs) => updateSectionDocuments(DealSectionName.COLLATERAL, docs)}
-            documents={documents}
           />
         );
       case DealSectionName.FINANCIALS:
@@ -193,48 +212,21 @@ export const DealFormPage: React.FC<DealFormPageProps> = ({ mode }) => {
             onChange={(data) => updateSectionData(DealSectionName.FINANCIALS, data)}
             isEnabled={isEnabled}
             onToggleEnabled={() => toggleSectionEnabled(DealSectionName.FINANCIALS)}
-            isReadOnly={mode === 'edit'}
+            // isReadOnly={mode === 'edit'}
             dealId={dealId}
             organizationId={formData.organizationId}
             onDocumentUpload={(docs) => updateSectionDocuments(DealSectionName.FINANCIALS, docs)}
             documents={documents}
           />
         );
-      case DealSectionName.SENIOR_DEBT:
-        return (
-          <SeniorDebtSection
-            data={formData.seniorDebt}
-            onChange={(data) => updateSectionData(DealSectionName.SENIOR_DEBT, data)}
-            isEnabled={isEnabled}
-            onToggleEnabled={() => toggleSectionEnabled(DealSectionName.SENIOR_DEBT)}
-            isReadOnly={mode === 'edit'}
-            dealId={dealId}
-            organizationId={formData.organizationId}
-            onDocumentUpload={(docs) => updateSectionDocuments(DealSectionName.SENIOR_DEBT, docs)}
-            documents={documents}
-          />
-        );
       case DealSectionName.NEXT_STEPS:
         return (
           <NextStepsSection
-            data={{
-              ...formData.nextSteps,
-              startDate: formData.startDate,
-              nextMeetingDate: formData.nextMeetingDate
-            }}
-            onChange={(data) => {
-              updateSectionData(DealSectionName.NEXT_STEPS, data);
-              // Also update the main formData startDate and nextMeetingDate
-              if (data.startDate !== formData.startDate) {
-                updateBasicInfo({ startDate: data.startDate });
-              }
-              if (data.nextMeetingDate !== formData.nextMeetingDate) {
-                updateBasicInfo({ nextMeetingDate: data.nextMeetingDate });
-              }
-            }}
+            data={formData.nextSteps}
+            onChange={(data) => updateSectionData(DealSectionName.NEXT_STEPS, data)}
             isEnabled={isEnabled}
             onToggleEnabled={() => toggleSectionEnabled(DealSectionName.NEXT_STEPS)}
-            isReadOnly={mode === 'edit'}
+            // isReadOnly={mode === 'edit'}
             dealId={dealId}
             organizationId={formData.organizationId}
           />
@@ -316,7 +308,6 @@ export const DealFormPage: React.FC<DealFormPageProps> = ({ mode }) => {
                   : 'text-gray-700 hover:bg-gray-100'
               }`}
             >
-              <span>📋</span>
               <span className="hidden sm:inline">Basic Info</span>
               <span className="sm:hidden">Basic</span>
             </button>
@@ -337,10 +328,8 @@ export const DealFormPage: React.FC<DealFormPageProps> = ({ mode }) => {
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
-                  <span>{section.icon}</span>
                   <span className="hidden sm:inline">{section.label}</span>
                   <span className="sm:hidden">{section.label.split(' ')[0]}</span>
-                  {isEnabled && <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />}
                   {hasData && (
                     <Badge variant="secondary" className="text-xs hidden sm:inline-flex">
                       {formData.documents[section.id]?.length || 0}
@@ -364,10 +353,11 @@ export const DealFormPage: React.FC<DealFormPageProps> = ({ mode }) => {
                   industry: formData.industry,
                   organizationId: formData.organizationId,
                   location: formData.location,
-                  notes: formData.notes
+                  notes: formData.notes,
+                  status: formData.status
                 }}
                 onChange={updateBasicInfo}
-                isReadOnly={mode === 'edit'}
+                // isReadOnly={mode === 'edit'}
               />
             ) : (
               renderSection()

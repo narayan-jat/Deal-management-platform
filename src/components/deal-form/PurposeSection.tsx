@@ -11,8 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { DealPurposeForm } from '@/types/deal/Deal.sections';
-import { TIMELINE_OPTIONS } from '@/types/deal/Deal.sections';
+import { DealPurposeForm, TIMELINE_OPTIONS } from '@/types/deal/Deal.sections';
 import { DocumentUploadButton } from '@/components/builder-dashboard/DocumentUploadButton';
 
 interface PurposeSectionProps {
@@ -70,7 +69,7 @@ export const PurposeSection: React.FC<PurposeSectionProps> = ({
           {/* Purpose Description */}
           <div className="space-y-2">
             <Label htmlFor="purpose" className="text-sm font-medium text-gray-700">
-              Purpose Description
+              Description
             </Label>
             <Textarea
               id="purpose"

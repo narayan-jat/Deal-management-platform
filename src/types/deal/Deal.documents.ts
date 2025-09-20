@@ -9,6 +9,9 @@ export type DealDocument = {
   fileName: string; // file_name
   signatureStatus: SignatureStatus; // signature_status
   uploadedAt: string; // uploaded_at
+  sectionName?: string; // section_name
+  formCategory?: string; // form_category
+  itemId?: string; // item_id
 };
 
 // For upload form

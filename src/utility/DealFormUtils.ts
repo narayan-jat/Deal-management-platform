@@ -11,7 +11,6 @@ import {
   DealPurposeForm,
   DealCollateralForm,
   DealFinancialsForm,
-  DealSeniorDebtForm,
   DealNextStepsForm,
   PersonTag,
   PersonTagType,
@@ -86,34 +85,29 @@ export const clearAllDealFormData = () => {
  */
 export const createInitialDealForm = (): CompleteDealForm => {
   return {
-    // Basic deal info
-    title: '',
-    industry: '',
-    organizationId: '',
-    requestedAmount: 0,
-    status: DealStatus.NEW,
-    startDate: '',
-    endDate: '',
-    nextMeetingDate: '',
-    location: '',
-    notes: '',
+  // Basic deal info
+  title: '',
+  industry: '',
+  organizationId: '',
+  status: DealStatus.NEW,
+  location: '',
+  notes: '',
     
     // Sections
     overview: createInitialOverviewForm(),
     purpose: createInitialPurposeForm(),
     collateral: createInitialCollateralForm(),
     financials: createInitialFinancialsForm(),
-    seniorDebt: createInitialSeniorDebtForm(),
     nextSteps: createInitialNextStepsForm(),
     
     // Section enablement
     sectionsEnabled: {
-      [DealSectionName.OVERVIEW]: true,
+      [DealSectionName.BASIC_INFO]: true,
+      [DealSectionName.OVERVIEW]: false,
       [DealSectionName.PURPOSE]: false,
       [DealSectionName.COLLATERAL]: false,
       [DealSectionName.FINANCIALS]: false,
-      [DealSectionName.SENIOR_DEBT]: false,
-      [DealSectionName.NEXT_STEPS]: false,
+      [DealSectionName.NEXT_STEPS]: true,
     },
     
     // Documents for each section
@@ -121,7 +115,6 @@ export const createInitialDealForm = (): CompleteDealForm => {
       [DealSectionName.PURPOSE]: [],
       [DealSectionName.COLLATERAL]: [],
       [DealSectionName.FINANCIALS]: [],
-      [DealSectionName.SENIOR_DEBT]: [],
     }
   };
 };
@@ -131,12 +124,14 @@ export const createInitialDealForm = (): CompleteDealForm => {
  */
 export const createInitialOverviewForm = (): DealOverviewForm => {
   return {
-    sponsors: [],
     borrowers: [],
     lenders: [],
+    otherParties: [],
     loanRequest: 0,
+    totalProjectCost: 0,
     rate: { type: 'single', value: 0 },
-    status: DealStatus.NEW
+    ltv: 0,
+    dscr: 0
   };
 };
 
@@ -155,15 +150,7 @@ export const createInitialPurposeForm = (): DealPurposeForm => {
  */
 export const createInitialCollateralForm = (): DealCollateralForm => {
   return {
-    propertyDescription: '',
-    propertyType: '',
-    buildingSize: 0,
-    yearBuilt: new Date().getFullYear(),
-    occupancy: 0,
-    condition: '',
-    location: '',
-    appraisedValue: 0,
-    riskNotes: ''
+    items: []
   };
 };
 
@@ -173,29 +160,10 @@ export const createInitialCollateralForm = (): DealCollateralForm => {
 export const createInitialFinancialsForm = (): DealFinancialsForm => {
   return {
     sourcesOfFunds: '',
-    usesOfFunds: '',
-    historicalFinancials: '',
-    projectedFinancials: '',
-    exitStrategy: '',
-    ltv: 0,
-    dscr: 0
+    usesOfFunds: ''
   };
 };
 
-/**
- * Creates initial senior debt form data
- */
-export const createInitialSeniorDebtForm = (): DealSeniorDebtForm => {
-  return {
-    amount: 0,
-    interestRate: 0,
-    term: '',
-    amortization: '',
-    recourse: '',
-    prepaymentPenalty: '',
-    fees: ''
-  };
-};
 
 /**
  * Creates initial next steps form data
@@ -221,11 +189,7 @@ export const convertDealModelToForm = (deal: DealModel): Partial<CompleteDealFor
     title: deal.title,
     industry: deal.industry,
     organizationId: deal.organizationId,
-    requestedAmount: deal.requestedAmount,
     status: deal.status,
-    startDate: deal.startDate,
-    endDate: deal.endDate,
-    nextMeetingDate: deal.nextMeetingDate,
     location: deal.location,
     notes: deal.notes
   };
@@ -239,14 +203,62 @@ export const convertFormToDealModel = (formData: CompleteDealForm): Partial<Deal
     title: formData.title,
     industry: formData.industry,
     organizationId: formData.organizationId,
-    requestedAmount: formData.requestedAmount,
     status: formData.status as DealStatus,
-    startDate: formData.startDate,
-    endDate: formData.endDate,
-    nextMeetingDate: formData.nextMeetingDate,
     location: formData.location,
     notes: formData.notes
   };
+};
+
+// =====================================================
+// DATE UTILITIES
+// =====================================================
+
+/**
+ * Formats a date string for HTML date input (YYYY-MM-DD format)
+ */
+export const formatDateForInput = (dateString: string): string => {
+  if (!dateString) return '';
+  
+  // If it's already in YYYY-MM-DD format, return as is
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+    return dateString;
+  }
+  
+  // Try to parse and format the date
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '';
+    
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+  } catch (error) {
+    console.warn('Error formatting date:', error);
+    return '';
+  }
+};
+
+/**
+ * Formats a date for display (MM/DD/YYYY format)
+ */
+export const formatDateForDisplay = (dateString: string): string => {
+  if (!dateString) return '';
+  
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '';
+    
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const year = date.getFullYear();
+    
+    return `${month}/${day}/${year}`;
+  } catch (error) {
+    console.warn('Error formatting date for display:', error);
+    return '';
+  }
 };
 
 // =====================================================
@@ -259,28 +271,25 @@ export const convertFormToDealModel = (formData: CompleteDealForm): Partial<Deal
 export const validateSection = (sectionName: DealSectionName, formData: CompleteDealForm): boolean => {
   switch (sectionName) {
     case DealSectionName.OVERVIEW:
-      return formData.overview.sponsors.length > 0 || 
-             formData.overview.borrowers.length > 0 || 
-             formData.overview.lenders.length > 0;
+      return formData.overview.borrowers.length > 0 || 
+             formData.overview.lenders.length > 0 ||
+             formData.overview.otherParties.length > 0;
     
     case DealSectionName.PURPOSE:
       return formData.purpose.purpose.trim() !== '' || 
              formData.purpose.timeline.trim() !== '';
     
     case DealSectionName.COLLATERAL:
-      return formData.collateral.propertyType.trim() !== '' || 
-             formData.collateral.location.trim() !== '';
+      return formData.collateral.items.length > 0;
     
     case DealSectionName.FINANCIALS:
       return formData.financials.sourcesOfFunds.trim() !== '' || 
              formData.financials.usesOfFunds.trim() !== '';
     
-    case DealSectionName.SENIOR_DEBT:
-      return formData.seniorDebt.amount > 0 || 
-             formData.seniorDebt.interestRate > 0;
     
     case DealSectionName.NEXT_STEPS:
-      return formData.nextSteps.expectedCloseDate.trim() !== '' || 
+      return formData.nextSteps.startDate.trim() !== '' || 
+             formData.nextSteps.expectedCloseDate.trim() !== '' || 
              formData.nextSteps.notes.trim() !== '';
     
     default:
@@ -303,20 +312,18 @@ export const validateCompleteForm = (formData: CompleteDealForm): { isValid: boo
     errors.push('Industry is required');
   }
   
-  if (!formData.startDate) {
-    errors.push('Start date is required');
-  }
-  
-  if (!formData.nextMeetingDate) {
-    errors.push('Next meeting date is required');
+  // Check required dates in NextSteps section
+  if (!formData.nextSteps.startDate) {
+    errors.push('Origination date is required');
   }
   
   // Section validation for enabled sections
-  Object.entries(formData.sectionsEnabled).forEach(([sectionName, enabled]) => {
-    if (enabled && !validateSection(sectionName as DealSectionName, formData)) {
-      errors.push(`${sectionName} section is enabled but incomplete`);
-    }
-  });
+  // Disable section validation for now
+  // Object.entries(formData.sectionsEnabled).forEach(([sectionName, enabled]) => {
+  //   if (enabled && !validateSection(sectionName as DealSectionName, formData)) {
+  //     errors.push(`${sectionName} section is enabled but incomplete`);
+  //   }
+  // });
   
   return {
     isValid: errors.length === 0,
@@ -418,4 +425,30 @@ export const getEnabledSections = (sectionsEnabled: { [key in DealSectionName]: 
   return Object.entries(sectionsEnabled)
     .filter(([_, enabled]) => enabled)
     .map(([sectionName, _]) => sectionName as DealSectionName);
+};
+
+/**
+ * Formats a date string for database storage, handling empty strings
+ */
+export const formatDateForDatabase = (dateString: string): string | null => {
+  if (!dateString || dateString.trim() === '') {
+    return null;
+  }
+  
+  // If it's already in YYYY-MM-DD format, return as is
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+    return dateString;
+  }
+  
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return null;
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  } catch (error) {
+    console.warn('Error formatting date for database:', error);
+    return null;
+  }
 };

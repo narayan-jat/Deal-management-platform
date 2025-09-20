@@ -71,4 +71,7 @@ export interface DealDocumentModel {
   uploadedAt: string; // uploaded_at
   signatureStatus: SignatureStatus; // signature_status
   signedAt?: string; // signed_at
+  sectionName?: string; // section_name - NEW: identifies which section the document belongs to
+  formCategory?: string; // form_category - NEW: sub-categorization within sections
+  itemId?: string; // item_id - NEW: links to specific item within section (e.g., collateral item ID)
 }

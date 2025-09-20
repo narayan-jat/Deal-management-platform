@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import ViewDeal from '@/components/builder-dashboard/ViewDeal';
+import ViewDealTabs from '@/components/builder-dashboard/ViewDealTabs';
 import CreateEditDealCard from '@/components/builder-dashboard/CreateEditDealCard';
 import DotLoader from '@/components/ui/loader';
 import { useViewDealPage } from '@/hooks/useViewDealPage';
@@ -48,7 +48,7 @@ export default function ViewDealPage() {
 
   return (
     <>
-      <ViewDeal
+      <ViewDealTabs
         dealLogs={dealLogs}
         isFetchingDealLogs={isFetchingDealLogs}
         deal={deal} 

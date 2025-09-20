@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { DealModel, DealMemberModel } from '../types/deal/Deal.model';
 import { UploadDocumentForm } from '@/types/deal/Deal.documents';
+import { CompleteDealForm, DealSectionName } from '@/types/deal/Deal.sections';
 import { DealService } from '@/services/deals/DealService';
 import { ErrorService } from '@/services/ErrorService';
 import { DealMember, InviteMemberForm } from '@/types/deal/Deal.members';
@@ -11,7 +12,6 @@ import { DealMemberRole } from '@/types/deal/Deal.enums';
 import { getDateString } from '@/utility/Utility';
 import { DealMemberService } from '@/services/deals/DealMemberService';
 import { useDocumentUpload } from './useDocumentUpload';
-
 import { createDealLogs } from './utils';
 import { useUserProfile } from '@/context/UserProfileProvider';
 
@@ -22,8 +22,51 @@ export const useCreateEditDeal = () => {
   const { userProfile } = useUserProfile();
   const { createDealDocuments, updateDealDocuments, handleDeleteDocument: deleteDocument } = useDocumentUpload();
 
-  // Create a new deal
-  const handleCreateDeal = async (deal: Partial<DealModel>, documents: UploadDocumentForm[], members: InviteMemberForm[]): Promise<DealModel | null> => {
+  // Create a new deal with complete form data
+  const handleCreateDeal = async (dealFormData: CompleteDealForm): Promise<DealModel | null> => {
+    if (!user?.id) {
+      setApiError("User not authenticated");
+      return null;
+    }
+    
+    if (!userProfile?.primaryOrganization?.organization?.id) {
+      setApiError("User organization not found");
+      return null;
+    }
+
+    try {
+      setLoading(true);
+      // Add the createdBy field to the deal.
+      dealFormData.createdBy = user.id;
+      // Add the organizationId field to the deal.
+      dealFormData.organizationId = userProfile?.primaryOrganization.organization.id;
+      // Convert the date fields to correct format if the date is provided. 
+      // Send a string in 'YYYY-MM-DD' format. If no date is provided, do not include the field.
+      // Use the new comprehensive deal creation service
+      const result = await DealService.createCompleteDeal(dealFormData);
+      
+      // Create deal logs for the creation
+      await createDealLogs(user.id, result.deal.id, {
+        deal: {
+          title: result.deal.title,
+          status: result.deal.status,
+          action: 'deal created',
+        },
+      }, LogType.CREATED);
+      
+      return result.deal;
+    } catch (error) {
+      console.error('Error creating deal:', error);
+      setApiError(error.message);
+      ErrorService.handleApiError(error, "useCreateEditDeal.handleCreateDeal");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Legacy method for backward compatibility
+  const handleCreateDealLegacy = async (deal: Partial<DealModel>, documents: UploadDocumentForm[], members: InviteMemberForm[]): Promise<DealModel | null> => {
     if (!user?.id) {
       setApiError("User not authenticated");
       return null;
@@ -75,7 +118,48 @@ export const useCreateEditDeal = () => {
 
 
 
-  const handleEditDeal = async (deal: Partial<DealModel>, documents: UploadDocumentForm[], members: InviteMemberForm[]): Promise<DealModel | null> => {
+  // Edit a deal with complete form data
+  const handleEditDeal = async (dealId: string, dealFormData: CompleteDealForm): Promise<DealModel | null> => {
+    if (!dealId) {
+      console.error('Deal ID is missing for edit operation');
+      setApiError('Deal ID is required for editing');
+      return null;
+    }
+
+    if (!user?.id) {
+      console.error('User not authenticated for edit operation');
+      setApiError('User not authenticated');
+      return null;
+    }
+    
+    try {
+      setLoading(true);
+      
+      // Use the new comprehensive deal update service
+      const result = await DealService.updateCompleteDeal(dealId, dealFormData);
+      
+      // Create deal logs for the update
+      await createDealLogs(user.id, dealId, {
+        deal: {
+          title: result.deal.title,
+          status: result.deal.status,
+          action: 'deal updated',
+        },
+      }, LogType.UPDATED);
+      
+      return result.deal as DealModel;
+    } catch (error) {
+      console.error('Error updating deal:', error);
+      setApiError(error.message);
+      ErrorService.handleApiError(error, "useCreateEditDeal.handleEditDeal");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Legacy method for backward compatibility
+  const handleEditDealLegacy = async (deal: Partial<DealModel>, documents: UploadDocumentForm[], members: InviteMemberForm[]): Promise<DealModel | null> => {
     
     if (!deal.id) {
       console.error('Deal ID is missing for edit operation');
@@ -154,8 +238,13 @@ export const useCreateEditDeal = () => {
   return { 
     loading, 
     apiError, 
+    // New methods for comprehensive deal management
     handleCreateDeal, 
-    handleEditDeal, 
+    handleEditDeal,
+    // Legacy methods for backward compatibility
+    handleCreateDealLegacy, 
+    handleEditDealLegacy,
+    // Document management
     handleDeleteDocument: deleteDocument
   };
 }

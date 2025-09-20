@@ -6,10 +6,12 @@ import {
   Tag,
   Plus,
   X,
+  Calculator,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import CurrencyInput from 'react-currency-input-field';
 import { 
   Select,
   SelectContent,
@@ -38,10 +40,15 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
   isReadOnly = false
 }) => {
   const handlePersonTagAdd = (type: PersonTagType) => {
-    const newTag = createPersonTag('', '', '', type);
+    const newTag = createPersonTag(crypto.randomUUID(), '', '', type);
+    
+    const fieldName = type === PersonTagType.BORROWERS ? 'borrowers' :
+                     type === PersonTagType.LENDERS ? 'lenders' :
+                     'otherParties';
+    
     onChange({
       ...data,
-      [type]: [...data[type], newTag]
+      [fieldName]: [...data[fieldName], newTag]
     });
   };
 
@@ -51,19 +58,27 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
     field: keyof PersonTag,
     value: string
   ) => {
-    const updatedTags = [...data[type]];
+    const fieldName = type === PersonTagType.BORROWERS ? 'borrowers' :
+                     type === PersonTagType.LENDERS ? 'lenders' :
+                     'otherParties';
+    
+    const updatedTags = [...data[fieldName]];
     updatedTags[index] = { ...updatedTags[index], [field]: value };
     onChange({
       ...data,
-      [type]: updatedTags
+      [fieldName]: updatedTags
     });
   };
 
   const handlePersonTagRemove = (type: PersonTagType, index: number) => {
-    const updatedTags = data[type].filter((_, i) => i !== index);
+    const fieldName = type === PersonTagType.BORROWERS ? 'borrowers' :
+                     type === PersonTagType.LENDERS ? 'lenders' :
+                     'otherParties';
+    
+    const updatedTags = data[fieldName].filter((_, i) => i !== index);
     onChange({
       ...data,
-      [type]: updatedTags
+      [fieldName]: updatedTags
     });
   };
 
@@ -109,7 +124,11 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
         )}
       </div>
       
-      {data[type].map((tag, index) => (
+      {(() => {
+        const fieldName = type === PersonTagType.BORROWERS ? 'borrowers' :
+                         type === PersonTagType.LENDERS ? 'lenders' :
+                         'otherParties';
+        return data[fieldName].map((tag, index) => (
         <div key={index} className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
           <div className="flex-1 grid grid-cols-3 gap-2">
             <Input
@@ -144,7 +163,8 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
             </Button>
           )}
         </div>
-      ))}
+        ));
+      })()}
     </div>
   );
 
@@ -171,28 +191,44 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
       {isEnabled && (
         <div className="space-y-6 p-4 border border-gray-200 rounded-lg bg-white">
           {/* Person Tags */}
-          {renderPersonTags(PersonTagType.SPONSORS, 'Sponsors')}
           {renderPersonTags(PersonTagType.BORROWERS, 'Borrowers')}
           {renderPersonTags(PersonTagType.LENDERS, 'Lenders')}
+          {renderPersonTags(PersonTagType.OTHER_PARTIES, 'Other Parties')}
 
           {/* Loan Request */}
           <div className="space-y-2">
             <Label htmlFor="loanRequest" className="text-sm font-medium text-gray-700">
               Loan Request Amount
             </Label>
-            <div className="relative">
-              <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-              <Input
-                id="loanRequest"
-                type="number"
-                placeholder="0.00"
-                value={data.loanRequest}
-                onChange={(e) => onChange({ ...data, loanRequest: parseFloat(e.target.value) || 0 })}
-                disabled={isReadOnly}
-                className="pl-10"
-                step="0.01"
-              />
-            </div>
+            <CurrencyInput
+              id="loanRequest"
+              value={data.loanRequest}
+              onValueChange={(value) => onChange({ ...data, loanRequest: parseFloat(value || '0') })}
+              disabled={isReadOnly}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="0"
+              prefix="$"
+              decimalsLimit={2}
+              allowDecimals={true}
+            />
+          </div>
+
+          {/* Total Project Cost */}
+          <div className="space-y-2">
+            <Label htmlFor="totalProjectCost" className="text-sm font-medium text-gray-700">
+              Total Project Cost
+            </Label>
+            <CurrencyInput
+              id="totalProjectCost"
+              value={data.totalProjectCost}
+              onValueChange={(value) => onChange({ ...data, totalProjectCost: parseFloat(value || '0') })}
+              disabled={isReadOnly}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="0"
+              prefix="$"
+              decimalsLimit={2}
+              allowDecimals={true}
+            />
           </div>
 
           {/* Rate */}
@@ -258,28 +294,48 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
             </div>
           </div>
 
-          {/* Status */}
-          <div className="space-y-2">
-            <Label htmlFor="status" className="text-sm font-medium text-gray-700">
-              Status
-            </Label>
-            <Select
-              value={data.status}
-              onValueChange={(value) => onChange({ ...data, status: value })}
-              disabled={isReadOnly}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.values(DealStatus).map((status) => (
-                  <SelectItem key={status} value={status}>
-                    {status.replace('_', ' ')}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          {/* LTV and DSCR */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="ltv" className="text-sm font-medium text-gray-700">
+                Loan-to-Value (LTV) %
+              </Label>
+              <div className="flex items-center gap-2">
+                <Percent className="h-4 w-4 text-gray-500" />
+                <Input
+                  id="ltv"
+                  type="number"
+                  placeholder="0.00"
+                  value={data.ltv}
+                  onChange={(e) => onChange({ ...data, ltv: parseFloat(e.target.value) || 0 })}
+                  disabled={isReadOnly}
+                  min="0"
+                  max="100"
+                  step="0.01"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="dscr" className="text-sm font-medium text-gray-700">
+                Debt Service Coverage Ratio (DSCR)
+              </Label>
+              <div className="flex items-center gap-2">
+                <Calculator className="h-4 w-4 text-gray-500" />
+                <Input
+                  id="dscr"
+                  type="number"
+                  placeholder="0.00"
+                  value={data.dscr}
+                  onChange={(e) => onChange({ ...data, dscr: parseFloat(e.target.value) || 0 })}
+                  disabled={isReadOnly}
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+            </div>
           </div>
+
         </div>
       )}
     </div>

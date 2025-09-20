@@ -11,15 +11,14 @@ export enum DealSectionName {
   PURPOSE = 'PURPOSE',
   COLLATERAL = 'COLLATERAL',
   FINANCIALS = 'FINANCIALS',
-  SENIOR_DEBT = 'SENIOR_DEBT',
   NEXT_STEPS = 'NEXT_STEPS'
 }
 
 // Person Tag Type for tagging people in different roles
 export enum PersonTagType {
-  SPONSORS = 'sponsors',
   BORROWERS = 'borrowers',
-  LENDERS = 'lenders'
+  LENDERS = 'lenders',
+  OTHER_PARTIES = 'other_parties'
 }
 export interface PersonTag {
   id: string;
@@ -49,12 +48,14 @@ export interface DealSectionModel {
 export interface DealOverviewModel {
   id: string;
   dealId: string;
-  sponsors: PersonTag[];
   borrowers: PersonTag[];
   lenders: PersonTag[];
+  otherParties: PersonTag[];
   loanRequest: number;
+  totalProjectCost: number;
   rate: Rate;
-  status: string;
+  ltv: number;
+  dscr: number;
   createdAt: string;
 }
 
@@ -67,21 +68,15 @@ export interface DealPurposeModel {
   createdAt: string;
 }
 
-// Deal Collateral Model
+// Deal Collateral Model - stores individual collateral items
 export interface DealCollateralModel {
   id: string;
   dealId: string;
-  propertyDescription: string;
-  propertyType: string;
-  buildingSize: number;
-  yearBuilt: number;
-  occupancy: number;
-  condition: string;
-  location: string;
-  appraisedValue: number;
-  riskNotes: string;
+  collateralType: string; // PROPERTY, FINANCIAL_ASSETS, CORPORATE_ASSETS
+  collateralData: any; // JSON field storing the specific collateral item data
   createdAt: string;
 }
+
 
 // Deal Financials Model
 export interface DealFinancialsModel {
@@ -89,27 +84,10 @@ export interface DealFinancialsModel {
   dealId: string;
   sourcesOfFunds: string;
   usesOfFunds: string;
-  historicalFinancials: string;
-  projectedFinancials: string;
-  exitStrategy: string;
-  ltv: number; // Loan-to-Value
-  dscr: number; // Debt Service Coverage Ratio
   createdAt: string;
 }
 
-// Deal Senior Debt Model
-export interface DealSeniorDebtModel {
-  id: string;
-  dealId: string;
-  amount: number;
-  interestRate: number;
-  term: string;
-  amortization: string;
-  recourse: string;
-  prepaymentPenalty: string;
-  fees: string;
-  createdAt: string;
-}
+// Note: DealSeniorDebtModel removed as Senior Debt section was removed
 
 // Deal Next Steps Model
 export interface DealNextStepsModel {
@@ -124,12 +102,14 @@ export interface DealNextStepsModel {
 
 // Form Data Types for each section
 export interface DealOverviewForm {
-  sponsors: PersonTag[];
   borrowers: PersonTag[];
   lenders: PersonTag[];
+  otherParties: PersonTag[];
   loanRequest: number;
+  totalProjectCost: number;
   rate: Rate;
-  status: string;
+  ltv: number;
+  dscr: number;
 }
 
 export interface DealPurposeForm {
@@ -137,7 +117,44 @@ export interface DealPurposeForm {
   timeline: string;
 }
 
-export interface DealCollateralForm {
+// Re-export constants from centralized file
+export {
+  CollateralType,
+  FinancialAssetSubtype,
+  CorporateAssetSubtype,
+  LienPosition,
+  LienStatus,
+  PropertyType,
+  PropertyCondition,
+  TimelineOption,
+  RecourseType,
+  COLLATERAL_TYPE_OPTIONS,
+  FINANCIAL_ASSET_SUBTYPE_OPTIONS,
+  CORPORATE_ASSET_SUBTYPE_OPTIONS,
+  LIEN_POSITION_OPTIONS,
+  LIEN_STATUS_OPTIONS,
+  PROPERTY_TYPE_OPTIONS,
+  PROPERTY_CONDITION_OPTIONS,
+  TIMELINE_OPTIONS,
+  RECOURSE_OPTIONS
+} from '@/constants/DealFormConstants';
+import { CollateralType } from '@/constants/DealFormConstants';
+// Debt Details
+export interface DebtDetails {
+  lenderName: string;
+  outstandingBalance: number;
+  originalLoanAmount?: number;
+  interestRate: number;
+  maturityDate: string;
+  lienPosition: string;
+  collateralSecuredAgainst?: string;
+  notes?: string;
+}
+
+// Property Collateral Item
+export interface PropertyCollateralItem {
+  id: string;
+  collateralType: CollateralType.PROPERTY;
   propertyDescription: string;
   propertyType: string;
   buildingSize: number;
@@ -147,27 +164,53 @@ export interface DealCollateralForm {
   location: string;
   appraisedValue: number;
   riskNotes: string;
+  hasDebt: boolean;
+  debtDetails?: DebtDetails;
+  notes?: string;
+  documents: any[];
+}
+
+// Financial Assets Collateral Item
+export interface FinancialAssetsCollateralItem {
+  id: string;
+  collateralType: CollateralType.FINANCIAL_ASSETS;
+  assetType: string; // Cash, Marketable Securities, Receivables, Inventory
+  custodianHolder: string;
+  value: number;
+  lienStatus: string;
+  notes: string;
+  hasDebt: boolean;
+  debtDetails?: DebtDetails;
+  documents: any[];
+}
+
+// Corporate Assets Collateral Item
+export interface CorporateAssetsCollateralItem {
+  id: string;
+  collateralType: CollateralType.CORPORATE_ASSETS;
+  assetType: string; // Equipment/Machinery, Vehicles, Equity Pledges, etc.
+  description: string;
+  estimatedValue: number;
+  ownership: string;
+  notes: string;
+  hasDebt: boolean;
+  debtDetails?: DebtDetails;
+  documents: any[];
+}
+
+// Union type for all collateral items
+export type CollateralItem = PropertyCollateralItem | FinancialAssetsCollateralItem | CorporateAssetsCollateralItem;
+
+export interface DealCollateralForm {
+  items: CollateralItem[];
 }
 
 export interface DealFinancialsForm {
   sourcesOfFunds: string;
   usesOfFunds: string;
-  historicalFinancials: string;
-  projectedFinancials: string;
-  exitStrategy: string;
-  ltv: number;
-  dscr: number;
 }
 
-export interface DealSeniorDebtForm {
-  amount: number;
-  interestRate: number;
-  term: string;
-  amortization: string;
-  recourse: string;
-  prepaymentPenalty: string;
-  fees: string;
-}
+// Note: DealSeniorDebtForm removed as Senior Debt section was removed
 
 export interface DealNextStepsForm {
   expectedCloseDate: string;
@@ -182,29 +225,24 @@ export interface CompleteDealForm {
   title: string;
   industry: string;
   organizationId: string;
-  requestedAmount: number;
   status: string;
-  startDate: string;
-  endDate: string;
-  nextMeetingDate: string;
   location: string;
   notes: string;
-  
+  createdBy?: string;
   // Sections
   overview: DealOverviewForm;
   purpose: DealPurposeForm;
   collateral: DealCollateralForm;
   financials: DealFinancialsForm;
-  seniorDebt: DealSeniorDebtForm;
   nextSteps: DealNextStepsForm;
   
   // Section enablement
   sectionsEnabled: {
+    [DealSectionName.BASIC_INFO]: boolean;
     [DealSectionName.OVERVIEW]: boolean;
     [DealSectionName.PURPOSE]: boolean;
     [DealSectionName.COLLATERAL]: boolean;
     [DealSectionName.FINANCIALS]: boolean;
-    [DealSectionName.SENIOR_DEBT]: boolean;
     [DealSectionName.NEXT_STEPS]: boolean;
   };
   
@@ -213,44 +251,6 @@ export interface CompleteDealForm {
     [DealSectionName.PURPOSE]: any[];
     [DealSectionName.COLLATERAL]: any[];
     [DealSectionName.FINANCIALS]: any[];
-    [DealSectionName.SENIOR_DEBT]: any[];
   };
 }
 
-// Property Type Options
-export const PROPERTY_TYPE_OPTIONS = [
-  { value: 'OFFICE', label: 'Office' },
-  { value: 'MULTIFAMILY', label: 'Multifamily' },
-  { value: 'RETAIL', label: 'Retail' },
-  { value: 'INDUSTRIAL', label: 'Industrial' },
-  { value: 'HOSPITALITY', label: 'Hospitality' },
-  { value: 'MIXED_USE', label: 'Mixed Use' },
-  { value: 'LAND', label: 'Land' },
-  { value: 'OTHER', label: 'Other' }
-];
-
-// Recourse Options
-export const RECOURSE_OPTIONS = [
-  { value: 'FULL', label: 'Full Recourse' },
-  { value: 'LIMITED', label: 'Limited Recourse' },
-  { value: 'NON_RECOURSE', label: 'Non-Recourse' }
-];
-
-// Condition Options
-export const CONDITION_OPTIONS = [
-  { value: 'EXCELLENT', label: 'Excellent' },
-  { value: 'GOOD', label: 'Good' },
-  { value: 'FAIR', label: 'Fair' },
-  { value: 'POOR', label: 'Poor' },
-  { value: 'NEEDS_RENOVATION', label: 'Needs Renovation' }
-];
-
-// Timeline Options
-export const TIMELINE_OPTIONS = [
-  { value: '1-3_MONTHS', label: '1-3 Months' },
-  { value: '3-6_MONTHS', label: '3-6 Months' },
-  { value: '6-12_MONTHS', label: '6-12 Months' },
-  { value: '1-2_YEARS', label: '1-2 Years' },
-  { value: '2-5_YEARS', label: '2-5 Years' },
-  { value: '5+_YEARS', label: '5+ Years' }
-];
