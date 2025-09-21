@@ -11,6 +11,12 @@ export enum CollateralType {
   CORPORATE_ASSETS = 'CORPORATE_ASSETS'
 }
 
+// Financial Document Types
+export enum FinancialFormCategory {
+  HISTORICAL = 'HISTORICAL',
+  PROJECTED = 'PROJECTED'
+}
+
 // Financial Asset Subtypes
 export enum FinancialAssetSubtype {
   CASH = 'CASH',

@@ -77,8 +77,12 @@ export default function ViewDealTabs({
     getMemberName,
     getAvailableTabs,
     updateDealDocuments,
+    loadDocumentsBySection,
+    documentsBySection,
+    loadingDocuments,
   } = useDealView(deal);
 
+  console.log('documentsBySection', documentsBySection);
   // Render section content
   const renderSectionContent = () => {
     if (loadingSections) {
@@ -100,7 +104,14 @@ export default function ViewDealTabs({
 
     switch (activeTab) {
       case "BASIC_INFO":
-        return <BasicInfoSection deal={deal} />;
+        return (
+          <BasicInfoSection 
+            deal={deal} 
+            onDocumentPreview={handleDocumentPreview}
+            onDocumentDownload={handleDocumentDownload}
+            documents={documentsBySection['BASIC_INFO'] || []}
+          />
+        );
       case DealSectionName.OVERVIEW:
         return (
           <OverviewSection
@@ -108,6 +119,7 @@ export default function ViewDealTabs({
             deal={deal}
             onDocumentPreview={handleDocumentPreview}
             onDocumentDownload={handleDocumentDownload}
+            documents={documentsBySection['OVERVIEW'] || []}
           />
         );
       case DealSectionName.PURPOSE:
@@ -117,6 +129,7 @@ export default function ViewDealTabs({
             deal={deal}
             onDocumentPreview={handleDocumentPreview}
             onDocumentDownload={handleDocumentDownload}
+            documents={documentsBySection['PURPOSE'] || []}
           />
         );
       case DealSectionName.COLLATERAL:
@@ -135,6 +148,7 @@ export default function ViewDealTabs({
             deal={deal}
             onDocumentPreview={handleDocumentPreview}
             onDocumentDownload={handleDocumentDownload}
+            documents={documentsBySection['FINANCIALS'] || []}
           />
         );
       case DealSectionName.NEXT_STEPS:
@@ -144,6 +158,7 @@ export default function ViewDealTabs({
             deal={deal}
             onDocumentPreview={handleDocumentPreview}
             onDocumentDownload={handleDocumentDownload}
+            documents={documentsBySection['NEXT_STEPS'] || []}
           />
         );
       default:
@@ -180,13 +195,17 @@ export default function ViewDealTabs({
                 dealId={deal.id}
                 organizationId={deal.organizationId}
                 onUpload={async (documents) => {
+                  // Documents uploaded from deal view go to BASIC_INFO section
                   return await updateDealDocuments(
                     deal.id,
                     documents,
-                    deal.organizationId || ""
+                    deal.organizationId || "",
+                    DealSectionName.BASIC_INFO
                   );
                 }}
                 onSuccess={() => {
+                  // Refresh documents after upload
+                  loadDocumentsBySection();
                   if (onRefreshDeal) {
                     onRefreshDeal();
                   }

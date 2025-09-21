@@ -70,14 +70,7 @@ export const DocumentUploadButton: React.FC<DocumentUploadButtonProps> = ({
   };
 
   const handleUpload = async (files: File[]) => {
-    if (!files.length) return;
-
-    if (!organizationId) {
-      const errorMsg = 'Organization ID not found. Cannot upload documents.';
-      toast.error(errorMsg);
-      onError?.(errorMsg);
-      return;
-    }
+    if (!files.length) return
 
     setIsUploading(true);
 
@@ -91,7 +84,7 @@ export const DocumentUploadButton: React.FC<DocumentUploadButtonProps> = ({
       const uploadedDocuments = await onUpload(documents);
       
       if (uploadedDocuments.length > 0) {
-        toast.success(`${uploadedDocuments.length} document(s) uploaded successfully`);
+        toast.success(`${uploadedDocuments.length} document(s) selected for upload successfully`);
         onSuccess?.(uploadedDocuments);
       }
     } catch (error) {

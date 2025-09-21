@@ -77,7 +77,7 @@ export const useDocumentUpload = () => {
   };
 
   // Update deal documents (for edit operations)
-  const updateDealDocuments = async (dealId: string, documents: UploadDocumentForm[], organizationId: string) => {
+  const updateDealDocuments = async (dealId: string, documents: UploadDocumentForm[], organizationId: string, sectionName: DealSectionName = DealSectionName.BASIC_INFO, formCategory?: string, itemId?: string) => {
     if (!user?.id) {
       setApiError("User not authenticated");
       return [];
@@ -100,6 +100,9 @@ export const useDocumentUpload = () => {
           filePath: result.path,
           fileName: result.fileName,
           mimeType: result.mimeType,
+          sectionName: sectionName,
+          formCategory: formCategory,
+          itemId: itemId,
         }));
 
         // Add the documents to the deal documents table
@@ -111,6 +114,7 @@ export const useDocumentUpload = () => {
             id: document.id,
             isUploaded: true,
             action: 'document uploaded',
+            section: sectionName,
           }));
           
           await createDealLogs(user.id, dealId, {
@@ -130,39 +134,12 @@ export const useDocumentUpload = () => {
     }
   };
 
-  // Delete a document
+  // Delete a document - DISABLED for security reasons
   const handleDeleteDocument = async (dealId: string, documentId: string, filePath: string) => {
-    if (!user?.id) {
-      setApiError("User not authenticated");
-      return false;
-    }
-
-    try {
-      setLoading(true);
-      
-      // First remove the document from the storage
-      await DocumentStorageService.deleteDocument(filePath);
-      
-      // Then remove the document from the deal documents table
-      await DealDocumentService.deleteDealDocument([documentId]);
-      
-      // Update the deal logs
-      await createDealLogs(user.id, dealId, {
-        documents: {
-          id: documentId,
-          isDeleted: true,
-          action: 'document deleted',
-        },
-      }, LogType.DELETED);
-      
-      return true;
-    } catch (error) {
-      setApiError(error.message);
-      ErrorService.handleApiError(error, "useDocumentUpload.handleDeleteDocument");
-      return false;
-    } finally {
-      setLoading(false);
-    }
+    // Document deletion is disabled for security reasons
+    console.warn("Document deletion is disabled for security reasons");
+    setApiError("Document deletion is not allowed for security reasons");
+    return false;
   };
 
   // Get deal documents

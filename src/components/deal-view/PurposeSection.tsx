@@ -7,13 +7,15 @@ interface PurposeSectionProps {
   deal: any;
   onDocumentPreview: (document: any) => void;
   onDocumentDownload: (document: any) => void;
+  documents: any[];
 }
 
 export const PurposeSection: React.FC<PurposeSectionProps> = ({ 
   purposeData, 
   deal,
   onDocumentPreview,
-  onDocumentDownload
+  onDocumentDownload,
+  documents = []
 }) => {
   if (!purposeData) {
     return <div className="text-center py-8 text-gray-500">No purpose data available</div>;
@@ -45,14 +47,14 @@ export const PurposeSection: React.FC<PurposeSectionProps> = ({
       </div>
 
       {/* Documents for this section */}
-      {deal.documents && deal.documents.length > 0 && (
+      {documents && documents.length > 0 && (
         <div className="pt-6 border-t border-gray-200">
           <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
             <FileText className="w-5 h-5" />
             <span>Documents</span>
           </h4>
           <div className="space-y-3">
-            {deal.documents.map((document: any, index: number) => (
+            {documents.map((document: any, index: number) => (
               <div
                 key={document.id || index}
                 className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors group"

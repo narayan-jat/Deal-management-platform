@@ -14,7 +14,8 @@ export const useDealView = (deal: DealCardType) => {
   const [isLogDialogOpen, setIsLogDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<DealSectionName | 'BASIC_INFO'>('BASIC_INFO');
   const [sectionsData, setSectionsData] = useState<any>(null);
-  const [sectionsEnabled, setSectionsEnabled] = useState<{ [key in DealSectionName]: boolean }>({
+  const [sectionsEnabled, setSectionsEnabled] = useState<{ [key in DealSectionName | 'BASIC_INFO']: boolean }>({
+    'BASIC_INFO': true,
     [DealSectionName.OVERVIEW]: false,
     [DealSectionName.PURPOSE]: false,
     [DealSectionName.COLLATERAL]: false,
@@ -22,6 +23,8 @@ export const useDealView = (deal: DealCardType) => {
     [DealSectionName.NEXT_STEPS]: false,
   });
   const [loadingSections, setLoadingSections] = useState(true);
+  const [documentsBySection, setDocumentsBySection] = useState<{ [key: string]: any[] }>({});
+  const [loadingDocuments, setLoadingDocuments] = useState(false);
 
   // Use the centralized comment hook
   const { 
@@ -45,7 +48,7 @@ export const useDealView = (deal: DealCardType) => {
   } = useComment();
 
   // Use the document upload hook
-  const { updateDealDocuments } = useDocumentUpload();
+  const { updateDealDocuments, getAllDealDocumentsBySection } = useDocumentUpload();
 
   // Mention-related state
   const [isMentionDropdownOpen, setIsMentionDropdownOpen] = useState(false);
@@ -65,7 +68,8 @@ export const useDealView = (deal: DealCardType) => {
           
           // Set enabled sections
           if (sectionsResponse.sections) {
-            const enabledSections: { [key in DealSectionName]: boolean } = {
+            const enabledSections: { [key in DealSectionName | 'BASIC_INFO']: boolean } = {
+              'BASIC_INFO': true,
               [DealSectionName.OVERVIEW]: false,
               [DealSectionName.PURPOSE]: false,
               [DealSectionName.COLLATERAL]: false,
@@ -100,6 +104,27 @@ export const useDealView = (deal: DealCardType) => {
     };
 
     fetchSectionsData();
+  }, [deal?.id]);
+
+  // Load documents by section
+  const loadDocumentsBySection = async () => {
+    if (!deal?.id) return;
+    
+    try {
+      setLoadingDocuments(true);
+      const documents = await getAllDealDocumentsBySection(deal.id);
+      console.log('Loaded documents by section:', documents);
+      setDocumentsBySection(documents);
+    } catch (error) {
+      console.error('Error loading documents:', error);
+    } finally {
+      setLoadingDocuments(false);
+    }
+  };
+
+  // Load documents when deal changes
+  useEffect(() => {
+    loadDocumentsBySection();
   }, [deal?.id]);
 
   // Helper function to get member name from memberId
@@ -245,11 +270,12 @@ export const useDealView = (deal: DealCardType) => {
 
   // Get all available tabs (Basic Info + enabled sections)
   const getAvailableTabs = () => {
-    const tabs = [{ key: 'BASIC_INFO', label: 'Basic Info' }];
+    const tabs = [];
     
     Object.entries(sectionsEnabled).forEach(([sectionName, enabled]) => {
       if (enabled) {
         const labels = {
+          [DealSectionName.BASIC_INFO]: 'Basic Info',
           [DealSectionName.OVERVIEW]: 'Overview',
           [DealSectionName.PURPOSE]: 'Purpose',
           [DealSectionName.COLLATERAL]: 'Collateral',
@@ -304,5 +330,8 @@ export const useDealView = (deal: DealCardType) => {
     getMemberName,
     getAvailableTabs,
     updateDealDocuments,
+    loadDocumentsBySection,
+    documentsBySection,
+    loadingDocuments,
   };
 };

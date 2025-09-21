@@ -203,6 +203,8 @@ export const DealFormPage: React.FC<DealFormPageProps> = ({ mode }) => {
             // isReadOnly={mode === 'edit'}
             dealId={dealId}
             organizationId={formData.organizationId}
+            documents={formData.documents[DealSectionName.COLLATERAL] || []}
+            onDocumentUpload={(docs) => updateSectionDocuments(DealSectionName.COLLATERAL, docs)}
           />
         );
       case DealSectionName.FINANCIALS:

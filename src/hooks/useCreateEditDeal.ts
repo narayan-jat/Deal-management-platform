@@ -14,6 +14,7 @@ import { DealMemberService } from '@/services/deals/DealMemberService';
 import { useDocumentUpload } from './useDocumentUpload';
 import { createDealLogs } from './utils';
 import { useUserProfile } from '@/context/UserProfileProvider';
+import { extractDocumentsFromFormData, removeDocumentsFromNestedObjects, groupDocumentsBySection } from '@/utility/DocumentExtractionUtils';
 
 export const useCreateEditDeal = () => {
   const [loading, setLoading] = useState(false);
@@ -40,10 +41,43 @@ export const useCreateEditDeal = () => {
       dealFormData.createdBy = user.id;
       // Add the organizationId field to the deal.
       dealFormData.organizationId = userProfile?.primaryOrganization.organization.id;
-      // Convert the date fields to correct format if the date is provided. 
-      // Send a string in 'YYYY-MM-DD' format. If no date is provided, do not include the field.
-      // Use the new comprehensive deal creation service
-      const result = await DealService.createCompleteDeal(dealFormData);
+      
+      // Extract all documents from nested sections
+      const extractedDocuments = extractDocumentsFromFormData(dealFormData);
+      
+      // Remove documents from nested objects to avoid duplication
+      const dealFormDataWithoutDocs = removeDocumentsFromNestedObjects(dealFormData);
+      dealFormDataWithoutDocs.documents = {};
+      // Create the deal first
+      const result = await DealService.createCompleteDeal(dealFormDataWithoutDocs);
+      
+      // Now upload documents if any exist
+      if (extractedDocuments.length > 0) {
+        const organizationId = dealFormData.organizationId;
+        
+        // Group documents by section for processing
+        const documentsBySection = groupDocumentsBySection(extractedDocuments);
+        
+        for (const [sectionName, sectionDocuments] of Object.entries(documentsBySection)) {
+          if (sectionDocuments.length > 0) {
+            // Process each document individually since they may have different form categories and item IDs
+            for (const extractedDoc of sectionDocuments) {
+              const documents = [extractedDoc.document];
+              const formCategory = extractedDoc.formCategory;
+              const itemId = extractedDoc.itemId;
+              
+              await createDealDocuments(
+                result.deal.id, 
+                documents, 
+                organizationId, 
+                sectionName as DealSectionName,
+                formCategory,
+                itemId
+              );
+            }
+          }
+        }
+      }
       
       // Create deal logs for the creation
       await createDealLogs(user.id, result.deal.id, {
@@ -135,9 +169,45 @@ export const useCreateEditDeal = () => {
     try {
       setLoading(true);
       
-      // Use the new comprehensive deal update service
-      const result = await DealService.updateCompleteDeal(dealId, dealFormData);
+      // Extract all documents from nested sections
+      const extractedDocuments = extractDocumentsFromFormData(dealFormData);
       
+      // Remove documents from nested objects to avoid duplication
+      const dealFormDataWithoutDocs = removeDocumentsFromNestedObjects(dealFormData);
+      dealFormDataWithoutDocs.documents = {};
+      // Use the new comprehensive deal update service
+      const result = await DealService.updateCompleteDeal(dealId, dealFormDataWithoutDocs);
+      
+      // Upload the documents on the storage.
+      // filter out those documents which are already uploaded. this means
+      // having a filePath.
+      // Now upload documents if any exist
+      if (extractedDocuments.length > 0) {
+        const organizationId = userProfile?.primaryOrganization.organization.id;
+        
+        // Group documents by section for processing
+        const documentsBySection = groupDocumentsBySection(extractedDocuments);
+        
+        for (const [sectionName, sectionDocuments] of Object.entries(documentsBySection)) {
+          if (sectionDocuments.length > 0) {
+            // Process each document individually since they may have different form categories and item IDs
+            for (const extractedDoc of sectionDocuments) {
+              const documents = [extractedDoc.document];
+              const formCategory = extractedDoc.formCategory;
+              const itemId = extractedDoc.itemId;
+              
+              await updateDealDocuments(
+                dealId, 
+                documents, 
+                organizationId, 
+                sectionName as DealSectionName,
+                formCategory,
+                itemId
+              );
+            }
+          }
+        }
+      }
       // Create deal logs for the update
       await createDealLogs(user.id, dealId, {
         deal: {
@@ -230,10 +300,6 @@ export const useCreateEditDeal = () => {
       setLoading(false);
     }
   }
-
-
-
-
 
   return { 
     loading, 

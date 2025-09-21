@@ -40,7 +40,7 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
   isReadOnly = false
 }) => {
   const handlePersonTagAdd = (type: PersonTagType) => {
-    const newTag = createPersonTag(crypto.randomUUID(), '', '', type);
+    const newTag = createPersonTag(Date.now().toString(), '', '', type);
     
     const fieldName = type === PersonTagType.BORROWERS ? 'borrowers' :
                      type === PersonTagType.LENDERS ? 'lenders' :

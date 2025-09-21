@@ -155,7 +155,7 @@ export interface DebtDetails {
 export interface PropertyCollateralItem {
   id: string;
   collateralType: CollateralType.PROPERTY;
-  propertyDescription: string;
+  description: string;
   propertyType: string;
   buildingSize: number;
   yearBuilt: number;
@@ -208,6 +208,8 @@ export interface DealCollateralForm {
 export interface DealFinancialsForm {
   sourcesOfFunds: string;
   usesOfFunds: string;
+  historicalDocuments: any[];
+  projectedDocuments: any[];
 }
 
 // Note: DealSeniorDebtForm removed as Senior Debt section was removed
@@ -248,6 +250,8 @@ export interface CompleteDealForm {
   
   // Documents for each section
   documents: {
+    [DealSectionName.BASIC_INFO]: any[];
+    [DealSectionName.OVERVIEW]: any[];
     [DealSectionName.PURPOSE]: any[];
     [DealSectionName.COLLATERAL]: any[];
     [DealSectionName.FINANCIALS]: any[];

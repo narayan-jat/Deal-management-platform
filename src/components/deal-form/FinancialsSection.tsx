@@ -46,6 +46,56 @@ export const FinancialsSection: React.FC<FinancialsSectionProps> = ({
     });
   };
 
+  const handleHistoricalDocumentUpload = async (uploadedDocuments: any[]) => {
+    // Create standardized document format
+    const categorizedDocuments = uploadedDocuments.map(doc => ({
+      file: doc,
+      form_category: 'HISTORICAL',
+      itemId: undefined
+    }));
+
+    console.log('FinancialsSection - handleHistoricalDocumentUpload:', {
+      uploadedDocuments,
+      categorizedDocuments
+    });
+
+    // Update the main documents array through the parent component
+    if (onDocumentUpload) {
+      onDocumentUpload(categorizedDocuments);
+    }
+
+    return categorizedDocuments;
+  };
+
+  const handleProjectedDocumentUpload = async (uploadedDocuments: any[]) => {
+    // Create standardized document format
+    const categorizedDocuments = uploadedDocuments.map(doc => ({
+      file: doc,
+      form_category: 'PROJECTED',
+      itemId: undefined
+    }));
+
+    console.log('FinancialsSection - handleProjectedDocumentUpload:', {
+      uploadedDocuments,
+      categorizedDocuments
+    });
+
+    // Update the main documents array through the parent component
+    if (onDocumentUpload) {
+      onDocumentUpload(categorizedDocuments);
+    }
+
+    return categorizedDocuments;
+  };
+
+  // Filter documents by category from the main documents array
+  const getDocumentsByCategory = (category: string) => {
+    const filtered = (documents || []).filter(doc => doc.form_category === category);
+    console.log(`FinancialsSection - documents for ${category}:`, filtered);
+    console.log('FinancialsSection - all documents:', documents);
+    return filtered;
+  };
+
   return (
     <div className="space-y-6">
       {/* Section Header */}
@@ -108,14 +158,9 @@ export const FinancialsSection: React.FC<FinancialsSectionProps> = ({
                 Historical Financials
               </Label>
               <DocumentUploadButton
-                dealId={dealId}
+                dealId={dealId || "new-deal"}
                 organizationId={organizationId}
-                onUpload={async (uploadedDocuments) => {
-                  if (onDocumentUpload) {
-                    onDocumentUpload([...documents, ...uploadedDocuments]);
-                  }
-                  return uploadedDocuments;
-                }}
+                onUpload={handleHistoricalDocumentUpload}
                 onSuccess={(uploadedDocuments) => {
                   console.log('Historical financials uploaded:', uploadedDocuments);
                 }}
@@ -123,6 +168,29 @@ export const FinancialsSection: React.FC<FinancialsSectionProps> = ({
                 buttonText="Upload Historical Financials"
                 loadingText="Uploading..."
               />
+              {/* Show uploaded historical documents */}
+              {getDocumentsByCategory('HISTORICAL').length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                    Uploaded Historical Documents ({getDocumentsByCategory('HISTORICAL').length})
+                  </p>
+                  <div className="space-y-1 max-h-24 overflow-y-auto">
+                    {getDocumentsByCategory('HISTORICAL').map((document: any, index: number) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-2 bg-gray-50 rounded border text-xs"
+                      >
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <FileText className="h-3 w-3 text-gray-400 flex-shrink-0" />
+                          <span className="truncate">
+                            {document.file?.name || document.fileName}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="space-y-3">
@@ -130,14 +198,9 @@ export const FinancialsSection: React.FC<FinancialsSectionProps> = ({
                 Projected Financials
               </Label>
               <DocumentUploadButton
-                dealId={dealId}
+                dealId={dealId || "new-deal"}
                 organizationId={organizationId}
-                onUpload={async (uploadedDocuments) => {
-                  if (onDocumentUpload) {
-                    onDocumentUpload([...documents, ...uploadedDocuments]);
-                  }
-                  return uploadedDocuments;
-                }}
+                onUpload={handleProjectedDocumentUpload}
                 onSuccess={(uploadedDocuments) => {
                   console.log('Projected financials uploaded:', uploadedDocuments);
                 }}
@@ -145,6 +208,29 @@ export const FinancialsSection: React.FC<FinancialsSectionProps> = ({
                 buttonText="Upload Projected Financials"
                 loadingText="Uploading..."
               />
+              {/* Show uploaded projected documents */}
+              {getDocumentsByCategory('PROJECTED').length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                    Uploaded Projected Documents ({getDocumentsByCategory('PROJECTED').length})
+                  </p>
+                  <div className="space-y-1 max-h-24 overflow-y-auto">
+                    {getDocumentsByCategory('PROJECTED').map((document: any, index: number) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-2 bg-gray-50 rounded border text-xs"
+                      >
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <FileText className="h-3 w-3 text-gray-400 flex-shrink-0" />
+                          <span className="truncate">
+                            {document.file?.name || document.fileName}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

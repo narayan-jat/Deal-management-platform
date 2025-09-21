@@ -98,6 +98,8 @@ export const useDealForm = ({
           
           // Documents
           documents: {
+            [DealSectionName.BASIC_INFO]: completeDeal.documents[DealSectionName.BASIC_INFO] || [],
+            [DealSectionName.OVERVIEW]: completeDeal.documents[DealSectionName.OVERVIEW] || [],
             [DealSectionName.PURPOSE]: completeDeal.documents[DealSectionName.PURPOSE] || [],
             [DealSectionName.COLLATERAL]: completeDeal.documents[DealSectionName.COLLATERAL] || [],
             [DealSectionName.FINANCIALS]: completeDeal.documents[DealSectionName.FINANCIALS] || [],

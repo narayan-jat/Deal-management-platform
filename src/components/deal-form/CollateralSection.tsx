@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   Building, 
   DollarSign, 
@@ -41,6 +41,7 @@ import {
   PROPERTY_TYPE_OPTIONS,
   PROPERTY_CONDITION_OPTIONS
 } from '@/types/deal/Deal.sections';
+import { populateCollateralItemDocuments } from '@/utility/DocumentExtractionUtils';
 
 interface CollateralSectionProps {
   data: DealCollateralForm;
@@ -50,6 +51,8 @@ interface CollateralSectionProps {
   isReadOnly?: boolean;
   dealId?: string;
   organizationId?: string;
+  documents?: any[];
+  onDocumentUpload?: (documents: any[]) => void;
 }
 
 export const CollateralSection: React.FC<CollateralSectionProps> = ({
@@ -59,9 +62,15 @@ export const CollateralSection: React.FC<CollateralSectionProps> = ({
   onToggleEnabled,
   isReadOnly = false,
   dealId,
-  organizationId
+  organizationId,
+  documents = [],
+  onDocumentUpload
 }) => {
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
+  
+  // Populate documents for each collateral item
+  const itemsWithDocuments = populateCollateralItemDocuments(data.items, documents);
+  
   const [newItemType, setNewItemType] = useState<CollateralType>(CollateralType.PROPERTY);
 
   const createNewCollateralItem = (type: CollateralType): CollateralItem => {
@@ -160,27 +169,31 @@ export const CollateralSection: React.FC<CollateralSectionProps> = ({
   };
 
   const handleItemDocumentUpload = async (itemId: string, uploadedDocuments: any[]) => {
-    const updatedItems = data.items.map(item => {
-      if (item.id === itemId) {
-        return {
-          ...item,
-          documents: [...item.documents, ...uploadedDocuments]
-        };
-      }
-      return item;
-    });
-    onChange({
-      ...data,
-      items: updatedItems
-    });
+    // Find the collateral item to get its type
+    const item = data.items.find(item => item.id === itemId);
+    if (!item) return uploadedDocuments;
+
+    // Add the documents to the main documents array with standardized format
+    const categorizedDocuments = uploadedDocuments.map(doc => ({
+      file: doc,
+      formCategory: item.collateralType,
+      itemId: itemId
+    }));
+
+    // Update the main documents array through the parent component
+    if (onDocumentUpload) {
+      onDocumentUpload(categorizedDocuments);
+    }
+
+    return categorizedDocuments;
   };
 
   const removeItemDocument = (itemId: string, documentIndex: number) => {
-    const updatedItems = data.items.map(item => {
+    const updatedItems = itemsWithDocuments.map(item => {
       if (item.id === itemId) {
         return {
           ...item,
-          documents: item.documents.filter((_, index) => index !== documentIndex)
+          documents: itemsWithDocuments.filter((_, index) => index !== documentIndex).map(item => item.documents).flat()
         };
       }
       return item;
@@ -761,7 +774,7 @@ export const CollateralSection: React.FC<CollateralSectionProps> = ({
                           <FileText className="h-4 w-4 text-gray-400 flex-shrink-0" />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-gray-900 truncate">
-                              {document.file?.name || document.fileName}
+                              {document.file.file?.name}
                             </p>
                           </div>
                         </div>
@@ -846,7 +859,7 @@ export const CollateralSection: React.FC<CollateralSectionProps> = ({
           )}
 
           {/* Collateral Items */}
-          {data.items.length === 0 ? (
+          {itemsWithDocuments.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <Building className="h-12 w-12 mx-auto mb-4 text-gray-300" />
               <p>No collateral items added yet.</p>
@@ -854,7 +867,7 @@ export const CollateralSection: React.FC<CollateralSectionProps> = ({
             </div>
           ) : (
             <div className="space-y-4">
-              {data.items.map(renderCollateralItem)}
+              {itemsWithDocuments.map((item) => renderCollateralItem(item))}
             </div>
           )}
 

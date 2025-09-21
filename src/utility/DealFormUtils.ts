@@ -112,6 +112,8 @@ export const createInitialDealForm = (): CompleteDealForm => {
     
     // Documents for each section
     documents: {
+      [DealSectionName.BASIC_INFO]: [],
+      [DealSectionName.OVERVIEW]: [],
       [DealSectionName.PURPOSE]: [],
       [DealSectionName.COLLATERAL]: [],
       [DealSectionName.FINANCIALS]: [],
@@ -160,7 +162,9 @@ export const createInitialCollateralForm = (): DealCollateralForm => {
 export const createInitialFinancialsForm = (): DealFinancialsForm => {
   return {
     sourcesOfFunds: '',
-    usesOfFunds: ''
+    usesOfFunds: '',
+    historicalDocuments: [],
+    projectedDocuments: []
   };
 };
 

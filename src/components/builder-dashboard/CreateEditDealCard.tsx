@@ -526,16 +526,10 @@ export default function CreateEditDealCard({
                                 </p>
                               </div>
                             </div>
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveDocument(index)}
-                              className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors flex-shrink-0"
-                              aria-label={`Remove document ${
-                                document.file?.name || document.id
-                              }`}
-                            >
+                            {/* Document deletion disabled for security reasons */}
+                            <div className="p-1 text-gray-400 cursor-not-allowed flex-shrink-0" title="Document deletion is disabled for security reasons">
                               <Trash2 className="h-4 w-4" />
-                            </button>
+                            </div>
                           </div>
                         ))}
                       </div>
