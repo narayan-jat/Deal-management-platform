@@ -312,6 +312,55 @@ export class InviteService {
   }
 
   /**
+   * Get already invited emails for a deal
+   */
+  static async getAlreadyInvitedEmails(dealId: string): Promise<string[]> {
+    try {
+      const { data, error } = await supabase
+        .from("invites")
+        .select("email")
+        .eq("deal_id", dealId)
+        .in("status", ["PENDING", "ACCEPTED"]);
+
+      if (error) {
+        throw error;
+      }
+
+      return data?.map(invite => invite.email) || [];
+    } catch (error) {
+      ErrorService.handleApiError(error, "InviteService.getAlreadyInvitedEmails");
+      throw error;
+    }
+  }
+
+  /**
+   * Send email invites using the edge function
+   */
+  static async sendEmailInvites(invites: Array<{email: string, role: string, dealId: string, invitedBy: string, permissions?: any}>) {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-email-invite`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ invites })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to send email invites');
+      }
+
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      ErrorService.handleApiError(error, "InviteService.sendEmailInvites");
+      throw error;
+    }
+  }
+
+  /**
    * Generate a secure token for shared links
    */
   private static generateToken(): string {

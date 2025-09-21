@@ -16,6 +16,8 @@ import { createDealLogs } from './utils';
 import { useUserProfile } from '@/context/UserProfileProvider';
 import { extractDocumentsFromFormData, removeDocumentsFromNestedObjects, groupDocumentsBySection } from '@/utility/DocumentExtractionUtils';
 import { useNavigate } from 'react-router-dom';
+import { sendOverviewEmailInvites } from '@/utility/EmailInviteUtils';
+import { toast } from 'sonner';
 
 export const useCreateEditDeal = () => {
   const [loading, setLoading] = useState(false);
@@ -102,6 +104,27 @@ export const useCreateEditDeal = () => {
           action: 'deal created',
         },
       }, LogType.CREATED);
+      
+      // Send email invites to people in overview section
+      try {
+        const inviteResult = await sendOverviewEmailInvites(
+          dealFormData.overview,
+          result.deal.id,
+          user.id
+        );
+        
+        if (inviteResult.success > 0) {
+          console.log(`Successfully sent ${inviteResult.success} email invites`);
+        }
+        if (inviteResult.failed > 0) {
+          toast.error(`Failed to send ${inviteResult.failed} email invites`);
+          console.warn(`Failed to send ${inviteResult.failed} email invites`);
+        }
+      } catch (error) {
+        console.error('Error sending email invites:', error);
+        // Don't fail the deal creation if email invites fail
+      }
+      
       navigate(`/deals/${result.deal.id}`);
       return result.deal;
     } catch (error) {
@@ -245,6 +268,26 @@ export const useCreateEditDeal = () => {
           action: 'deal updated',
         },
       }, LogType.UPDATED);
+      
+      // Send email invites to new people in overview section
+      try {
+        const inviteResult = await sendOverviewEmailInvites(
+          dealFormData.overview,
+          dealId,
+          user.id
+        );
+        
+        if (inviteResult.success > 0) {
+          console.log(`Successfully sent ${inviteResult.success} email invites`);
+        }
+        if (inviteResult.failed > 0) {
+          toast.error(`Failed to send ${inviteResult.failed} email invites`);
+          console.warn(`Failed to send ${inviteResult.failed} email invites`);
+        }
+      } catch (error) {
+        console.error('Error sending email invites:', error);
+        // Don't fail the deal update if email invites fail
+      }
       
       navigate(`/deals/${dealId}`);
       return result.deal as DealModel;
