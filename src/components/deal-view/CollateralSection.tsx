@@ -7,25 +7,22 @@ interface CollateralSectionProps {
   deal: any;
   onDocumentPreview: (document: any) => void;
   onDocumentDownload: (document: any) => void;
+  documents?: any[];
 }
 
 export const CollateralSection: React.FC<CollateralSectionProps> = ({ 
   collateralData, 
   deal,
   onDocumentPreview,
-  onDocumentDownload
+  onDocumentDownload,
+  documents = []
 }) => {
   if (!collateralData || !collateralData.items || collateralData.items.length === 0) {
     return <div className="text-center py-8 text-gray-500">No collateral data available</div>;
   }
 
   // Collect all documents from all collateral items
-  const allCollateralDocuments = collateralData.items.reduce((acc: any[], item: any) => {
-    if (item.documents && item.documents.length > 0) {
-      return [...acc, ...item.documents];
-    }
-    return acc;
-  }, []);
+  const allCollateralDocuments = documents;
 
   console.log(collateralData);
   return (

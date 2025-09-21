@@ -4,7 +4,8 @@ import {
   DollarSign, 
   Percent,
   FileText,
-  Upload
+  Upload,
+  X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { DealFinancialsForm } from '@/types/deal/Deal.sections';
 import { DocumentUploadButton } from '@/components/builder-dashboard/DocumentUploadButton';
+import { populateFinancialsDocuments } from '@/utility/DocumentExtractionUtils';
 
 interface FinancialsSectionProps {
   data: DealFinancialsForm;
@@ -50,7 +52,7 @@ export const FinancialsSection: React.FC<FinancialsSectionProps> = ({
     // Create standardized document format
     const categorizedDocuments = uploadedDocuments.map(doc => ({
       file: doc,
-      form_category: 'HISTORICAL',
+      formCategory: 'HISTORICAL',
       itemId: undefined
     }));
 
@@ -61,7 +63,7 @@ export const FinancialsSection: React.FC<FinancialsSectionProps> = ({
 
     // Update the main documents array through the parent component
     if (onDocumentUpload) {
-      onDocumentUpload(categorizedDocuments);
+      onDocumentUpload([...documents, ...categorizedDocuments]);
     }
 
     return categorizedDocuments;
@@ -71,7 +73,7 @@ export const FinancialsSection: React.FC<FinancialsSectionProps> = ({
     // Create standardized document format
     const categorizedDocuments = uploadedDocuments.map(doc => ({
       file: doc,
-      form_category: 'PROJECTED',
+      formCategory: 'PROJECTED',
       itemId: undefined
     }));
 
@@ -82,18 +84,25 @@ export const FinancialsSection: React.FC<FinancialsSectionProps> = ({
 
     // Update the main documents array through the parent component
     if (onDocumentUpload) {
-      onDocumentUpload(categorizedDocuments);
+      onDocumentUpload([...documents, ...categorizedDocuments]);
     }
 
     return categorizedDocuments;
   };
 
+  // Populate local documents for better UX (local copy from section documents)
+  const dataWithDocuments = populateFinancialsDocuments(data, documents || []);
+  
   // Filter documents by category from the main documents array
   const getDocumentsByCategory = (category: string) => {
-    const filtered = (documents || []).filter(doc => doc.form_category === category);
-    console.log(`FinancialsSection - documents for ${category}:`, filtered);
-    console.log('FinancialsSection - all documents:', documents);
+    const filtered = (documents || []).filter(doc => doc.formCategory === category);
     return filtered;
+  };
+
+  const removeDocument = (documentName: string) => {
+    if (onDocumentUpload) {
+      onDocumentUpload(documents.filter(doc => doc.file?.file?.name !== documentName));
+    }
   };
 
   return (
@@ -169,13 +178,13 @@ export const FinancialsSection: React.FC<FinancialsSectionProps> = ({
                 loadingText="Uploading..."
               />
               {/* Show uploaded historical documents */}
-              {getDocumentsByCategory('HISTORICAL').length > 0 && (
+              {dataWithDocuments.historicalDocuments && dataWithDocuments.historicalDocuments.length > 0 && (
                 <div className="space-y-2">
                   <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                    Uploaded Historical Documents ({getDocumentsByCategory('HISTORICAL').length})
+                    Uploaded Historical Documents ({dataWithDocuments.historicalDocuments.length})
                   </p>
                   <div className="space-y-1 max-h-24 overflow-y-auto">
-                    {getDocumentsByCategory('HISTORICAL').map((document: any, index: number) => (
+                    {dataWithDocuments.historicalDocuments.map((document: any, index: number) => (
                       <div
                         key={index}
                         className="flex items-center justify-between p-2 bg-gray-50 rounded border text-xs"
@@ -183,9 +192,19 @@ export const FinancialsSection: React.FC<FinancialsSectionProps> = ({
                         <div className="flex items-center gap-2 flex-1 min-w-0">
                           <FileText className="h-3 w-3 text-gray-400 flex-shrink-0" />
                           <span className="truncate">
-                            {document.file?.name || document.fileName}
+                            {document.file?.file?.name || document.fileName}
                           </span>
                         </div>
+                        {!document?.filePath && !isReadOnly && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeDocument(document.file?.file?.name)}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -209,13 +228,13 @@ export const FinancialsSection: React.FC<FinancialsSectionProps> = ({
                 loadingText="Uploading..."
               />
               {/* Show uploaded projected documents */}
-              {getDocumentsByCategory('PROJECTED').length > 0 && (
+              {dataWithDocuments.projectedDocuments && dataWithDocuments.projectedDocuments.length > 0 && (
                 <div className="space-y-2">
                   <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                    Uploaded Projected Documents ({getDocumentsByCategory('PROJECTED').length})
+                    Uploaded Projected Documents ({dataWithDocuments.projectedDocuments.length})
                   </p>
                   <div className="space-y-1 max-h-24 overflow-y-auto">
-                    {getDocumentsByCategory('PROJECTED').map((document: any, index: number) => (
+                    {dataWithDocuments.projectedDocuments.map((document: any, index: number) => (
                       <div
                         key={index}
                         className="flex items-center justify-between p-2 bg-gray-50 rounded border text-xs"
@@ -223,9 +242,19 @@ export const FinancialsSection: React.FC<FinancialsSectionProps> = ({
                         <div className="flex items-center gap-2 flex-1 min-w-0">
                           <FileText className="h-3 w-3 text-gray-400 flex-shrink-0" />
                           <span className="truncate">
-                            {document.file?.name || document.fileName}
+                            {document.file?.file?.name || document.fileName}
                           </span>
                         </div>
+                        {!document?.filePath && !isReadOnly && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeDocument(document.file?.file?.name)}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        )}
                       </div>
                     ))}
                   </div>

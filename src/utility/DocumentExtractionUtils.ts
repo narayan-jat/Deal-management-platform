@@ -23,13 +23,15 @@ export const extractDocumentsFromFormData = (formData: any): ExtractedDocument[]
         console.log(`Found ${documents.length} documents in section ${sectionName}`);
         documents.forEach((doc: any) => {
           // Handle both old format (UploadDocumentForm) and new format (with form_category, itemId)
-          const documentData = doc.file ? doc : { file: doc };
-          extractedDocuments.push({
-            document: documentData,
-            sectionName: sectionName as DealSectionName,
-            formCategory: doc.form_category || '',
-            itemId: doc.itemId || undefined,
-          });
+          const documentData = doc.file ? doc : null;
+          if (documentData) {
+            extractedDocuments.push({
+              document: documentData.file,
+              sectionName: sectionName as DealSectionName,
+              formCategory: doc.formCategory || '',
+              itemId: doc.itemId || undefined,
+            });
+          }
         });
       }
     });
@@ -73,6 +75,7 @@ export const groupDocumentsBySection = (extractedDocuments: ExtractedDocument[])
 
 /**
  * Populates documents for collateral items from the main documents array
+ * This creates a local copy for better UX while keeping the main section documents as source of truth
  */
 export const populateCollateralItemDocuments = (collateralItems: CollateralItem[], sectionDocuments: any[]): CollateralItem[] => {
   return collateralItems.map(item => {
@@ -83,7 +86,18 @@ export const populateCollateralItemDocuments = (collateralItems: CollateralItem[
     
     return {
       ...item,
-      documents: itemDocuments
+      documents: itemDocuments // Local copy for UX
     };
   });
+};
+
+/**
+ * Populates documents for financials categories from the main documents array
+ */
+export const populateFinancialsDocuments = (financialsData: any, sectionDocuments: any[]): any => {
+  return {
+    ...financialsData,
+    historicalDocuments: sectionDocuments.filter(doc => doc.formCategory === 'HISTORICAL'),
+    projectedDocuments: sectionDocuments.filter(doc => doc.formCategory === 'PROJECTED')
+  };
 };

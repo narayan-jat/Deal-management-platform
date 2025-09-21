@@ -129,11 +129,11 @@ export const DealFormPage: React.FC<DealFormPageProps> = ({ mode }) => {
         await handleCreateDeal(formData);
         clearStorage();
         toast.success('Deal created successfully');
-        navigate('/deals');
+        // navigate('/deals');
       } else {
         await handleEditDeal(dealId!, formData);
         toast.success('Deal updated successfully');
-        navigate('/deals');
+        // navigate('/deals');
       }
     } catch (error) {
       console.error('Error submitting deal:', error);
@@ -203,7 +203,7 @@ export const DealFormPage: React.FC<DealFormPageProps> = ({ mode }) => {
             // isReadOnly={mode === 'edit'}
             dealId={dealId}
             organizationId={formData.organizationId}
-            documents={formData.documents[DealSectionName.COLLATERAL] || []}
+            documents={documents}
             onDocumentUpload={(docs) => updateSectionDocuments(DealSectionName.COLLATERAL, docs)}
           />
         );

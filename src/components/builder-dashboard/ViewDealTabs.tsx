@@ -139,6 +139,7 @@ export default function ViewDealTabs({
             deal={deal}
             onDocumentPreview={handleDocumentPreview}
             onDocumentDownload={handleDocumentDownload}
+            documents={documentsBySection['COLLATERAL'] || []}
           />
         );
       case DealSectionName.FINANCIALS:

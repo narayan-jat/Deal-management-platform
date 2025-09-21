@@ -15,6 +15,7 @@ import { useDocumentUpload } from './useDocumentUpload';
 import { createDealLogs } from './utils';
 import { useUserProfile } from '@/context/UserProfileProvider';
 import { extractDocumentsFromFormData, removeDocumentsFromNestedObjects, groupDocumentsBySection } from '@/utility/DocumentExtractionUtils';
+import { useNavigate } from 'react-router-dom';
 
 export const useCreateEditDeal = () => {
   const [loading, setLoading] = useState(false);
@@ -22,7 +23,7 @@ export const useCreateEditDeal = () => {
   const { user } = useAuth();
   const { userProfile } = useUserProfile();
   const { createDealDocuments, updateDealDocuments, handleDeleteDocument: deleteDocument } = useDocumentUpload();
-
+  const navigate = useNavigate();
   // Create a new deal with complete form data
   const handleCreateDeal = async (dealFormData: CompleteDealForm): Promise<DealModel | null> => {
     if (!user?.id) {
@@ -48,6 +49,20 @@ export const useCreateEditDeal = () => {
       // Remove documents from nested objects to avoid duplication
       const dealFormDataWithoutDocs = removeDocumentsFromNestedObjects(dealFormData);
       dealFormDataWithoutDocs.documents = {};
+      
+      // Remove local document arrays from collateral items and financials for database push
+      if (dealFormDataWithoutDocs.collateral?.items) {
+        dealFormDataWithoutDocs.collateral.items = dealFormDataWithoutDocs.collateral.items.map((item: any) => {
+          const { documents, ...itemWithoutDocs } = item;
+          return itemWithoutDocs;
+        });
+      }
+      
+      if (dealFormDataWithoutDocs.financials) {
+        const { historicalDocuments, projectedDocuments, ...financialsWithoutDocs } = dealFormDataWithoutDocs.financials;
+        dealFormDataWithoutDocs.financials = financialsWithoutDocs;
+      }
+      
       // Create the deal first
       const result = await DealService.createCompleteDeal(dealFormDataWithoutDocs);
       
@@ -87,7 +102,7 @@ export const useCreateEditDeal = () => {
           action: 'deal created',
         },
       }, LogType.CREATED);
-      
+      navigate(`/deals/${result.deal.id}`);
       return result.deal;
     } catch (error) {
       console.error('Error creating deal:', error);
@@ -175,6 +190,20 @@ export const useCreateEditDeal = () => {
       // Remove documents from nested objects to avoid duplication
       const dealFormDataWithoutDocs = removeDocumentsFromNestedObjects(dealFormData);
       dealFormDataWithoutDocs.documents = {};
+      
+      // Remove local document arrays from collateral items and financials for database push
+      if (dealFormDataWithoutDocs.collateral?.items) {
+        dealFormDataWithoutDocs.collateral.items = dealFormDataWithoutDocs.collateral.items.map((item: any) => {
+          const { documents, ...itemWithoutDocs } = item;
+          return itemWithoutDocs;
+        });
+      }
+      
+      if (dealFormDataWithoutDocs.financials) {
+        const { historicalDocuments, projectedDocuments, ...financialsWithoutDocs } = dealFormDataWithoutDocs.financials;
+        dealFormDataWithoutDocs.financials = financialsWithoutDocs;
+      }
+      
       // Use the new comprehensive deal update service
       const result = await DealService.updateCompleteDeal(dealId, dealFormDataWithoutDocs);
       
@@ -217,6 +246,7 @@ export const useCreateEditDeal = () => {
         },
       }, LogType.UPDATED);
       
+      navigate(`/deals/${dealId}`);
       return result.deal as DealModel;
     } catch (error) {
       console.error('Error updating deal:', error);
@@ -290,7 +320,7 @@ export const useCreateEditDeal = () => {
         action: 'deal updated',
       };
       await createDealLogs(user.id, camelCaseDeal.id, logMetaData, LogType.UPDATED);
-      
+        
       return camelCaseDeal;
     } catch (error) {
       console.error('Error updating deal:', error);

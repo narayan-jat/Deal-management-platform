@@ -44,6 +44,12 @@ export const PurposeSection: React.FC<PurposeSectionProps> = ({
     });
   };
 
+  const removeDocument = (documentName: string) => {
+    if (onDocumentUpload) {
+      onDocumentUpload(documents.filter(doc => doc.file?.file?.name !== documentName));
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Section Header */}
@@ -118,8 +124,14 @@ export const PurposeSection: React.FC<PurposeSectionProps> = ({
                 dealId={dealId}
                 organizationId={organizationId}
                 onUpload={async (uploadedDocuments) => {
+                  // fomat the uploaded documents to file, 
+                  const formattedDocuments = uploadedDocuments.map(doc => ({
+                    file: doc,
+                    formCategory: null,
+                    itemId: undefined
+                  }));
                   if (onDocumentUpload) {
-                    onDocumentUpload([...documents, ...uploadedDocuments]);
+                    onDocumentUpload([...documents, ...formattedDocuments]);
                   }
                   return uploadedDocuments;
                 }}
@@ -148,16 +160,17 @@ export const PurposeSection: React.FC<PurposeSectionProps> = ({
                         <FileText className="h-4 w-4 text-gray-400 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-900 truncate">
-                            {document.file?.name || document.fileName}
+                            {document.file?.file?.name || document.fileName}
                           </p>
                         </div>
                       </div>
-                      {!isReadOnly && (
+                      {!document?.filePath && !isReadOnly && (
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
                           className="text-red-500 hover:text-red-700"
+                          onClick={() => removeDocument(document.file?.file?.name)}
                         >
                           Remove
                         </Button>

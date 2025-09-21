@@ -68,7 +68,7 @@ export const CollateralSection: React.FC<CollateralSectionProps> = ({
 }) => {
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
   
-  // Populate documents for each collateral item
+  // Populate documents for each collateral item (local copy for UX)
   const itemsWithDocuments = populateCollateralItemDocuments(data.items, documents);
   
   const [newItemType, setNewItemType] = useState<CollateralType>(CollateralType.PROPERTY);
@@ -180,30 +180,23 @@ export const CollateralSection: React.FC<CollateralSectionProps> = ({
       itemId: itemId
     }));
 
+    console.log("categorizedDocuments", categorizedDocuments);
+
     // Update the main documents array through the parent component
     if (onDocumentUpload) {
-      onDocumentUpload(categorizedDocuments);
+      onDocumentUpload([...documents, ...categorizedDocuments]);
     }
+
 
     return categorizedDocuments;
   };
 
-  const removeItemDocument = (itemId: string, documentIndex: number) => {
-    const updatedItems = itemsWithDocuments.map(item => {
-      if (item.id === itemId) {
-        return {
-          ...item,
-          documents: itemsWithDocuments.filter((_, index) => index !== documentIndex).map(item => item.documents).flat()
-        };
-      }
-      return item;
-    });
-    onChange({
-      ...data,
-      items: updatedItems
-    });
-  };
 
+  const removeDocument = (documentName: string) => {
+    if (onDocumentUpload) {
+      onDocumentUpload(documents.filter(doc => doc.file?.file?.name !== documentName));
+    }
+  };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -765,7 +758,7 @@ export const CollateralSection: React.FC<CollateralSectionProps> = ({
                     Uploaded Files ({item.documents.length})
                   </h4>
                   <div className="space-y-2 max-h-32 overflow-y-auto">
-                    {item.documents.map((document, index) => (
+                    {item.documents.map((document: any, index: number) => (
                       <div
                         key={index}
                         className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
@@ -774,16 +767,16 @@ export const CollateralSection: React.FC<CollateralSectionProps> = ({
                           <FileText className="h-4 w-4 text-gray-400 flex-shrink-0" />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-gray-900 truncate">
-                              {document.file.file?.name}
+                              {document.file?.file?.name || document.fileName}
                             </p>
                           </div>
                         </div>
-                        {!isReadOnly && (
+                        {!document?.filePath && !isReadOnly && (
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
-                            onClick={() => removeItemDocument(item.id, index)}
+                            onClick={() => removeDocument(document.file?.file?.name)}
                             className="text-red-500 hover:text-red-700"
                           >
                             <X className="h-4 w-4" />
