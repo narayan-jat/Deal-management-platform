@@ -24,6 +24,7 @@ interface FinancialsSectionProps {
   dealId?: string;
   organizationId?: string;
   onDocumentUpload?: (documents: any[]) => void;
+  onDeleteDocument?: (dealId: string, document: any) => Promise<boolean>;
   documents?: any[];
 }
 
@@ -36,6 +37,7 @@ export const FinancialsSection: React.FC<FinancialsSectionProps> = ({
   dealId,
   organizationId,
   onDocumentUpload,
+  onDeleteDocument,
   documents = []
 }) => {
   console.log(' financials data', data);
@@ -99,9 +101,22 @@ export const FinancialsSection: React.FC<FinancialsSectionProps> = ({
     return filtered;
   };
 
-  const removeDocument = (documentName: string) => {
-    if (onDocumentUpload) {
-      onDocumentUpload(documents.filter(doc => doc.file?.file?.name !== documentName));
+  const removeDocument = async (document: any) => {
+    // Check if this is a saved document (has id and filePath) or a file upload
+    if (document.id && document.filePath && onDeleteDocument) {
+      if (!dealId) {
+        console.error("Deal ID is required for document deletion");
+        return;
+      }
+      // This is a saved document - use the proper deletion method
+      const success = await onDeleteDocument(dealId, document);
+      if (success && onDocumentUpload) {
+        // Remove from local documents array after successful deletion
+        onDocumentUpload(documents.filter(doc => doc.id !== document.id));
+      }
+    } else if (document.file && onDocumentUpload) {
+      // This is a file upload that hasn't been saved yet - just remove from array
+      onDocumentUpload(documents.filter(doc => doc.file?.file?.name !== document.file?.file?.name));
     }
   };
 
@@ -195,12 +210,12 @@ export const FinancialsSection: React.FC<FinancialsSectionProps> = ({
                             {document.file?.file?.name || document.fileName}
                           </span>
                         </div>
-                        {!document?.filePath && !isReadOnly && (
+                        {!isReadOnly && (
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
-                            onClick={() => removeDocument(document.file?.file?.name)}
+                            onClick={() => removeDocument(document)}
                           >
                             <X className="h-3 w-3" />
                           </Button>
@@ -245,12 +260,12 @@ export const FinancialsSection: React.FC<FinancialsSectionProps> = ({
                             {document.file?.file?.name || document.fileName}
                           </span>
                         </div>
-                        {!document?.filePath && !isReadOnly && (
+                        {!isReadOnly && (
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
-                            onClick={() => removeDocument(document.file?.file?.name)}
+                            onClick={() => removeDocument(document)}
                           >
                             <X className="h-3 w-3" />
                           </Button>

@@ -16,6 +16,7 @@ import { getSectionFormKey } from '@/utility/SectionMappingUtils';
 import { DealStatus } from '@/types/deal/Deal.enums';
 import { useCreateEditDeal } from '@/hooks/useCreateEditDeal';
 import { DealSectionsService } from '@/services/deals/DealSectionsService';
+import { useDocumentUpload } from '@/hooks/useDocumentUpload';
 import { toast } from 'sonner';
 
 // Import section components
@@ -58,6 +59,7 @@ export const DealFormPage: React.FC<DealFormPageProps> = ({ mode }) => {
   });
 
   const { handleCreateDeal, handleEditDeal } = useCreateEditDeal();
+  const { handleDeleteDocumentObject } = useDocumentUpload();
 
   // Validation function for required fields
   const validateRequiredFields = () => {
@@ -107,6 +109,16 @@ export const DealFormPage: React.FC<DealFormPageProps> = ({ mode }) => {
     } else {
       toast.error('Failed to save draft');
     }
+  };
+
+  // Handle document deletion
+  const handleDeleteDocument = async (dealId: string, document: any) => {
+    if (!dealId) {
+      toast.error('Deal ID is required for document deletion');
+      return false;
+    }
+    
+    return await handleDeleteDocumentObject(dealId, document);
   };
 
   const handleSubmit = async (isDraft: boolean = false) => {
@@ -190,6 +202,7 @@ export const DealFormPage: React.FC<DealFormPageProps> = ({ mode }) => {
             dealId={dealId}
             organizationId={formData.organizationId}
             onDocumentUpload={(docs) => updateSectionDocuments(DealSectionName.PURPOSE, docs)}
+            onDeleteDocument={handleDeleteDocument}
             documents={documents}
           />
         );
@@ -205,6 +218,7 @@ export const DealFormPage: React.FC<DealFormPageProps> = ({ mode }) => {
             organizationId={formData.organizationId}
             documents={documents}
             onDocumentUpload={(docs) => updateSectionDocuments(DealSectionName.COLLATERAL, docs)}
+            onDeleteDocument={handleDeleteDocument}
           />
         );
       case DealSectionName.FINANCIALS:
@@ -218,6 +232,7 @@ export const DealFormPage: React.FC<DealFormPageProps> = ({ mode }) => {
             dealId={dealId}
             organizationId={formData.organizationId}
             onDocumentUpload={(docs) => updateSectionDocuments(DealSectionName.FINANCIALS, docs)}
+            onDeleteDocument={handleDeleteDocument}
             documents={documents}
           />
         );

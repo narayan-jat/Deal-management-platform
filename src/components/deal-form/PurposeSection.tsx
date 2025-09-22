@@ -23,6 +23,7 @@ interface PurposeSectionProps {
   dealId?: string;
   organizationId?: string;
   onDocumentUpload?: (documents: any[]) => void;
+  onDeleteDocument?: (dealId: string, document: any) => Promise<boolean>;
   documents?: any[];
 }
 
@@ -35,6 +36,7 @@ export const PurposeSection: React.FC<PurposeSectionProps> = ({
   dealId,
   organizationId,
   onDocumentUpload,
+  onDeleteDocument,
   documents = []
 }) => {
   const handleInputChange = (field: keyof DealPurposeForm, value: string) => {
@@ -44,9 +46,22 @@ export const PurposeSection: React.FC<PurposeSectionProps> = ({
     });
   };
 
-  const removeDocument = (documentName: string) => {
-    if (onDocumentUpload) {
-      onDocumentUpload(documents.filter(doc => doc.file?.file?.name !== documentName));
+  const removeDocument = async (document: any) => {
+    // Check if this is a saved document (has id and filePath) or a file upload
+    if (document.id && document.filePath && onDeleteDocument) {
+      // This is a saved document - use the proper deletion method
+      if (!dealId) {
+        console.error("Deal ID is required for document deletion");
+        return;
+      }
+      const success = await onDeleteDocument(dealId, document);
+      if (success && onDocumentUpload) {
+        // Remove from local documents array after successful deletion
+        onDocumentUpload(documents.filter(doc => doc.id !== document.id));
+      }
+    } else if (document.file && onDocumentUpload) {
+      // This is a file upload that hasn't been saved yet - just remove from array
+      onDocumentUpload(documents.filter(doc => doc.file?.file?.name !== document.file?.file?.name));
     }
   };
 
@@ -164,13 +179,13 @@ export const PurposeSection: React.FC<PurposeSectionProps> = ({
                           </p>
                         </div>
                       </div>
-                      {!document?.filePath && !isReadOnly && (
+                      {!isReadOnly && (
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
                           className="text-red-500 hover:text-red-700"
-                          onClick={() => removeDocument(document.file?.file?.name)}
+                          onClick={() => removeDocument(document)}
                         >
                           Remove
                         </Button>

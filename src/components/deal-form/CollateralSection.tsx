@@ -53,6 +53,7 @@ interface CollateralSectionProps {
   organizationId?: string;
   documents?: any[];
   onDocumentUpload?: (documents: any[]) => void;
+  onDeleteDocument?: (dealId: string, document: any) => Promise<boolean>;
 }
 
 export const CollateralSection: React.FC<CollateralSectionProps> = ({
@@ -64,7 +65,8 @@ export const CollateralSection: React.FC<CollateralSectionProps> = ({
   dealId,
   organizationId,
   documents = [],
-  onDocumentUpload
+  onDocumentUpload,
+  onDeleteDocument
 }) => {
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
   
@@ -192,9 +194,22 @@ export const CollateralSection: React.FC<CollateralSectionProps> = ({
   };
 
 
-  const removeDocument = (documentName: string) => {
-    if (onDocumentUpload) {
-      onDocumentUpload(documents.filter(doc => doc.file?.file?.name !== documentName));
+  const removeDocument = async (document: any) => {
+    // Check if this is a saved document (has id and filePath) or a file upload
+    if (document.id && document.filePath && onDeleteDocument) {
+      if (!dealId) {
+        console.error("Deal ID is required for document deletion");
+        return;
+      }
+      // This is a saved document - use the proper deletion method
+      const success = await onDeleteDocument(dealId, document);
+      if (success && onDocumentUpload) {
+        // Remove from local documents array after successful deletion
+        onDocumentUpload(documents.filter(doc => doc.id !== document.id));
+      }
+    } else if (document.file && onDocumentUpload) {
+      // This is a file upload that hasn't been saved yet - just remove from array
+      onDocumentUpload(documents.filter(doc => doc.file?.file?.name !== document.file?.file?.name));
     }
   };
 
@@ -771,12 +786,12 @@ export const CollateralSection: React.FC<CollateralSectionProps> = ({
                             </p>
                           </div>
                         </div>
-                        {!document?.filePath && !isReadOnly && (
+                        {!isReadOnly && (
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
-                            onClick={() => removeDocument(document.file?.file?.name)}
+                            onClick={() => removeDocument(document)}
                             className="text-red-500 hover:text-red-700"
                           >
                             <X className="h-4 w-4" />

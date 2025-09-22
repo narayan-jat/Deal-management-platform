@@ -4,12 +4,13 @@ import { DocumentStorageService } from '@/services/DocumentStorageService';
 import { DealDocumentService } from '@/services/deals/DealDocumentService';
 import { CollateralDocumentService } from '@/services/deals/CollateralDocumentService';
 import { FinancialDocumentService } from '@/services/deals/FinancialDocumentService';
+import { DealLogService } from '@/services/deals/DealLogService';
 import { DealSectionName, CollateralItem } from '@/types/deal/Deal.sections';
 import { useAuth } from '@/context/AuthProvider';
-import { SignatureStatus } from '@/types/deal/Deal.enums';
+import { SignatureStatus, LogType } from '@/types/deal/Deal.enums';
 import { createDealLogs } from './utils';
-import { LogType } from '@/types/deal/Deal.enums';
 import { ErrorService } from '@/services/ErrorService';
+import { toast } from 'sonner';
 
 export const useDocumentUpload = () => {
   const [loading, setLoading] = useState(false);
@@ -134,12 +135,72 @@ export const useDocumentUpload = () => {
     }
   };
 
-  // Delete a document - DISABLED for security reasons
+  // Delete a document from both database and storage
   const handleDeleteDocument = async (dealId: string, documentId: string, filePath: string) => {
-    // Document deletion is disabled for security reasons
-    console.warn("Document deletion is disabled for security reasons");
-    setApiError("Document deletion is not allowed for security reasons");
-    return false;
+    try {
+      setLoading(true);
+      setApiError(null);
+
+      // Step 1: Delete from database first
+      await DealDocumentService.deleteDealDocument([documentId]);
+
+      // Step 2: Delete from storage
+      await DocumentStorageService.deleteDocument(filePath);
+
+      // Step 3: Log the deletion in deal logs
+      await DealLogService.createDealLog({
+        dealId: dealId,
+        memberId: user?.id || '',
+        logType: LogType.DELETED,
+        logData: {
+          documents: {
+            document_id: documentId,
+            file_path: filePath,
+            action: "document deleted",
+          },
+        }
+      });
+
+      toast.success("Document deleted successfully");
+      return true;
+    } catch (error) {
+      console.error("Error deleting document:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to delete document";
+      setApiError(errorMessage);
+      toast.error(errorMessage);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Delete a document object (handles both database entries and file uploads)
+  const handleDeleteDocumentObject = async (dealId: string, document: any) => {
+    try {
+      setLoading(true);
+      setApiError(null);
+
+      // Check if this is a database entry (has id and filePath)
+      if (document.id && document.filePath) {
+        // This is a saved document - delete from both database and storage
+        return await handleDeleteDocument(dealId, document.id, document.filePath);
+      } else if (document.file) {
+        // This is a file upload that hasn't been saved yet - just remove from array
+        // No database or storage deletion needed
+        toast.success("Document removed from upload list");
+        return true;
+      } else {
+        throw new Error("Invalid document object - missing required properties");
+      }
+    } catch (error) {
+      console.error("Error deleting document object:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to delete document";
+      setApiError(errorMessage);
+      toast.error(errorMessage);
+      return false;
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Get deal documents
@@ -406,6 +467,7 @@ export const useDocumentUpload = () => {
     createDealDocuments,
     updateDealDocuments,
     handleDeleteDocument,
+    handleDeleteDocumentObject,
     getDealDocuments,
     // New section-based methods
     createSectionDocuments,
