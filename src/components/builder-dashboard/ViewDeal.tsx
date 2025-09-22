@@ -28,6 +28,8 @@ import { DealLogModel } from '@/types/deal/Deal.model';
 import { parseLogData } from '@/utility/LogDataParser';
 import { getLogIcon } from '@/utility/LogIconUtils';
 import DealLogDetailsDialog from './DealLogDetailsDialog';
+import { useAuth } from '@/context/AuthProvider';
+import { canUserEditDeal, canUserCommentOnDeal } from '@/utility/DealRoleUtils';
 import { useComment } from '@/hooks/useComment';
 import { MentionDropdown } from '@/components/ui/MentionDropdown';
 import { DocumentUploadButton } from './DocumentUploadButton';
@@ -55,6 +57,7 @@ export default function ViewDeal({
   onRefreshDeal
 }: ViewDealProps) {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
   const [selectedLog, setSelectedLog] = useState<DealLogModel | null>(null);
   const [isLogDialogOpen, setIsLogDialogOpen] = useState(false);
@@ -91,6 +94,12 @@ export default function ViewDeal({
   const commentInputRef = useRef<HTMLTextAreaElement>(null);
 
   const statusInfo = getStatusInfo(deal.status);
+
+  // Check if current user can edit the deal
+  const canEdit = user ? canUserEditDeal(user.id, deal.contributors || []) : false;
+  
+  // Check if current user can comment on the deal
+  const canComment = user ? canUserCommentOnDeal(user.id, deal.contributors || []) : false;
 
   // Helper function to get member name from memberId
   const getMemberName = (memberId: string): string => {
@@ -279,14 +288,16 @@ export default function ViewDeal({
                 loadingText="Uploading..."
               />
 
-              {/* Edit Deal Button */}
-              <Button
-                onClick={() => navigate(ROUTES.EDIT_DEAL.replace(':dealId', deal.id))}
-                className="flex items-center space-x-2"
-              >
-                <Edit className="w-4 h-4" />
-                <span className="hidden sm:inline">Edit Deal</span>
-              </Button>
+              {/* Edit Deal Button - Only show if user can edit */}
+              {canEdit && (
+                <Button
+                  onClick={() => navigate(ROUTES.EDIT_DEAL.replace(':dealId', deal.id))}
+                  className="flex items-center space-x-2"
+                >
+                  <Edit className="w-4 h-4" />
+                  <span className="hidden sm:inline">Edit Deal</span>
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -407,35 +418,46 @@ export default function ViewDeal({
                 </h3>
               </div>
               <div className="p-6">
-                {/* Add Comment Form */}
-                <div className="mb-6">
-                  <div className="flex space-x-3 items-center relative">
-                    <Textarea
-                      ref={commentInputRef}
-                      placeholder="Add a comment... Use @ to mention team members"
-                      value={newComment}
-                      onChange={(e) => handleCommentInputChange(e, false)}
-                      onKeyDown={handleMentionKeyDown}
-                      className="flex-1 min-h-[80px] resize-none"
-                      disabled={isSubmittingComment}
-                    />
-                    <Button
-                      onClick={() => handleSubmitCommentWithMembers(deal)}
-                      disabled={!newComment.trim() || isSubmittingComment}
-                    >
-                      <Send className="w-4 h-4" />
-                    </Button>
-                    
-                    {/* Mention Dropdown */}
-                    <MentionDropdown
-                      isOpen={isMentionDropdownOpen}
-                      members={getFilteredMembers(mentionQuery, deal.contributors || [])}
-                      selectedIndex={selectedMentionIndex}
-                      onSelectMember={handleMemberSelect}
-                      onClose={() => setIsMentionDropdownOpen(false)}
-                    />
+                {/* Add Comment Form - Only show if user can comment */}
+                {canComment && (
+                  <div className="mb-6">
+                    <div className="flex space-x-3 items-center relative">
+                      <Textarea
+                        ref={commentInputRef}
+                        placeholder="Add a comment... Use @ to mention team members"
+                        value={newComment}
+                        onChange={(e) => handleCommentInputChange(e, false)}
+                        onKeyDown={handleMentionKeyDown}
+                        className="flex-1 min-h-[80px] resize-none"
+                        disabled={isSubmittingComment}
+                      />
+                      <Button
+                        onClick={() => handleSubmitCommentWithMembers(deal)}
+                        disabled={!newComment.trim() || isSubmittingComment}
+                      >
+                        <Send className="w-4 h-4" />
+                      </Button>
+                      
+                      {/* Mention Dropdown */}
+                      <MentionDropdown
+                        isOpen={isMentionDropdownOpen}
+                        members={getFilteredMembers(mentionQuery, deal.contributors || [])}
+                        selectedIndex={selectedMentionIndex}
+                        onSelectMember={handleMemberSelect}
+                        onClose={() => setIsMentionDropdownOpen(false)}
+                      />
+                    </div>
                   </div>
-                </div>
+                )}
+                
+                {/* Show message if user cannot comment */}
+                {!canComment && (
+                  <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <p className="text-sm text-gray-600 text-center">
+                      You have view-only access to this deal. Only members with editor, admin, or owner roles can add comments.
+                    </p>
+                  </div>
+                )}
 
                 {/* Comments List */}
                 {isFetchingDealComments ? (
@@ -504,15 +526,18 @@ export default function ViewDeal({
                               <p className="text-sm text-gray-700 break-words flex-1">
                                 {comment.comment}
                               </p>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleEditComment(comment)}
-                                className="ml-2 flex-shrink-0 p-2 h-8 w-8 hover:bg-gray-50 hover:border-gray-300"
-                                title="Edit comment"
-                              >
-                                <Edit className="w-4 h-4" />
-                              </Button>
+                              {/* Only show edit button if user can comment */}
+                              {canComment && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleEditComment(comment)}
+                                  className="ml-2 flex-shrink-0 p-2 h-8 w-8 hover:bg-gray-50 hover:border-gray-300"
+                                  title="Edit comment"
+                                >
+                                  <Edit className="w-4 h-4" />
+                                </Button>
+                              )}
                             </div>
                           )}
                         </div>

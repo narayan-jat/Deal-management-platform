@@ -10,6 +10,8 @@ import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/config/routes";
 import { DealSectionName } from "@/types/deal/Deal.sections";
 import { useDealView } from "@/hooks/useDealView";
+import { useAuth } from "@/context/AuthProvider";
+import { canUserEditDeal } from "@/utility/DealRoleUtils";
 
 // Import section components
 import { BasicInfoSection } from "@/components/deal-view/BasicInfoSection";
@@ -42,6 +44,7 @@ export default function ViewDealTabs({
   onRefreshDeal,
 }: ViewDealTabsProps) {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   // Use the custom hook for all deal view logic
   const {
@@ -83,6 +86,10 @@ export default function ViewDealTabs({
   } = useDealView(deal);
 
   console.log('documentsBySection', documentsBySection);
+  
+  // Check if current user can edit the deal
+  const canEdit = user ? canUserEditDeal(user.id, deal.contributors || []) : false;
+  
   // Render section content
   const renderSectionContent = () => {
     if (loadingSections) {
@@ -192,6 +199,7 @@ export default function ViewDealTabs({
             </div>
             <div className="flex items-center space-x-3">
               {/* Document Upload Button */}
+              {canEdit && (
               <DocumentUploadButton
                 dealId={deal.id}
                 organizationId={deal.organizationId}
@@ -216,17 +224,20 @@ export default function ViewDealTabs({
                 buttonText="Upload Documents"
                 loadingText="Uploading..."
               />
+              )}
 
-              {/* Edit Deal Button */}
-              <Button
-                onClick={() =>
-                  navigate(ROUTES.EDIT_DEAL.replace(":dealId", deal.id))
-                }
-                className="flex items-center space-x-2"
-              >
-                <Edit className="w-4 h-4" />
-                <span className="hidden sm:inline">Edit Deal</span>
-              </Button>
+              {/* Edit Deal Button - Only show if user can edit */}
+              {canEdit && (
+                <Button
+                  onClick={() =>
+                    navigate(ROUTES.EDIT_DEAL.replace(":dealId", deal.id))
+                  }
+                  className="flex items-center space-x-2"
+                >
+                  <Edit className="w-4 h-4" />
+                  <span className="hidden sm:inline">Edit Deal</span>
+                </Button>
+              )}
             </div>
           </div>
         </div>

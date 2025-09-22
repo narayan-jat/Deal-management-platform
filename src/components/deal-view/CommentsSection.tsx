@@ -5,6 +5,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { MentionDropdown } from '@/components/ui/MentionDropdown';
 import { formatDate } from '@/utility/Utility';
+import { useAuth } from '@/context/AuthProvider';
+import { canUserCommentOnDeal } from '@/utility/DealRoleUtils';
 
 interface CommentsSectionProps {
   dealComments: any[];
@@ -51,6 +53,10 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
   getFilteredMembers,
   deal
 }) => {
+  const { user } = useAuth();
+  
+  // Check if current user can comment on the deal
+  const canComment = user ? canUserCommentOnDeal(user.id, deal.contributors || []) : false;
   return (
     <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
       <div className="px-6 py-4 border-b border-gray-200">
@@ -63,35 +69,46 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
         </h3>
       </div>
       <div className="p-6">
-        {/* Add Comment Form */}
-        <div className="mb-6">
-          <div className="flex space-x-3 items-center relative">
-            <Textarea
-              ref={commentInputRef}
-              placeholder="Add a comment... Use @ to mention team members"
-              value={newComment}
-              onChange={(e) => handleCommentInputChange(e, false)}
-              onKeyDown={handleMentionKeyDown}
-              className="flex-1 min-h-[80px] resize-none"
-              disabled={isSubmittingComment}
-            />
-            <Button
-              onClick={() => handleSubmitCommentWithMembers(deal)}
-              disabled={!newComment.trim() || isSubmittingComment}
-            >
-              <Send className="w-4 h-4" />
-            </Button>
-            
-            {/* Mention Dropdown */}
-            <MentionDropdown
-              isOpen={isMentionDropdownOpen}
-              members={getFilteredMembers(mentionQuery, deal.contributors || [])}
-              selectedIndex={selectedMentionIndex}
-              onSelectMember={handleMemberSelect}
-              onClose={() => {}}
-            />
+        {/* Add Comment Form - Only show if user can comment */}
+        {canComment && (
+          <div className="mb-6">
+            <div className="flex space-x-3 items-center relative">
+              <Textarea
+                ref={commentInputRef}
+                placeholder="Add a comment... Use @ to mention team members"
+                value={newComment}
+                onChange={(e) => handleCommentInputChange(e, false)}
+                onKeyDown={handleMentionKeyDown}
+                className="flex-1 min-h-[80px] resize-none"
+                disabled={isSubmittingComment}
+              />
+              <Button
+                onClick={() => handleSubmitCommentWithMembers(deal)}
+                disabled={!newComment.trim() || isSubmittingComment}
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+              
+              {/* Mention Dropdown */}
+              <MentionDropdown
+                isOpen={isMentionDropdownOpen}
+                members={getFilteredMembers(mentionQuery, deal.contributors || [])}
+                selectedIndex={selectedMentionIndex}
+                onSelectMember={handleMemberSelect}
+                onClose={() => {}}
+              />
+            </div>
           </div>
-        </div>
+        )}
+        
+        {/* Show message if user cannot comment */}
+        {!canComment && (
+          <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <p className="text-sm text-gray-600 text-center">
+              You have view-only access to this deal. Only members with editor, admin, or owner roles can add comments.
+            </p>
+          </div>
+        )}
 
         {/* Comments List */}
         {isFetchingDealComments ? (
@@ -160,15 +177,18 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
                       <p className="text-sm text-gray-700 break-words flex-1">
                         {comment.comment}
                       </p>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEditComment(comment)}
-                        className="ml-2 flex-shrink-0 p-2 h-8 w-8 hover:bg-gray-50 hover:border-gray-300"
-                        title="Edit comment"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
+                      {/* Only show edit button if user can comment */}
+                      {canComment && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditComment(comment)}
+                          className="ml-2 flex-shrink-0 p-2 h-8 w-8 hover:bg-gray-50 hover:border-gray-300"
+                          title="Edit comment"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                      )}
                     </div>
                   )}
                 </div>
