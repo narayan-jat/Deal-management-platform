@@ -1,7 +1,7 @@
 import React from "react";
 import { Edit, ArrowLeft, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DealCardType } from "@/types/deal/DealCard";
+import { DealViewType } from "@/types/deal/DealView";
 import { cn } from "@/lib/utils";
 import { DealLogModel } from "@/types/deal/Deal.model";
 import DealLogDetailsDialog from "./DealLogDetailsDialog";
@@ -9,7 +9,6 @@ import { DocumentUploadButton } from "./DocumentUploadButton";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/config/routes";
 import { DealSectionName } from "@/types/deal/Deal.sections";
-import { useDealView } from "@/hooks/useDealView";
 import { useAuth } from "@/context/AuthProvider";
 import { canUserEditDeal } from "@/utility/DealRoleUtils";
 
@@ -25,14 +24,59 @@ import { ActivityLogSection } from "@/components/deal-view/ActivityLogSection";
 import { CollaboratorsSection } from "@/components/deal-view/CollaboratorsSection";
 import { formatDate } from "@/utility/Utility";
 import { Separator } from "@radix-ui/react-select";
+import { Contributor } from "@/types/deal/Deal.members";
 
 interface ViewDealTabsProps {
-  deal: DealCardType;
+  deal: DealViewType;
   onEdit: () => void;
   onClose?: () => void;
   dealLogs: DealLogModel[];
   isFetchingDealLogs: boolean;
   onRefreshDeal?: () => void;
+  
+  // Sections
+  sectionsData: any;
+  loadingSections: boolean;
+  sectionsEnabled: { [key in DealSectionName | 'BASIC_INFO']: boolean };
+  activeTab: DealSectionName | 'BASIC_INFO';
+  setActiveTab: (tab: DealSectionName | 'BASIC_INFO') => void;
+  getAvailableTabs: () => Array<{ key: string; label: string }>;
+  
+  // Documents
+  documentsBySection: { [key: string]: any[] };
+  loadingDocuments: boolean;
+  loadDocumentsBySection: () => Promise<void>;
+  handleDocumentDownload: (documentId: string, fileName: string) => Promise<void>;
+  handleDocumentPreview: (documentId: string) => Promise<void>;
+  updateDealDocuments: (dealId: string, documents: any[], organizationId: string, sectionName: string) => Promise<any[]>;
+  
+  // Comments
+  dealComments: any[];
+  isFetchingDealComments: boolean;
+  newComment: string;
+  isSubmittingComment: boolean;
+  editingCommentId: string | null;
+  editingCommentText: string;
+  isMentionDropdownOpen: boolean;
+  mentionQuery: string;
+  selectedMentionIndex: number;
+  commentInputRef: React.RefObject<HTMLTextAreaElement>;
+  handleCommentInputChange: (value: string) => void;
+  handleMemberSelect: (member: any) => void;
+  handleMentionKeyDown: (e: React.KeyboardEvent) => void;
+  handleUpdateCommentLocalWithMembers: (commentId: string, text: string, members: any[]) => void;
+  handleCancelEdit: () => void;
+  handleEditComment: (commentId: string, text: string) => void;
+  setEditingCommentText: (text: string) => void;
+  handleSubmitCommentWithMembers: (text: string, members: any[]) => Promise<void>;
+  getFilteredMembers: (members: any[], query: string) => any[];
+  getMemberName: (memberId: string) => string;
+  
+  // Logs
+  selectedLog: DealLogModel | null;
+  isLogDialogOpen: boolean;
+  handleViewLogDetails: (log: DealLogModel) => void;
+  handleCloseLogDialog: () => void;
 }
 
 export default function ViewDealTabs({
@@ -42,53 +86,48 @@ export default function ViewDealTabs({
   dealLogs,
   isFetchingDealLogs,
   onRefreshDeal,
+  sectionsData,
+  loadingSections,
+  sectionsEnabled,
+  activeTab,
+  setActiveTab,
+  getAvailableTabs,
+  documentsBySection,
+  loadingDocuments,
+  loadDocumentsBySection,
+  handleDocumentDownload,
+  handleDocumentPreview,
+  updateDealDocuments,
+  dealComments,
+  isFetchingDealComments,
+  newComment,
+  isSubmittingComment,
+  editingCommentId,
+  editingCommentText,
+  isMentionDropdownOpen,
+  mentionQuery,
+  selectedMentionIndex,
+  commentInputRef,
+  handleCommentInputChange,
+  handleMemberSelect,
+  handleMentionKeyDown,
+  handleUpdateCommentLocalWithMembers,
+  handleCancelEdit,
+  handleEditComment,
+  setEditingCommentText,
+  handleSubmitCommentWithMembers,
+  getFilteredMembers,
+  getMemberName,
+  selectedLog,
+  isLogDialogOpen,
+  handleViewLogDetails,
+  handleCloseLogDialog,
 }: ViewDealTabsProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // Use the custom hook for all deal view logic
-  const {
-    selectedLog,
-    isLogDialogOpen,
-    activeTab,
-    sectionsData,
-    loadingSections,
-    dealComments,
-    isFetchingDealComments,
-    newComment,
-    isSubmittingComment,
-    editingCommentId,
-    editingCommentText,
-    isMentionDropdownOpen,
-    mentionQuery,
-    selectedMentionIndex,
-    commentInputRef,
-    setActiveTab,
-    handleViewLogDetails,
-    handleCloseLogDialog,
-    handleDocumentDownload,
-    handleDocumentPreview,
-    handleCommentInputChange,
-    handleMemberSelect,
-    handleMentionKeyDown,
-    handleUpdateCommentLocalWithMembers,
-    handleCancelEdit,
-    handleEditComment,
-    setEditingCommentText,
-    handleSubmitCommentWithMembers,
-    getFilteredMembers,
-    getMemberName,
-    getAvailableTabs,
-    updateDealDocuments,
-    loadDocumentsBySection,
-    documentsBySection,
-    loadingDocuments,
-  } = useDealView(deal);
-
-  console.log('documentsBySection', documentsBySection);
-  
   // Check if current user can edit the deal
-  const canEdit = user ? canUserEditDeal(user.id, deal.contributors || []) : false;
+  const canEdit = user ? canUserEditDeal(user.id, deal.members || []) : false;
   
   // Render section content
   const renderSectionContent = () => {
@@ -113,9 +152,9 @@ export default function ViewDealTabs({
       case "BASIC_INFO":
         return (
           <BasicInfoSection 
-            deal={deal} 
-            onDocumentPreview={handleDocumentPreview}
-            onDocumentDownload={handleDocumentDownload}
+            deal={deal as any} 
+            onDocumentPreview={(document: any) => handleDocumentPreview(document.id)}
+            onDocumentDownload={(document: any) => handleDocumentDownload(document.id, document.fileName)}
             documents={documentsBySection['BASIC_INFO'] || []}
           />
         );
@@ -123,9 +162,9 @@ export default function ViewDealTabs({
         return (
           <OverviewSection
             overviewData={sectionsData.overview}
-            deal={deal}
-            onDocumentPreview={handleDocumentPreview}
-            onDocumentDownload={handleDocumentDownload}
+            deal={deal as any}
+            onDocumentPreview={(document: any) => handleDocumentPreview(document.id)}
+            onDocumentDownload={(document: any) => handleDocumentDownload(document.id, document.fileName)}
             documents={documentsBySection['OVERVIEW'] || []}
           />
         );
@@ -133,9 +172,9 @@ export default function ViewDealTabs({
         return (
           <PurposeSection
             purposeData={sectionsData.purpose}
-            deal={deal}
-            onDocumentPreview={handleDocumentPreview}
-            onDocumentDownload={handleDocumentDownload}
+            deal={deal as any}
+            onDocumentPreview={(document: any) => handleDocumentPreview(document.id)}
+            onDocumentDownload={(document: any) => handleDocumentDownload(document.id, document.fileName)}
             documents={documentsBySection['PURPOSE'] || []}
           />
         );
@@ -143,9 +182,9 @@ export default function ViewDealTabs({
         return (
           <CollateralSection
             collateralData={sectionsData.collateral}
-            deal={deal}
-            onDocumentPreview={handleDocumentPreview}
-            onDocumentDownload={handleDocumentDownload}
+            deal={deal as any}
+            onDocumentPreview={(document: any) => handleDocumentPreview(document.id)}
+            onDocumentDownload={(document: any) => handleDocumentDownload(document.id, document.fileName)}
             documents={documentsBySection['COLLATERAL'] || []}
           />
         );
@@ -153,9 +192,9 @@ export default function ViewDealTabs({
         return (
           <FinancialsSection
             financialsData={sectionsData.financials}
-            deal={deal}
-            onDocumentPreview={handleDocumentPreview}
-            onDocumentDownload={handleDocumentDownload}
+            deal={deal as any}
+            onDocumentPreview={(document: any) => handleDocumentPreview(document.id)}
+            onDocumentDownload={(document: any) => handleDocumentDownload(document.id, document.fileName)}
             documents={documentsBySection['FINANCIALS'] || []}
           />
         );
@@ -163,9 +202,9 @@ export default function ViewDealTabs({
         return (
           <NextStepsSection
             nextStepsData={sectionsData.nextSteps}
-            deal={deal}
-            onDocumentPreview={handleDocumentPreview}
-            onDocumentDownload={handleDocumentDownload}
+            deal={deal as any}
+            onDocumentPreview={(document: any) => handleDocumentPreview(document.id)}
+            onDocumentDownload={(document: any) => handleDocumentDownload(document.id, document.fileName)}
             documents={documentsBySection['NEXT_STEPS'] || []}
           />
         );
@@ -296,17 +335,19 @@ export default function ViewDealTabs({
               selectedMentionIndex={selectedMentionIndex}
               commentInputRef={commentInputRef}
               getMemberName={getMemberName}
-              handleCommentInputChange={handleCommentInputChange}
+              handleCommentInputChange={(e: React.ChangeEvent<HTMLTextAreaElement>, isEditing: boolean) => {
+                handleCommentInputChange(e.target.value);
+              }}
               handleMentionKeyDown={handleMentionKeyDown}
               handleMemberSelect={handleMemberSelect}
-              handleSubmitCommentWithMembers={handleSubmitCommentWithMembers}
-              handleUpdateCommentLocalWithMembers={
-                handleUpdateCommentLocalWithMembers
-              }
+              handleSubmitCommentWithMembers={(deal: any) => {
+                handleSubmitCommentWithMembers(deal.text, deal.members);
+              }}
+              handleUpdateCommentLocalWithMembers={handleUpdateCommentLocalWithMembers as any}
               handleCancelEdit={handleCancelEdit}
-              handleEditComment={handleEditComment}
-              getFilteredMembers={getFilteredMembers}
-              deal={deal}
+              handleEditComment={handleEditComment as any}
+              getFilteredMembers={getFilteredMembers as any}
+              deal={deal as any}
             />
 
             {/* Activity Log Section */}
@@ -318,9 +359,11 @@ export default function ViewDealTabs({
             />
           </div>
 
-          {/* Right Column - Collaborators */}
+          {/* Right Column - Members */}
           <div className="space-y-6">
-            <CollaboratorsSection contributors={deal.contributors || []} />
+            <CollaboratorsSection 
+              contributors={deal.members || []} 
+            />
             {/* Deal Metadata */}
             <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
               <div className="px-6 py-4 border-b border-gray-200">

@@ -1,5 +1,6 @@
 import { DealMemberRole } from '@/types/deal/Deal.enums';
 import { Contributor } from '@/types/deal/Deal.members';
+import { editAccessRoles } from '@/Constants';
 
 /**
  * Utility functions for deal role-based access control
@@ -20,8 +21,7 @@ export const canUserEditDeal = (userId: string, contributors: Contributor[]): bo
   }
 
   // Only OWNER, EDITOR, and ADMIN can edit deals
-  const editableRoles = [DealMemberRole.OWNER, DealMemberRole.EDITOR, DealMemberRole.ADMIN];
-  return editableRoles.includes(userContributor.role as DealMemberRole);
+  return editAccessRoles.includes(userContributor.role as DealMemberRole);
 };
 
 /**

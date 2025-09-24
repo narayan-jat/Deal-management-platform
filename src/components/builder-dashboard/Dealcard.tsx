@@ -10,6 +10,7 @@ import { StatusToTitleMap } from "@/types/deal/DealCard";
 import { formatCurrency, getStatusInfo } from "@/utility/Utility";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/config/routes";
+import { useAuth } from "@/context/AuthProvider";
 
 type DealCardProps = {
   deal: DealCardType;
@@ -26,6 +27,7 @@ type DealCardProps = {
 export default function DealCard(props: DealCardProps) {
   const { deal, refProps, styles, listeners, attributes, onEdit, onView, hasEditAccess, onInviteCollaborators } = props;
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [isCollaboratorsModalOpen, setIsCollaboratorsModalOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const {handleDealChatClick} = useDealChat();
@@ -92,6 +94,12 @@ export default function DealCard(props: DealCardProps) {
     } else {
       toast.error("Invite functionality not available");
     }
+  };
+
+  // Handle collaborator removed
+  const handleCollaboratorRemoved = (contributorId: string) => {
+    // reload the window is the only option.
+    window.location.reload();
   };
 
 
@@ -257,6 +265,10 @@ export default function DealCard(props: DealCardProps) {
         onClose={() => setIsCollaboratorsModalOpen(false)}
         collaborators={deal.contributors}
         title={`Collaborators`}
+        dealId={deal.id}
+        currentUserId={user?.id}
+        hasEditAccess={hasEditAccess}
+        onCollaboratorRemoved={handleCollaboratorRemoved}
       />
 
       {/* Invite Collaborators Modal */}

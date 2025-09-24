@@ -82,4 +82,30 @@ export class DealMemberService {
       throw error;
     }
   }
+
+  /**
+   * Removes a deal member from the "deal_members" table.
+   * @param dealId - The ID of the deal.
+   * @param memberId - The ID of the member to remove.
+   * @returns The removed deal member.
+   */
+  static async removeDealMember(dealId: string, memberId: string) {
+    try {
+      const { data, error } = await supabase
+        .from("deal_members")
+        .delete()
+        .eq("deal_id", dealId)
+        .eq("member_id", memberId)
+        .select();
+
+      if (error) {
+        throw error;
+      }
+
+      return data;
+    } catch (error) {
+      ErrorService.handleApiError(error, "DealMembersService.removeDealMember");
+      throw error;
+    }
+  }
 }

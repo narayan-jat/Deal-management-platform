@@ -18,7 +18,45 @@ export default function ViewDealPage() {
     handleCloseEditModal, 
     dealLogs, 
     isFetchingDealLogs,
-    refreshDeal
+    refreshDeal,
+    members,
+    membersLoading,
+    sectionsData,
+    loadingSections,
+    sectionsEnabled,
+    activeTab,
+    setActiveTab,
+    getAvailableTabs,
+    documentsBySection,
+    loadingDocuments,
+    loadDocumentsBySection,
+    handleDocumentDownload,
+    handleDocumentPreview,
+    updateDealDocuments,
+    dealComments,
+    isFetchingDealComments,
+    newComment,
+    isSubmittingComment,
+    editingCommentId,
+    editingCommentText,
+    isMentionDropdownOpen,
+    mentionQuery,
+    selectedMentionIndex,
+    commentInputRef,
+    handleCommentInputChange,
+    handleMemberSelect,
+    handleMentionKeyDown,
+    handleUpdateCommentLocalWithMembers,
+    handleCancelEdit,
+    handleEditComment,
+    setEditingCommentText,
+    handleSubmitCommentWithMembers,
+    getFilteredMembers,
+    getMemberName,
+    selectedLog,
+    isLogDialogOpen,
+    handleViewLogDetails,
+    handleCloseLogDialog,
   } = useViewDealPage();
 
   if (loading) {
@@ -45,16 +83,55 @@ export default function ViewDealPage() {
       </div>
     );
   }
-
   return (
     <>
       <ViewDealTabs
-        dealLogs={dealLogs}
-        isFetchingDealLogs={isFetchingDealLogs}
         deal={deal} 
         onEdit={handleEdit} 
         onClose={handleClose}
+        dealLogs={dealLogs}
+        isFetchingDealLogs={isFetchingDealLogs}
         onRefreshDeal={refreshDeal}
+        sectionsData={sectionsData}
+        loadingSections={loadingSections}
+        sectionsEnabled={sectionsEnabled}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        getAvailableTabs={getAvailableTabs}
+        documentsBySection={documentsBySection}
+        loadingDocuments={loadingDocuments}
+        loadDocumentsBySection={loadDocumentsBySection}
+        handleDocumentDownload={async (document: any) => {
+          await handleDocumentDownload(document.id, document.fileName);
+        }}
+        handleDocumentPreview={async (document: any) => {
+          await handleDocumentPreview(document.id);
+        }}
+        updateDealDocuments={updateDealDocuments}
+        dealComments={dealComments}
+        isFetchingDealComments={isFetchingDealComments}
+        newComment={newComment}
+        isSubmittingComment={isSubmittingComment}
+        editingCommentId={editingCommentId}
+        editingCommentText={editingCommentText}
+        isMentionDropdownOpen={isMentionDropdownOpen}
+        mentionQuery={mentionQuery}
+        selectedMentionIndex={selectedMentionIndex}
+        commentInputRef={commentInputRef}
+        handleCommentInputChange={handleCommentInputChange}
+        handleMemberSelect={handleMemberSelect}
+        handleMentionKeyDown={handleMentionKeyDown}
+        handleUpdateCommentLocalWithMembers={handleUpdateCommentLocalWithMembers as any}
+        handleCancelEdit={handleCancelEdit}
+        handleEditComment={handleEditComment as any}
+        setEditingCommentText={setEditingCommentText}
+        handleSubmitCommentWithMembers={handleSubmitCommentWithMembers as any}
+        getFilteredMembers={getFilteredMembers as any}
+        getMemberName={getMemberName}
+        selectedLog={selectedLog}
+        isLogDialogOpen={isLogDialogOpen}
+        handleViewLogDetails={handleViewLogDetails}
+        handleCloseLogDialog={handleCloseLogDialog}
       />
       
       {isEditModalOpen && (
@@ -65,13 +142,14 @@ export default function ViewDealPage() {
           mode="edit"
           initialBaseFormData={{
             ...deal,
-            documents: deal.documents.map(doc => ({ file: null, ...doc })),
-            members: deal.contributors.map(contributor => ({
-              id: contributor.id,
-              email: contributor.email,
-              role: contributor.role
+            status: deal.status as any, // Type assertion for compatibility
+            documents: deal.documents ? Object.values(deal.documents).flat().map(doc => ({ file: null, ...doc })) : [],
+            members: deal.members.map(member => ({
+              id: member.id,
+              email: member.email,
+              role: member.role
             }))
-          }}
+          } as any}
           onSubmit={handleEditSubmit}
         />
       )}

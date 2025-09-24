@@ -56,7 +56,10 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
   const { user } = useAuth();
   
   // Check if current user can comment on the deal
-  const canComment = user ? canUserCommentOnDeal(user.id, deal.contributors || []) : false;
+  console.log('CommentsSection - user:', user);
+  console.log('CommentsSection - deal.members:', deal.members);
+  const canComment = user ? canUserCommentOnDeal(user.id, deal.members || []) : false;
+  console.log('CommentsSection - canComment:', canComment);
   return (
     <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
       <div className="px-6 py-4 border-b border-gray-200">
@@ -166,7 +169,7 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
                       {/* Mention Dropdown for Edit Mode */}
                       <MentionDropdown
                         isOpen={isMentionDropdownOpen && editingCommentId === comment.id}
-                        members={getFilteredMembers(mentionQuery, deal.contributors || [])}
+                        members={getFilteredMembers(mentionQuery, deal.members || [])}
                         selectedIndex={selectedMentionIndex}
                         onSelectMember={handleMemberSelect}
                         onClose={() => {}}
