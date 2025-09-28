@@ -13,10 +13,6 @@ export interface DealModel {
   organizationId?: string; // organization_id
   createdAt: string; // created_at
   updatedAt: string; // updated_at
-  requestedAmount: number; // requested_amount
-  startDate: string; // starte_date
-  endDate?: string; // end_date
-  nextMeetingDate: string; // next_meeting_date
   notes: string; // notes
   location: string; // location
 }

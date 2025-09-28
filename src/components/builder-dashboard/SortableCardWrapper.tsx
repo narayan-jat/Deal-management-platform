@@ -23,11 +23,11 @@ export default function SortableCardWrapper(props: Props) {
   const hasEditAccess = editAccessRoles.includes(role);
 
   useEffect(() => {
-    if (deal.contributors) {
-      const member = deal.contributors.find((contributor) => contributor.id === user?.id);
-      setRole(member?.role as DealMemberRole);
+    if (deal.members) {
+      const member = deal.members.find((contributor) => contributor.id === user?.id);
+      setRole(member?.role as DealMemberRole || null);
     }
-  }, [deal.contributors, user?.id]);
+  }, [deal.members, user?.id]);
 
   const {
     attributes,

@@ -10,10 +10,10 @@ import camelcaseKeys from 'camelcase-keys';
 import { ProfileService } from '@/services/ProfileService';
 import { DealCardType } from '@/types/deal/DealCard';
 import { useSearch } from '@/context/SearchProvider';
-import { useDocumentUpload } from './useDocumentUpload';
 import { createDealLogs } from './utils';
 import { LogType } from '@/types/deal/Deal.enums';
 import { getSignedProfileImageUrl } from '@/utility/Utility';
+import { DealSectionName } from '@/types/deal/Deal.sections';
 
 export const useDashboard = () => {
   const [initialDeals, setInitialDeals] = useState<KanbanBoardColumns>({
@@ -26,63 +26,96 @@ export const useDashboard = () => {
   const [apiError, setApiError] = useState<string | null>(null);
   const { user } = useAuth();
   const { setAllDeals } = useSearch();
-  const { getDealDocuments } = useDocumentUpload();
 
-  const fetchDeals = async () => {
+  const fetchDeals = async (): Promise<DealCardType[]> => {
     try {
       setLoading(true);
       // Gets all deal IDs of which a member is a part of.
       const dealIds = await DealMemberService.getDealIdsOfMember(user?.id);
 
-      // Get the deals from the deal IDs.
-      const deals = await DealService.getDeals(dealIds);
+      if (!dealIds || dealIds.length === 0) {
+        return [];
+      }
 
-      // Get the members of the deals to show on the card.
-      await Promise.all(deals.map(async (deal) => {
-        const dealMembers = await DealMemberService.getDealMembers(deal.id);
-        const contributors = await Promise.all(
-          dealMembers.map(async (member) => {
-            try {
-              const memberDetails = await ProfileService.getProfile(member.member_id);
-              if (!memberDetails) return null;
-              return {
-                id: memberDetails.id,
-                name: memberDetails.first_name + ' ' + memberDetails.last_name,
-                email: memberDetails.email,
-                title: memberDetails.title,
-                profilePath: await getSignedProfileImageUrl(memberDetails.profile_path),
-                role: member.role,
-              };
-            } catch (error) {
-              ErrorService.handleApiError(error, "useDashboard");
-              return null;
-            }
-          })
-        );
-        // Filter out any nulls (in case of failed lookups)
-        deal.contributors = contributors.filter(Boolean);
-      }));
+      // Get complete deal data for each deal ID
+      const completeDeals = await Promise.all(
+        dealIds.map(async (dealId) => {
+          try {
+            const completeDeal = await DealService.getCompleteDeal(dealId);
+            
+            // Transform members to Contributor format
+            const contributors = await Promise.all(
+              completeDeal.members.map(async (member) => {
+                try {
+                  const memberDetails = await ProfileService.getProfile(member.member_id);
+                  if (!memberDetails) return null;
+                  return {
+                    id: memberDetails.id,
+                    name: memberDetails.first_name + ' ' + memberDetails.last_name,
+                    email: memberDetails.email,
+                    title: memberDetails.title,
+                    profilePath: await getSignedProfileImageUrl(memberDetails.profile_path),
+                    role: member.role,
+                    addedAt: member.added_at,
+                    addedBy: member.added_by,
+                  };
+                } catch (error) {
+                  ErrorService.handleApiError(error, "useDashboard.fetchDeals");
+                  return null;
+                }
+              })
+            );
 
-      // Get the documents of the deals to show on the card.
-      await Promise.all(deals.map(async (deal) => {
-        const dealDocuments = await getDealDocuments(deal.id);
-        deal.documents = dealDocuments.map((document) => ({
-          id: document.id,
-          fileName: document.file_name,
-          filePath: document.file_path,
-          mimeType: document.mime_type,
-          signatureStatus: document.signature_status,
-          uploadedAt: document.uploaded_at,
-          uploadedBy: document.uploaded_by,
-        }));
-      }));
+            // Filter out any nulls (in case of failed lookups)
+            const validContributors = contributors.filter(Boolean);
 
-      // convert to camelCase
-      const camelCaseDeals = camelcaseKeys(deals, { deep: true });
-      return camelCaseDeals;
+            // Transform documents to the expected format
+            const documentsBySection: { [sectionName: string]: any[] } = {};
+            Object.entries(completeDeal.documents).forEach(([sectionName, docs]) => {
+              documentsBySection[sectionName] = docs.map((doc) => ({
+                id: doc.id,
+                dealId: doc.dealId,
+                uploadedBy: doc.uploadedBy,
+                filePath: doc.filePath,
+                mimeType: doc.mimeType,
+                fileName: doc.fileName,
+                signatureStatus: doc.signatureStatus,
+                uploadedAt: doc.uploadedAt,
+                sectionName: doc.sectionName,
+                formCategory: doc.formCategory,
+                itemId: doc.itemId,
+              }));
+            });
+
+            // Format the deal card data
+            const dealCard: DealCardType = {
+              ...completeDeal.deal,
+              sections: {
+                sections: completeDeal.sections.sections || [],
+                overview: completeDeal.sections.overview,
+                purpose: completeDeal.sections.purpose,
+                collateral: completeDeal.sections.collateral,
+                financials: completeDeal.sections.financials,
+                nextSteps: completeDeal.sections.nextSteps,
+              },
+              documents: documentsBySection,
+              members: validContributors,
+            };
+
+            return dealCard;
+          } catch (error) {
+            ErrorService.handleApiError(error, "useDashboard.fetchDeals");
+            return null;
+          }
+        })
+      );
+
+      // Filter out any nulls (in case of failed lookups)
+      return completeDeals.filter(Boolean) as DealCardType[];
     } catch (error) {
       ErrorService.handleApiError(error, "useDashboard");
       setApiError('Failed to fetch deals');
+      return [];
     } finally {
       setLoading(false);
     }

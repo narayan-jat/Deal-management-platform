@@ -4,14 +4,25 @@
 
 import { DealModel } from "./Deal.model";
 import { DealDocument } from "./Deal.documents";
-import { UploadDocumentForm } from "./Deal.documents";
-import { Contributor, InviteMemberForm } from "./Deal.members";
+import { Contributor } from "./Deal.members";
 import { DealStatus } from "./Deal.enums";
+import { DealSectionModel, Rate } from "./Deal.sections";
+import { PersonTag } from "./Deal.sections";
 
 
 export type DealCardType = DealModel & {
-  contributors: Contributor[];
-  documents: DealDocument[];
+  sections: {
+    sections: DealSectionModel[];
+    overview: any;
+    purpose: any;
+    collateral: any;
+    financials: any;
+    nextSteps: any;
+  };
+  documents: {
+    [sectionName: string]: DealDocument[];
+  };
+  members: Contributor[];
 }
 
 export const StatusToTitleMap = {
@@ -23,7 +34,18 @@ export const StatusToTitleMap = {
   [DealStatus.DRAFT]: "Draft",
 }
 
-export type DealCardForm = Partial<DealCardType> & {
-  documents: UploadDocumentForm[];
-  members: InviteMemberForm[];
+export type DealCardContent = {
+  title: string;
+  status: DealStatus;
+  loanRequest?: number;
+  industry?: string;
+  rate?: Rate;
+  ltv?: string;
+  nextMeetingDate?: string;
+  term?: string;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+  members: Contributor[];
+  borrowers: PersonTag[];
 }

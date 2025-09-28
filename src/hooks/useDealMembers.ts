@@ -56,10 +56,35 @@ export const useDealMembers = (dealId: string) => {
     }
   };
 
+  // Delete a member from the deal
+  const deleteMember = async (member: Contributor) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Remove member from database
+      await DealMemberService.removeDealMember(dealId, member.id);
+
+      // Update local state by removing the member
+      setMembers(prevMembers => 
+        prevMembers.filter(m => m.id !== member.id)
+      );
+
+      return true;
+    } catch (error) {
+      ErrorService.handleApiError(error, "useDealMembers.deleteMember");
+      setError('Failed to delete member');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     members,
     loading,
     error,
     fetchDealMembers,
+    deleteMember,
   };
 };
