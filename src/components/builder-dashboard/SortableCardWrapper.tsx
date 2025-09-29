@@ -63,6 +63,7 @@ export default function SortableCardWrapper(props: Props) {
       onView={onView}
       hasEditAccess={hasEditAccess}
       onMemberDeleted={onMemberDeleted}
+      user={user}
     />
   );
 }

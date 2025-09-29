@@ -29,6 +29,7 @@ type DealCardProps = {
   hasEditAccess: boolean;
   onInviteCollaborators?: (emails: string[], role: DealMemberRole) => void;
   onMemberDeleted?: () => void;
+  user?: any;
 };
 
 export default function DealCard(props: DealCardProps) {
@@ -43,6 +44,7 @@ export default function DealCard(props: DealCardProps) {
     hasEditAccess,
     onInviteCollaborators,
     onMemberDeleted: onMemberDeletedProp,
+    user,
   } = props;
 
   // Use the custom hook for all logic
@@ -318,6 +320,7 @@ export default function DealCard(props: DealCardProps) {
         dealId={deal.id}
         onMemberDeleted={handleMemberDeleted}
         hasEditAccess={hasEditAccess}
+        user={user}
       />
 
       {/* Borrowers Modal */}

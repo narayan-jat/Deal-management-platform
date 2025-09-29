@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Search, User, Mail, Crown, Edit, Eye, MessageSquare, Trash2 } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { DealMemberRole } from "@/types/deal/Deal.enums";
 import { Contributor } from "@/types/deal/Deal.members";
 import { useDealMembers } from "@/hooks/useDealMembers";
 import { toast } from "sonner";
@@ -14,6 +13,7 @@ interface CollaboratorsModalProps {
   dealId: string;
   onMemberDeleted?: () => void;
   hasEditAccess?: boolean;
+  user?: any;
 }
 
 export default function CollaboratorsModal({
@@ -24,25 +24,25 @@ export default function CollaboratorsModal({
   dealId,
   onMemberDeleted,
   hasEditAccess = false,
+  user,
 }: CollaboratorsModalProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [deletingMemberId, setDeletingMemberId] = useState<string | null>(null);
   
   // Use the useDealMembers hook for delete functionality
   const { deleteMember, loading: deleteLoading } = useDealMembers(dealId);
-
   // Handle member deletion
   const handleDeleteMember = async (member: Contributor) => {
     if (!hasEditAccess) {
       toast.error("You don't have permission to delete members");
       return;
     }
-
+    const userId = user?.id || '';
     setDeletingMemberId(member.id);
     
     try {
-      const success = await deleteMember(member);
-      if (true) {
+      const success = await deleteMember(member, userId);
+      if (success) {
         toast.success(`${member.name} has been removed from the deal`);
         // Call the callback to refresh the parent component
         if (onMemberDeleted) {

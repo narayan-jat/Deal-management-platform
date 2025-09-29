@@ -4,6 +4,8 @@ import { ProfileService } from '@/services/ProfileService';
 import { getSignedProfileImageUrl } from '@/utility/Utility';
 import { ErrorService } from '@/services/ErrorService';
 import { Contributor } from '@/types/deal/Deal.members';
+import { DealLogService } from '@/services/deals/DealLogService';
+import { LogType } from '@/types/deal/Deal.enums';
 
 export const useDealMembers = (dealId: string) => {
   const [members, setMembers] = useState<Contributor[]>([]);
@@ -57,7 +59,7 @@ export const useDealMembers = (dealId: string) => {
   };
 
   // Delete a member from the deal
-  const deleteMember = async (member: Contributor) => {
+  const deleteMember = async (member: Contributor, userId: string) => {
     try {
       setLoading(true);
       setError(null);
@@ -69,6 +71,23 @@ export const useDealMembers = (dealId: string) => {
       setMembers(prevMembers => 
         prevMembers.filter(m => m.id !== member.id)
       );
+
+ 
+      await DealLogService.createDealLog({
+        dealId: dealId,
+        memberId: userId,
+        logType: LogType.DELETED,
+        logData: {
+          members: {
+            member: {
+              member_id: member.id,
+              name: member.name,
+              role: member.role,
+              action: "member deleted",
+            },
+          },
+        },
+      });
 
       return true;
     } catch (error) {
