@@ -7,6 +7,9 @@ import { useDealChat } from '@/hooks/useDealChat';
 import { ROUTES } from '@/config/routes';
 import { useAuth } from '@/context/AuthProvider';
 import { TIMELINE_OPTIONS } from '@/types/deal/Deal.sections';
+import { DealService } from '@/services/deals/DealService';
+import { ProfileService } from '@/services/ProfileService';
+import { getSignedProfileImageUrl } from '@/utility/Utility';
 
 type UseDealCardProps = {
   deal: DealCardType;
@@ -95,6 +98,7 @@ export const useDealCard = ({
       nextMeetingDate: deal.sections?.nextSteps?.nextMeetingDate || '',
       term: '',
       borrowers: deal.sections?.overview?.borrowers || [],
+      outstandingBalance: 0,
     }
     // term is the timeline of the purpose section
     if(deal.sections?.purpose?.timeline) {
@@ -103,6 +107,17 @@ export const useDealCard = ({
       dealContent.term = timelineLabel;
     }
 
+    // outstanding balance is the sum of the outstanding balance of the collateral items
+    if(deal.sections?.collateral) {
+      const collateral = deal.sections.collateral.items;
+      if (Array.isArray(collateral)) {
+        collateral.forEach((item: any) => {
+          if (item.debtDetails && item.debtDetails.outstandingBalance) {
+            dealContent.outstandingBalance += item.debtDetails.outstandingBalance;
+          }
+        });
+      }
+    }
     return dealContent;
 
   };
@@ -236,12 +251,7 @@ export const useDealCard = ({
   // Refresh deal content by fetching fresh data
   const refreshDealContent = async (): Promise<void> => {
     try {
-      // Import DealService to fetch fresh deal data
-      const { DealService } = await import('@/services/deals/DealService');
-      const { DealMemberService } = await import('@/services/deals/DealMemberService');
-      const { ProfileService } = await import('@/services/ProfileService');
-      const { getSignedProfileImageUrl } = await import('@/utility/Utility');
-      
+     
       // Fetch fresh deal data
       const completeDeal = await DealService.getCompleteDeal(deal.id);
       
@@ -275,6 +285,7 @@ export const useDealCard = ({
       const updatedDealContent: DealCardContent = {
         title: completeDeal.deal.title,
         status: completeDeal.deal.status,
+        outstandingBalance: 0,
         members: validContributors,
         industry: completeDeal.deal.industry,
         createdBy: completeDeal.deal.createdBy,
@@ -290,9 +301,20 @@ export const useDealCard = ({
       
       // Set term from timeline
       if (completeDeal.sections?.purpose?.timeline) {
-        const { TIMELINE_OPTIONS } = await import('@/types/deal/Deal.sections');
         const timelineLabel = TIMELINE_OPTIONS.find(opt => opt.value === completeDeal.sections?.purpose?.timeline)?.label;
         updatedDealContent.term = timelineLabel || '';
+      }
+      
+      // outstanding balance is the sum of the outstanding balance of the collateral items
+      if(completeDeal.sections?.collateral) {
+        const collateral = completeDeal.sections.collateral;
+        if (Array.isArray(collateral)) {
+          collateral.forEach((item: any) => {
+            if (item.debtDetails && item.debtDetails.outstandingBalance) {
+              updatedDealContent.outstandingBalance += item.debtDetails.outstandingBalance;
+            }
+          });
+        }
       }
       
       setDealContent(updatedDealContent);

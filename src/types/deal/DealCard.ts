@@ -39,6 +39,7 @@ export type DealCardContent = {
   status: DealStatus;
   loanRequest?: number;
   industry?: string;
+  outstandingBalance?: number;
   rate?: Rate;
   ltv?: string;
   nextMeetingDate?: string;

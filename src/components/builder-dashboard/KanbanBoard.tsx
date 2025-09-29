@@ -26,6 +26,7 @@ import { useCreateDeal } from "@/context/CreateDealProvider";
 import { getPlural } from "./utils";
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/config/routes';
+import { DebtDetails } from '@/types/deal/Deal.sections';
 
 
 const columnNames = {
@@ -33,6 +34,31 @@ const columnNames = {
   inProgress: "In Progress",
   negotiation: "Negotiation",
   completed: "Completed",
+};
+
+// Function to calculate total amount for a deal card
+const calculateDealTotalAmount = (card: DealCardType): number => {
+  let totalAmount = 0;
+  
+  // Add loan request amount from overview section
+  const loanRequest = card.sections?.overview?.loanRequest || 0;
+  totalAmount += loanRequest;
+  
+  // Add outstanding balance from collateral debt details
+  if (card.sections?.collateral) {
+    const collateral = card.sections.collateral.items;
+    
+    // Check if collateral is an array of items
+    if (Array.isArray(collateral)) {
+      collateral.forEach((item: any) => {
+        if (item.debtDetails && item.debtDetails.outstandingBalance) {
+          totalAmount += item.debtDetails.outstandingBalance;
+        }
+      });
+    }
+  }
+  
+  return totalAmount;
 };
 
 interface KanbanBoardProps {
@@ -144,7 +170,7 @@ export default function KanbanBoard({
               <h3 className="text-lg font-semibold mb-4">
                 {columnNames[key as keyof typeof columnNames]}
                 <span className="ml-2 text-sm text-gray-500 font-normal">
-                  {cards.length} {getPlural(cards.length)} - <DollarSign className="inline-block h-3 w-3" /> {formatCurrency(cards.reduce((acc, card) => acc + card.requestedAmount, 0))}
+                  {cards.length} {getPlural(cards.length)} - <DollarSign className="inline-block h-3 w-3" /> {formatCurrency(cards.reduce((acc, card) => acc + calculateDealTotalAmount(card), 0))}
                 </span>
               </h3>
               {/* <DroppableColumn

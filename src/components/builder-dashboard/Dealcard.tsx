@@ -4,7 +4,6 @@ import {
   DollarSign,
   Building2,
   Edit,
-  Eye,
   UserPlus,
   MessageCircle,
 } from "lucide-react";
@@ -59,7 +58,6 @@ export default function DealCard(props: DealCardProps) {
     handleInviteClick,
     handleInviteCollaborators,
     handleCollaboratorRemoved,
-    handleViewClick,
     handleCardClick,
     handleCardDoubleClick,
     handleEditClick,
@@ -129,14 +127,6 @@ export default function DealCard(props: DealCardProps) {
                 <MessageCircle className="h-4 w-4" />
               </button>
               <button
-                onClick={handleViewClick}
-                className="absolute top-0 right-10 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
-                title="View deal"
-                data-dnd-kit-disabled-draggable
-              >
-                <Eye className="h-4 w-4" />
-              </button>
-              <button
                 onClick={handleEditClick}
                 className="absolute top-0 right-3 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
                 title="Edit deal"
@@ -154,14 +144,6 @@ export default function DealCard(props: DealCardProps) {
                 data-dnd-kit-disabled-draggable
               >
                 <MessageCircle className="h-4 w-4" />
-              </button>
-              <button
-                onClick={handleViewClick}
-                className="absolute top-0 right-3 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
-                title="View deal"
-                data-dnd-kit-disabled-draggable
-              >
-                <Eye className="h-4 w-4" />
               </button>
             </>
           )}
@@ -219,6 +201,14 @@ export default function DealCard(props: DealCardProps) {
           <span className="text-gray-400 font-medium">Loan Request:</span>
           <span className="font-medium">
             {formatCurrency(dealContent?.loanRequest || 0)}
+          </span>
+        </div>
+
+        {/* outstanding balance */}
+        <div className="flex items-center gap-2 text-xs text-gray-600">
+          <span className="text-gray-400 font-medium">Outstanding:</span>
+          <span className="font-medium">
+            {formatCurrency(dealContent?.outstandingBalance || 0)}
           </span>
         </div>
 
