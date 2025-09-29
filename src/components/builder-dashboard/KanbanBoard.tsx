@@ -44,6 +44,7 @@ interface KanbanBoardProps {
   onDragEnd: (event: DragEndEvent) => void;
   onEdit: (dealId: string) => void;
   onView: (deal: DealCardType) => void;
+  onMemberDeleted?: () => void;
 }
 
 export default function KanbanBoard({
@@ -54,7 +55,8 @@ export default function KanbanBoard({
   onDragOver,
   onDragEnd,
   onEdit,
-  onView
+  onView,
+  onMemberDeleted,
 }: KanbanBoardProps) {
   const navigate = useNavigate();
   const [dropPosition, setDropPosition] = useState<{ columnId: string; index: number } | null>(null);
@@ -167,6 +169,7 @@ export default function KanbanBoard({
                         isDragging={activeId === card.id}
                         onEdit={() => onEdit(card.id)}
                         onView={() => onView(card)}
+                        onMemberDeleted={onMemberDeleted}
                       />
 
                       {/* Show drop indicator after this card if we're dropping at this position */}

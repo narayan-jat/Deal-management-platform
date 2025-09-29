@@ -28,6 +28,7 @@ type DealCardProps = {
   onView?: () => void;
   hasEditAccess: boolean;
   onInviteCollaborators?: (emails: string[], role: DealMemberRole) => void;
+  onMemberDeleted?: () => void;
 };
 
 export default function DealCard(props: DealCardProps) {
@@ -41,6 +42,7 @@ export default function DealCard(props: DealCardProps) {
     onView,
     hasEditAccess,
     onInviteCollaborators,
+    onMemberDeleted: onMemberDeletedProp,
   } = props;
 
   // Use the custom hook for all logic
@@ -65,6 +67,7 @@ export default function DealCard(props: DealCardProps) {
     formatMeetingDate,
     createDealContent,
     closeBorrowersModal,
+    refreshDealContent,
   } = useDealCard({
     deal,
     onEdit,
@@ -73,6 +76,16 @@ export default function DealCard(props: DealCardProps) {
     onInviteCollaborators,
     styles,
   });
+
+  // Handle member deletion and refresh
+  const handleMemberDeleted = async () => {
+    // Refresh the deal content to get updated members
+    await refreshDealContent();
+    // Also call the parent callback if provided (for any additional cleanup)
+    if (onMemberDeletedProp) {
+      onMemberDeletedProp();
+    }
+  };
 
   // Get status color using utility function
   const statusInfo = getStatusInfo(deal.status);
@@ -302,6 +315,9 @@ export default function DealCard(props: DealCardProps) {
         onClose={closeCollaboratorsModal}
         collaborators={dealContent?.members || []}
         title={`Collaborators`}
+        dealId={deal.id}
+        onMemberDeleted={handleMemberDeleted}
+        hasEditAccess={hasEditAccess}
       />
 
       {/* Borrowers Modal */}

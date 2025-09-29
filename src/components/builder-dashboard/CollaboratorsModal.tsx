@@ -1,14 +1,19 @@
 import { useState } from "react";
-import { Search, User, Mail, Crown, Edit, Eye, MessageSquare } from "lucide-react";
+import { Search, User, Mail, Crown, Edit, Eye, MessageSquare, Trash2 } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { DealMemberRole } from "@/types/deal/Deal.enums";
 import { Contributor } from "@/types/deal/Deal.members";
+import { useDealMembers } from "@/hooks/useDealMembers";
+import { toast } from "sonner";
 
 interface CollaboratorsModalProps {
   isOpen: boolean;
   onClose: () => void;
   collaborators: Contributor[];
   title?: string;
+  dealId: string;
+  onMemberDeleted?: () => void;
+  hasEditAccess?: boolean;
 }
 
 export default function CollaboratorsModal({
@@ -16,8 +21,42 @@ export default function CollaboratorsModal({
   onClose,
   collaborators,
   title = "Collaborators",
+  dealId,
+  onMemberDeleted,
+  hasEditAccess = false,
 }: CollaboratorsModalProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [deletingMemberId, setDeletingMemberId] = useState<string | null>(null);
+  
+  // Use the useDealMembers hook for delete functionality
+  const { deleteMember, loading: deleteLoading } = useDealMembers(dealId);
+
+  // Handle member deletion
+  const handleDeleteMember = async (member: Contributor) => {
+    if (!hasEditAccess) {
+      toast.error("You don't have permission to delete members");
+      return;
+    }
+
+    setDeletingMemberId(member.id);
+    
+    try {
+      const success = await deleteMember(member);
+      if (true) {
+        toast.success(`${member.name} has been removed from the deal`);
+        // Call the callback to refresh the parent component
+        if (onMemberDeleted) {
+          await onMemberDeleted();
+        }
+      } else {
+        toast.error("Failed to remove member");
+      }
+    } catch (error) {
+      toast.error("An error occurred while removing the member");
+    } finally {
+      setDeletingMemberId(null);
+    }
+  };
 
   // Filter collaborators based on search query
   const filteredCollaborators = collaborators.filter(
@@ -128,6 +167,24 @@ export default function CollaboratorsModal({
                       </div>
                     </div>
                   </div>
+
+                  {/* Delete Button */}
+                  {hasEditAccess && (
+                    <div className="flex-shrink-0 ml-3">
+                      <button
+                        onClick={() => handleDeleteMember(collaborator)}
+                        disabled={deletingMemberId === collaborator.id || deleteLoading}
+                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Remove member"
+                      >
+                        {deletingMemberId === collaborator.id ? (
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-red-600 border-t-transparent"></div>
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))
             )}

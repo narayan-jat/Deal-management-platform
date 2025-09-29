@@ -13,6 +13,7 @@ import DotLoader from "@/components/ui/loader";
 import { ROUTES } from "@/config/routes";
 import { useSearch } from "@/context/SearchProvider";
 import { useCreateDeal } from "@/context/CreateDealProvider";
+import { columnKeyToEnum } from "@/Constants";
 const columnNames = {
   new: "New",
   inProgress: "In Progress",
@@ -188,6 +189,10 @@ export default function Dashboard() {
           navigate(`${ROUTES.EDIT_DEAL.replace(':dealId', dealId)}`);
         }}
         onView={handleViewDeal}
+        onMemberDeleted={() => {
+          // Individual deal refresh is handled by the DealCard component
+          // This callback can be used for any additional cleanup if needed
+        }}
       />
 
     </div>

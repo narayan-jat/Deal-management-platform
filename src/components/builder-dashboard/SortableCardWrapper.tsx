@@ -12,10 +12,11 @@ type Props = {
   deal: DealCardType;
   onEdit: () => void;
   onView?: () => void;
+  onMemberDeleted?: () => void;
 };
 
 export default function SortableCardWrapper(props: Props) {
-  const { isDragging: externalIsDragging, deal, onEdit, onView } = props;
+  const { isDragging: externalIsDragging, deal, onEdit, onView, onMemberDeleted } = props;
   const [role, setRole] = useState<DealMemberRole | null>(null);
   const { user } = useAuth();
 
@@ -61,6 +62,7 @@ export default function SortableCardWrapper(props: Props) {
       onEdit={onEdit}
       onView={onView}
       hasEditAccess={hasEditAccess}
+      onMemberDeleted={onMemberDeleted}
     />
   );
 }

@@ -233,6 +233,77 @@ export const useDealCard = ({
     setIsBorrowersModalOpen(false);
   };
 
+  // Refresh deal content by fetching fresh data
+  const refreshDealContent = async (): Promise<void> => {
+    try {
+      // Import DealService to fetch fresh deal data
+      const { DealService } = await import('@/services/deals/DealService');
+      const { DealMemberService } = await import('@/services/deals/DealMemberService');
+      const { ProfileService } = await import('@/services/ProfileService');
+      const { getSignedProfileImageUrl } = await import('@/utility/Utility');
+      
+      // Fetch fresh deal data
+      const completeDeal = await DealService.getCompleteDeal(deal.id);
+      
+      // Transform members to Contributor format
+      const contributors = await Promise.all(
+        completeDeal.members.map(async (member) => {
+          try {
+            const memberDetails = await ProfileService.getProfile(member.member_id);
+            if (!memberDetails) return null;
+            return {
+              id: memberDetails.id,
+              name: memberDetails.first_name + ' ' + memberDetails.last_name,
+              email: memberDetails.email,
+              title: memberDetails.title,
+              profilePath: await getSignedProfileImageUrl(memberDetails.profile_path),
+              role: member.role,
+              addedAt: member.added_at,
+              addedBy: member.added_by,
+            };
+          } catch (error) {
+            console.error('Error fetching member details:', error);
+            return null;
+          }
+        })
+      );
+
+      // Filter out any nulls
+      const validContributors = contributors.filter(Boolean);
+      
+      // Create updated deal content with fresh data
+      const updatedDealContent: DealCardContent = {
+        title: completeDeal.deal.title,
+        status: completeDeal.deal.status,
+        members: validContributors,
+        industry: completeDeal.deal.industry,
+        createdBy: completeDeal.deal.createdBy,
+        createdAt: completeDeal.deal.createdAt,
+        updatedAt: completeDeal.deal.updatedAt,
+        loanRequest: completeDeal.sections?.overview?.loanRequest || 0,
+        rate: completeDeal.sections?.overview?.rate,
+        ltv: completeDeal.sections?.overview?.ltv?.toString() || '0',
+        nextMeetingDate: completeDeal.sections?.nextSteps?.nextMeetingDate || '',
+        term: '',
+        borrowers: completeDeal.sections?.overview?.borrowers || [],
+      };
+      
+      // Set term from timeline
+      if (completeDeal.sections?.purpose?.timeline) {
+        const { TIMELINE_OPTIONS } = await import('@/types/deal/Deal.sections');
+        const timelineLabel = TIMELINE_OPTIONS.find(opt => opt.value === completeDeal.sections?.purpose?.timeline)?.label;
+        updatedDealContent.term = timelineLabel || '';
+      }
+      
+      setDealContent(updatedDealContent);
+    } catch (error) {
+      console.error('Error refreshing deal content:', error);
+      // Fallback to local refresh if API call fails
+      const updatedContent = createDealContent();
+      setDealContent(updatedContent);
+    }
+  };
+
   return {
     // State
     isCollaboratorsModalOpen,
@@ -256,6 +327,7 @@ export const useDealCard = ({
     closeInviteModal,
     formatMeetingDate,
     createDealContent,
+    refreshDealContent,
   };
 };
 
