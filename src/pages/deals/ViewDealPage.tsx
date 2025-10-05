@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import ViewDealTabs from '@/components/builder-dashboard/ViewDealTabs';
-import CreateEditDealCard from '@/components/builder-dashboard/CreateEditDealCard';
 import DotLoader from '@/components/ui/loader';
 import { useViewDealPage } from '@/hooks/useViewDealPage';
 
@@ -10,17 +9,11 @@ export default function ViewDealPage() {
   const { 
     deal, 
     loading, 
-    isEditModalOpen, 
     handleEdit, 
     handleClose, 
-    handleDeleteDocument, 
-    handleEditSubmit, 
-    handleCloseEditModal, 
     dealLogs, 
     isFetchingDealLogs,
     refreshDeal,
-    members,
-    membersLoading,
     sectionsData,
     loadingSections,
     sectionsEnabled,
@@ -133,26 +126,6 @@ export default function ViewDealPage() {
         handleViewLogDetails={handleViewLogDetails}
         handleCloseLogDialog={handleCloseLogDialog}
       />
-      
-      {isEditModalOpen && (
-        <CreateEditDealCard
-          handleDeleteDocument={handleDeleteDocument}
-          isOpen={isEditModalOpen}
-          onClose={handleCloseEditModal}
-          mode="edit"
-          initialBaseFormData={{
-            ...deal,
-            status: deal.status as any, // Type assertion for compatibility
-            documents: deal.documents ? Object.values(deal.documents).flat().map(doc => ({ file: null, ...doc })) : [],
-            members: deal.members.map(member => ({
-              id: member.id,
-              email: member.email,
-              role: member.role
-            }))
-          } as any}
-          onSubmit={handleEditSubmit}
-        />
-      )}
     </>
   );
 } 

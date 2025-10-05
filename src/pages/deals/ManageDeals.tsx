@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
   Table, 
@@ -17,14 +16,16 @@ import {
   Eye, 
   Calendar, 
   DollarSign, 
-  Building2
+  Building2,
+  LocateIcon,
+  Locate
 } from "lucide-react";
-import { DealCardType } from "@/types/deal/DealCard";
-import { DealStatus } from "@/types/deal/Deal.enums";
-import { formatCurrency, formatDate } from "@/utility/Utility";
+import { formatDate } from "@/utility/Utility";
 import { useNavigate } from "react-router-dom";
 import { useManageDeals } from "@/hooks/useManageDeals";
 import DotLoader from "@/components/ui/loader";
+import { ROUTES } from "@/config/routes";
+import { DealModel } from "@/types/deal";
 
 export default function ManageDeals() {
   const navigate = useNavigate();
@@ -34,7 +35,6 @@ export default function ManageDeals() {
     draftDeals, 
     loading, 
     error, 
-    refreshDeals 
   } = useManageDeals();
 
   // Filter deals based on search query
@@ -44,9 +44,7 @@ export default function ManageDeals() {
     return matchesSearch;
   });
 
-  const handleViewDeal = (deal: DealCardType) => {
-    // Store the deal data temporarily so ViewDealPage can access it
-    sessionStorage.setItem('viewDealData', JSON.stringify(deal));
+  const handleViewDeal = (deal: Partial<DealModel>) => {
     navigate(`/deals/${deal.id}`);
   };
 
@@ -133,7 +131,7 @@ export default function ManageDeals() {
                       </>
                     )}
                   </div>
-                  <Button onClick={() => setIsCreateModalOpen(true)}>
+                  <Button onClick={() => navigate(ROUTES.CREATE_DEAL)}>
                     <Plus className="w-4 h-4 mr-2" />
                     Create New Deal
                   </Button>
@@ -157,14 +155,8 @@ export default function ManageDeals() {
                         </TableHead>
                         <TableHead className="font-semibold">
                           <div className="flex items-center gap-2">
-                            <DollarSign className="w-4 h-4 text-gray-400" />
-                            Amount
-                          </div>
-                        </TableHead>
-                        <TableHead className="font-semibold">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="w-4 h-4 text-gray-400" />
-                            Start Date
+                            <LocateIcon className="w-4 h-4 text-gray-400" />
+                            Location
                           </div>
                         </TableHead>
                         <TableHead className="font-semibold text-right"><div className="flex items-center gap-2">
@@ -182,10 +174,7 @@ export default function ManageDeals() {
                             <span className="truncate max-w-[150px] block">{deal.industry}</span>
                           </TableCell>
                           <TableCell>
-                            <span>{formatCurrency(deal.requestedAmount)}</span>
-                          </TableCell>
-                          <TableCell>
-                            <span>{formatDate(deal.startDate)}</span>
+                            <span>{deal.location}</span>
                           </TableCell>
                           <TableCell className="text-right">
                             <Button

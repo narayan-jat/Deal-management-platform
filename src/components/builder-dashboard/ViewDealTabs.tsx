@@ -64,11 +64,11 @@ interface ViewDealTabsProps {
   handleCommentInputChange: (value: string) => void;
   handleMemberSelect: (member: any) => void;
   handleMentionKeyDown: (e: React.KeyboardEvent) => void;
-  handleUpdateCommentLocalWithMembers: (commentId: string, text: string, members: any[]) => void;
+  handleUpdateCommentLocalWithMembers: () => void;
   handleCancelEdit: () => void;
   handleEditComment: (commentId: string, text: string) => void;
   setEditingCommentText: (text: string) => void;
-  handleSubmitCommentWithMembers: (text: string, members: any[]) => Promise<void>;
+  handleSubmitCommentWithMembers: () => Promise<void>;
   getFilteredMembers: (members: any[], query: string) => any[];
   getMemberName: (memberId: string) => string;
   
@@ -340,14 +340,12 @@ export default function ViewDealTabs({
               }}
               handleMentionKeyDown={handleMentionKeyDown}
               handleMemberSelect={handleMemberSelect}
-              handleSubmitCommentWithMembers={(deal: any) => {
-                handleSubmitCommentWithMembers(deal.text, deal.members);
-              }}
-              handleUpdateCommentLocalWithMembers={handleUpdateCommentLocalWithMembers as any}
+              handleSubmitCommentWithMembers={handleSubmitCommentWithMembers}
+              handleUpdateCommentLocalWithMembers={handleUpdateCommentLocalWithMembers}
               handleCancelEdit={handleCancelEdit}
               handleEditComment={handleEditComment as any}
               getFilteredMembers={getFilteredMembers as any}
-              deal={deal as any}
+              deal={deal as DealViewType}
             />
 
             {/* Activity Log Section */}

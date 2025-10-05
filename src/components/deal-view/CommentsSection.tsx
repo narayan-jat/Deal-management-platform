@@ -7,7 +7,7 @@ import { MentionDropdown } from '@/components/ui/MentionDropdown';
 import { formatDate } from '@/utility/Utility';
 import { useAuth } from '@/context/AuthProvider';
 import { canUserCommentOnDeal } from '@/utility/DealRoleUtils';
-
+import { DealViewType } from '@/types/deal/DealView';
 interface CommentsSectionProps {
   dealComments: any[];
   isFetchingDealComments: boolean;
@@ -23,12 +23,12 @@ interface CommentsSectionProps {
   handleCommentInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>, isEditing: boolean) => void;
   handleMentionKeyDown: (e: React.KeyboardEvent) => void;
   handleMemberSelect: (member: any) => void;
-  handleSubmitCommentWithMembers: (deal: any) => void;
-  handleUpdateCommentLocalWithMembers: (deal: any) => void;
+  handleSubmitCommentWithMembers: () => void;
+  handleUpdateCommentLocalWithMembers: () => void;
   handleCancelEdit: () => void;
   handleEditComment: (comment: any) => void;
   getFilteredMembers: (query: string, members: any[]) => any[];
-  deal: any;
+  deal: DealViewType;
 }
 
 export const CommentsSection: React.FC<CommentsSectionProps> = ({
@@ -54,12 +54,9 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
   deal
 }) => {
   const { user } = useAuth();
-  
+  console.log("ismentionopen", isMentionDropdownOpen)
   // Check if current user can comment on the deal
-  console.log('CommentsSection - user:', user);
-  console.log('CommentsSection - deal.members:', deal.members);
   const canComment = user ? canUserCommentOnDeal(user.id, deal.members || []) : false;
-  console.log('CommentsSection - canComment:', canComment);
   return (
     <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
       <div className="px-6 py-4 border-b border-gray-200">
@@ -86,7 +83,7 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
                 disabled={isSubmittingComment}
               />
               <Button
-                onClick={() => handleSubmitCommentWithMembers(deal)}
+                onClick={handleSubmitCommentWithMembers}
                 disabled={!newComment.trim() || isSubmittingComment}
               >
                 <Send className="w-4 h-4" />
@@ -95,7 +92,7 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
               {/* Mention Dropdown */}
               <MentionDropdown
                 isOpen={isMentionDropdownOpen}
-                members={getFilteredMembers(mentionQuery, deal.contributors || [])}
+                members={getFilteredMembers(mentionQuery, deal.members || [])}
                 selectedIndex={selectedMentionIndex}
                 onSelectMember={handleMemberSelect}
                 onClose={() => {}}
@@ -152,7 +149,7 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
                       <div className="flex space-x-2">
                         <Button
                           size="sm"
-                          onClick={() => handleUpdateCommentLocalWithMembers(deal)}
+                          onClick={handleUpdateCommentLocalWithMembers}
                           disabled={!editingCommentText.trim()}
                         >
                           Save

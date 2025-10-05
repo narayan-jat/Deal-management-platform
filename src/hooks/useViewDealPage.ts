@@ -11,6 +11,8 @@ import { useComment } from './useComment';
 import { useDocumentUpload } from './useDocumentUpload';
 import { ErrorService } from '@/services/ErrorService';
 import { toast } from 'sonner';
+import { DealLogService } from '@/services/deals/DealLogService';
+import camelcaseKeys from 'camelcase-keys';
 
 export const useViewDealPage = () => {
   const { dealId } = useParams<{ dealId: string }>();
@@ -32,7 +34,6 @@ export const useViewDealPage = () => {
   } = useDealMembers(dealId || '');
 
   // Document and comment states
-  const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
   const [selectedLog, setSelectedLog] = useState<DealLogModel | null>(null);
   const [isLogDialogOpen, setIsLogDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<DealSectionName | 'BASIC_INFO'>('BASIC_INFO');
@@ -53,25 +54,24 @@ export const useViewDealPage = () => {
   const { 
     comments: dealComments, 
     isFetchingComments: isFetchingDealComments,
-    handleUpdateCommentLocal,
-    handleUpdateCommentLocalWithMembers,
-    handleCancelEdit,
-    handleSubmitComment,
-    handleSubmitCommentWithMembers,
-    handleEditComment,
     newComment,
     setNewComment,
     isSubmittingComment,
     editingCommentId,
     editingCommentText,
     setEditingCommentText,
+    getFilteredMembers,
+    handleMentionMember,
     handleMentionDetection,
     handleMemberSelection,
-    getFilteredMembers,
-  } = useComment();
+    handleSubmitCommentWithMembers,
+    handleUpdateCommentLocalWithMembers,
+    handleCancelEdit,
+    handleEditComment,
+  } = useComment(deal);
 
   // Use the document upload hook
-  const { getDealDocuments, updateDealDocuments } = useDocumentUpload();
+  const { updateDealDocuments } = useDocumentUpload();
 
   // Mention dropdown states
   const [isMentionDropdownOpen, setIsMentionDropdownOpen] = useState(false);
@@ -129,6 +129,8 @@ export const useViewDealPage = () => {
 
       setSectionsEnabled(enabledSections);
       setLoadingSections(false);
+      // Fetch deal logs
+      await fetchDealLogs();
       
     } catch (error) {
       ErrorService.handleApiError(error, "useViewDealPage.fetchDealData");
@@ -247,12 +249,18 @@ export const useViewDealPage = () => {
   // Handle comment input change with mention detection
   const handleCommentInputChange = (value: string) => {
     setNewComment(value);
-    // TODO: Implement proper mention detection
+    // Implement proper mention detection
+    const detectMention = handleMentionDetection(value, value.length);
+    setIsMentionDropdownOpen(detectMention.isMentioning)
+    setMentionQuery(detectMention.query)
+    // filter the members
+    getFilteredMembers(mentionQuery, members)
   };
 
   // Handle member selection from mention dropdown
   const handleMemberSelect = (member: any) => {
     // TODO: Implement proper member selection
+    handleMemberSelection(member, newComment, newComment.length);
   };
 
   // Handle mention key navigation
@@ -288,7 +296,10 @@ export const useViewDealPage = () => {
     try {
       setIsFetchingDealLogs(true);
       // TODO: Implement deal logs fetching
-      setDealLogs([]);
+      const dealLogs = await DealLogService.getDealLogs(dealId);
+      // Convert to camel case
+      const camelCaseDealLogs = camelcaseKeys(dealLogs, { deep: true });
+      setDealLogs(camelCaseDealLogs);
     } catch (error) {
       ErrorService.handleApiError(error, "useViewDealPage.fetchDealLogs");
     } finally {
@@ -398,7 +409,7 @@ export const useViewDealPage = () => {
     dealLogs,
     isFetchingDealLogs,
     refreshDeal: fetchDealData,
-    
+    fetchDealLogs,
     // Members
     members,
     membersLoading,

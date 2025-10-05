@@ -3,17 +3,13 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { 
   ArrowLeft, 
   Save, 
-  Eye, 
-  EyeOff,
   AlertCircle,
-  CheckCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useDealForm } from '@/hooks/useDealForm';
-import { DealSectionName, CompleteDealForm } from '@/types/deal/Deal.sections';
+import { DealSectionName } from '@/types/deal/Deal.sections';
 import { getSectionFormKey } from '@/utility/SectionMappingUtils';
-import { DealStatus } from '@/types/deal/Deal.enums';
 import { useCreateEditDeal } from '@/hooks/useCreateEditDeal';
 import { DealSectionsService } from '@/services/deals/DealSectionsService';
 import { useDocumentUpload } from '@/hooks/useDocumentUpload';
@@ -36,7 +32,6 @@ export const DealFormPage: React.FC<DealFormPageProps> = ({ mode }) => {
   const { dealId } = useParams<{ dealId: string }>();
   const [activeTab, setActiveTab] = useState<DealSectionName>(DealSectionName.BASIC_INFO);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showMobileSections, setShowMobileSections] = useState(false);
 
   const {
     formData,

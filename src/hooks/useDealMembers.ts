@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DealMemberService } from '@/services/deals/DealMemberService';
 import { ProfileService } from '@/services/ProfileService';
 import { getSignedProfileImageUrl } from '@/utility/Utility';
@@ -57,6 +57,10 @@ export const useDealMembers = (dealId: string) => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchDealMembers();
+  }, [dealId]);
 
   // Delete a member from the deal
   const deleteMember = async (member: Contributor, userId: string) => {

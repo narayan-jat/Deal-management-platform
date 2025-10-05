@@ -10,15 +10,14 @@ import { useUserProfile } from '@/context/UserProfileProvider';
 import { useDocumentUpload } from './useDocumentUpload';
 import camelcaseKeys from 'camelcase-keys';
 import { getSignedProfileImageUrl } from '@/utility/Utility';
+import { DealModel } from '@/types/deal';
 
 export const useManageDeals = () => {
-  const [draftDeals, setDraftDeals] = useState<DealCardType[]>([]);
+  const [draftDeals, setDraftDeals] = useState<Partial<DealModel>[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
-  const { userProfile } = useUserProfile();
-  const { getDealDocuments } = useDocumentUpload();
-
+  
   const fetchDraftDeals = async () => {
     if (!user?.id) {
       setError('User not found');
@@ -36,60 +35,7 @@ export const useManageDeals = () => {
       // Filter for draft deals only
       const draftDealsData = deals.filter(deal => deal.status === DealStatus.DRAFT);
 
-      // Enrich deals with member and document information
-      const enrichedDeals = await Promise.all(
-        draftDealsData.map(async (deal) => {
-          try {
-            // Get deal members
-            const dealMembers = await DealMemberService.getDealMembers(deal.id);
-            const contributors = await Promise.all(
-              dealMembers.map(async (member) => {
-                try {
-                  const memberDetails = await ProfileService.getProfile(member.member_id);
-                  if (!memberDetails) return null;
-                  return {
-                    id: memberDetails.id,
-                    name: memberDetails.first_name + ' ' + memberDetails.last_name,
-                    email: memberDetails.email,
-                    title: memberDetails.title,
-                    profilePath: await getSignedProfileImageUrl(memberDetails.profile_path),
-                    role: member.role,
-                  };
-                } catch (error) {
-                  ErrorService.handleApiError(error, "useManageDeals");
-                  return null;
-                }
-              })
-            );
-
-            // Get deal documents
-            const dealDocuments = await getDealDocuments(deal.id);
-            const documents = dealDocuments.map((document) => ({
-              id: document.id,
-              fileName: document.file_name,
-              filePath: document.file_path,
-              mimeType: document.mime_type,
-              signatureStatus: document.signature_status,
-              uploadedAt: document.uploaded_at,
-              uploadedBy: document.uploaded_by,
-            }));
-
-            // Return enriched deal
-            return {
-              ...deal,
-              contributors: contributors.filter(Boolean),
-              documents,
-            };
-          } catch (error) {
-            ErrorService.handleApiError(error, "useManageDeals");
-            return null;
-          }
-        })
-      );
-
-      // Filter out null values and convert to camelCase
-      const validDeals = enrichedDeals.filter(Boolean);
-      const camelCaseDeals = camelcaseKeys(validDeals, { deep: true }) as DealCardType[];
+      const camelCaseDeals = camelcaseKeys(draftDealsData, { deep: true }) as Partial<DealModel>[];
       
       setDraftDeals(camelCaseDeals);
     } catch (error) {
