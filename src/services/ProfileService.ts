@@ -41,7 +41,6 @@ export class ProfileService {
    */
   static async updateProfile(userId: string, profileData: Partial<ProfileEditFormType>) {
     try {
-      console.log("userId", userId);
       // convert the data to camelcase
       const snakeCaseProfileData = snakecaseKeys(profileData, { deep: true });
       const { data, error } = await supabase

@@ -13,13 +13,11 @@ export interface ExtractedDocument {
  */
 export const extractDocumentsFromFormData = (formData: any): ExtractedDocument[] => {
   const extractedDocuments: ExtractedDocument[] = [];
-  console.log('Extracting documents from form data:', formData);
 
   // Extract documents from top-level sections
   if (formData.documents) {
     Object.entries(formData.documents).forEach(([sectionName, documents]) => {
       if (Array.isArray(documents)) {
-        console.log(`Found ${documents.length} documents in section ${sectionName}`);
         documents.forEach((doc: any) => {
           // Handle both old format (UploadDocumentForm) and new format (with form_category, itemId)
           const documentData = doc.file ? doc : null;
@@ -42,7 +40,6 @@ export const extractDocumentsFromFormData = (formData: any): ExtractedDocument[]
   // Note: Financials documents are now handled through the main documents array
   // with proper form_category structure (HISTORICAL, PROJECTED)
 
-  console.log(`Total extracted documents: ${extractedDocuments.length}`);
   return extractedDocuments;
 };
 

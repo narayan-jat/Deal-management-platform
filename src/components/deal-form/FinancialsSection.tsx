@@ -36,10 +36,7 @@ export const FinancialsSection: React.FC<FinancialsSectionProps> = ({
   onDeleteDocument,
   documents = []
 }) => {
-  console.log(' financials data', data);
   const handleInputChange = (field: keyof DealFinancialsForm, value: string | number) => {
-    console.log('financials value', value);
-    console.log('financials field', field);
     onChange({
       ...data,
       [field]: value
@@ -54,10 +51,6 @@ export const FinancialsSection: React.FC<FinancialsSectionProps> = ({
       itemId: undefined
     }));
 
-    console.log('FinancialsSection - handleHistoricalDocumentUpload:', {
-      uploadedDocuments,
-      categorizedDocuments
-    });
 
     // Update the main documents array through the parent component
     if (onDocumentUpload) {
@@ -75,10 +68,6 @@ export const FinancialsSection: React.FC<FinancialsSectionProps> = ({
       itemId: undefined
     }));
 
-    console.log('FinancialsSection - handleProjectedDocumentUpload:', {
-      uploadedDocuments,
-      categorizedDocuments
-    });
 
     // Update the main documents array through the parent component
     if (onDocumentUpload) {
@@ -182,7 +171,6 @@ export const FinancialsSection: React.FC<FinancialsSectionProps> = ({
                 organizationId={organizationId}
                 onUpload={handleHistoricalDocumentUpload}
                 onSuccess={(uploadedDocuments) => {
-                  console.log('Historical financials uploaded:', uploadedDocuments);
                 }}
                 className="w-full"
                 buttonText="Upload Historical Financials"
@@ -232,7 +220,6 @@ export const FinancialsSection: React.FC<FinancialsSectionProps> = ({
                 organizationId={organizationId}
                 onUpload={handleProjectedDocumentUpload}
                 onSuccess={(uploadedDocuments) => {
-                  console.log('Projected financials uploaded:', uploadedDocuments);
                 }}
                 className="w-full"
                 buttonText="Upload Projected Financials"

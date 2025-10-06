@@ -140,7 +140,6 @@ export const useAddCollaboratorsModal = (dealId: string) => {
         invitedBy: userProfile?.id || ""
       }));
 
-      console.log("invites", invites)
       // Make a call to the edge function to send the invites.
       const response = await axios.post(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-email-invite`, {
         invites
@@ -156,7 +155,6 @@ export const useAddCollaboratorsModal = (dealId: string) => {
         return;
       }
       
-      console.log("response", response)
       toast.success(`Invited ${emailList.length} user(s)`);
       setEmails("");
       setEmailRole(DealMemberRole.VIEWER);

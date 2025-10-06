@@ -181,7 +181,6 @@ export const CollateralSection: React.FC<CollateralSectionProps> = ({
       itemId: itemId
     }));
 
-    console.log("categorizedDocuments", categorizedDocuments);
 
     // Update the main documents array through the parent component
     if (onDocumentUpload) {
@@ -757,7 +756,6 @@ export const CollateralSection: React.FC<CollateralSectionProps> = ({
                     return uploadedDocuments;
                   }}
                   onSuccess={(uploadedDocuments) => {
-                    console.log('Collateral item documents uploaded:', uploadedDocuments);
                   }}
                   className="w-full"
                   buttonText="Upload Documents"

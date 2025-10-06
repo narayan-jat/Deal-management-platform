@@ -68,7 +68,6 @@ export const useDealForm = ({
         setLoading(true);
         const completeDeal = await DealService.getCompleteDeal(dealId);
         
-        console.log('completeDeal', completeDeal);
         // Convert the complete deal data to form format
         const formData = {
           // Basic deal info

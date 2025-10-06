@@ -38,7 +38,6 @@ export default function ProfileEditForm({ data, open, onOpenChange, handleUpload
 
   const handleSubmit = async () => {
     try {
-      console.log("Submitting form with data:", form);
       await handleUpdateProfile(form);
       onOpenChange(false);
     } catch (error) {

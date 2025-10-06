@@ -54,7 +54,6 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
   deal
 }) => {
   const { user } = useAuth();
-  console.log("ismentionopen", isMentionDropdownOpen)
   // Check if current user can comment on the deal
   const canComment = user ? canUserCommentOnDeal(user.id, deal.members || []) : false;
   return (

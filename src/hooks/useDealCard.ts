@@ -206,7 +206,6 @@ export const useDealCard = ({
       
       // Double click - enable drag and drop mode
       // This could trigger a visual indicator or enable drag mode
-      console.log('Double click detected - drag mode enabled');
       // You can add logic here to enable drag mode or show visual feedback
       
       clickCountRef.current = 0;
@@ -225,7 +224,6 @@ export const useDealCard = ({
     }
     
     // Double click - enable drag and drop mode
-    console.log('Double click detected - drag mode enabled');
     // You can add logic here to enable drag mode or show visual feedback
   };
 

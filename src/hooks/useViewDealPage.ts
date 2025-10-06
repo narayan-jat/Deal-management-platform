@@ -51,7 +51,6 @@ export const useViewDealPage = () => {
   const [documentsBySection, setDocumentsBySection] = useState<{ [key: string]: any[] }>({});
   const [loadingDocuments, setLoadingDocuments] = useState(false);
 
-  console.log("Documents by section state:", documentsBySection);
   // Use the centralized comment hook
   const { 
     comments: dealComments, 

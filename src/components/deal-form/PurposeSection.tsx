@@ -150,7 +150,7 @@ export const PurposeSection: React.FC<PurposeSectionProps> = ({
                   return uploadedDocuments;
                 }}
                 onSuccess={(uploadedDocuments) => {
-                  console.log('Purpose documents uploaded:', uploadedDocuments);
+                  // ...existing code...
                 }}
                 className="w-full"
                 buttonText="Upload Documents"

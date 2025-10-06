@@ -75,11 +75,10 @@ export const sendOverviewEmailInvites = async (
     const invites = await prepareEmailInvites(overviewData, dealId, invitedBy);
     
     if (invites.length === 0) {
-      console.log('No new email invites to send');
       return { success: 0, failed: 0 };
     }
     
-    console.log(`Sending ${invites.length} email invites:`, invites);
+  // ...existing code...
     
     const result = await InviteService.sendEmailInvites(invites);
     

@@ -24,7 +24,6 @@ export const CollateralSection: React.FC<CollateralSectionProps> = ({
   // Collect all documents from all collateral items
   const allCollateralDocuments = documents;
 
-  console.log(collateralData);
   return (
     <div className="space-y-6">
       <h4 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">

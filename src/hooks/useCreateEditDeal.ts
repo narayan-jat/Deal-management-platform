@@ -108,7 +108,6 @@ export const useCreateEditDeal = () => {
         );
         
         if (inviteResult.success > 0) {
-          console.log(`Successfully sent ${inviteResult.success} email invites`);
         }
         if (inviteResult.failed > 0) {
           toast.error(`Failed to send ${inviteResult.failed} email invites`);
@@ -219,7 +218,6 @@ export const useCreateEditDeal = () => {
         );
         
         if (inviteResult.success > 0) {
-          console.log(`Successfully sent ${inviteResult.success} email invites`);
         }
         if (inviteResult.failed > 0) {
           toast.error(`Failed to send ${inviteResult.failed} email invites`);
