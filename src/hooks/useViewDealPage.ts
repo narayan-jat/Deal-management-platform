@@ -13,6 +13,7 @@ import { ErrorService } from '@/services/ErrorService';
 import { toast } from 'sonner';
 import { DealLogService } from '@/services/deals/DealLogService';
 import camelcaseKeys from 'camelcase-keys';
+import { DocumentStorageService } from '@/services/DocumentStorageService';
 
 export const useViewDealPage = () => {
   const { dealId } = useParams<{ dealId: string }>();
@@ -50,6 +51,7 @@ export const useViewDealPage = () => {
   const [documentsBySection, setDocumentsBySection] = useState<{ [key: string]: any[] }>({});
   const [loadingDocuments, setLoadingDocuments] = useState(false);
 
+  console.log("Documents by section state:", documentsBySection);
   // Use the centralized comment hook
   const { 
     comments: dealComments, 
@@ -208,10 +210,23 @@ export const useViewDealPage = () => {
   };
 
   // Handle document download
-  const handleDocumentDownload = async (documentId: string, fileName: string) => {
+  const handleDocumentDownload = async (documentToBeDownloaded: any) => {
     try {
-      // TODO: Implement document download
-      toast.info('Document download not implemented yet');
+      // Get signed URL for download
+      const signedUrl = await DocumentStorageService.getDocumentSignedUrl(documentToBeDownloaded.filePath);
+      // Fetch the file as a blob
+      const response = await fetch(signedUrl);
+      if (!response.ok) throw new Error('Failed to fetch document');
+      const blob = await response.blob();
+      // Create a temporary link to trigger download
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = documentToBeDownloaded.fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(link.href);
+      toast.success('Download started');
     } catch (error) {
       ErrorService.handleApiError(error, "useViewDealPage.handleDocumentDownload");
       toast.error('Failed to download document');
@@ -219,10 +234,13 @@ export const useViewDealPage = () => {
   };
 
   // Handle document preview
-  const handleDocumentPreview = async (documentId: string) => {
+  const handleDocumentPreview = async (document: any) => {
     try {
-      // TODO: Implement document preview
-      toast.info('Document preview not implemented yet');
+      // Get signed URL for preview
+      const signedUrl = await DocumentStorageService.getDocumentSignedUrl(document.filePath);
+      // Open in new tab
+      window.open(signedUrl, '_blank');
+      toast.success('Preview opened in new tab');
     } catch (error) {
       ErrorService.handleApiError(error, "useViewDealPage.handleDocumentPreview");
       toast.error('Failed to preview document');

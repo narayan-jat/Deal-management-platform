@@ -45,8 +45,8 @@ interface ViewDealTabsProps {
   documentsBySection: { [key: string]: any[] };
   loadingDocuments: boolean;
   loadDocumentsBySection: () => Promise<void>;
-  handleDocumentDownload: (documentId: string, fileName: string) => Promise<void>;
-  handleDocumentPreview: (documentId: string) => Promise<void>;
+  handleDocumentDownload: (document: any) => Promise<void>;
+  handleDocumentPreview: (document: any) => Promise<void>;
   updateDealDocuments: (dealId: string, documents: any[], organizationId: string, sectionName: string) => Promise<any[]>;
   
   // Comments
@@ -152,8 +152,8 @@ export default function ViewDealTabs({
         return (
           <BasicInfoSection 
             deal={deal as any} 
-            onDocumentPreview={(document: any) => handleDocumentPreview(document.id)}
-            onDocumentDownload={(document: any) => handleDocumentDownload(document.id, document.fileName)}
+            onDocumentPreview={(document: any) => handleDocumentPreview(document)}
+            onDocumentDownload={(document: any) => handleDocumentDownload(document)}
             documents={documentsBySection['BASIC_INFO'] || []}
           />
         );
@@ -162,8 +162,8 @@ export default function ViewDealTabs({
           <OverviewSection
             overviewData={sectionsData.overview}
             deal={deal as any}
-            onDocumentPreview={(document: any) => handleDocumentPreview(document.id)}
-            onDocumentDownload={(document: any) => handleDocumentDownload(document.id, document.fileName)}
+            onDocumentPreview={(document: any) => handleDocumentPreview(document)}
+            onDocumentDownload={(document: any) => handleDocumentDownload(document)}
             documents={documentsBySection['OVERVIEW'] || []}
           />
         );
@@ -172,8 +172,8 @@ export default function ViewDealTabs({
           <PurposeSection
             purposeData={sectionsData.purpose}
             deal={deal as any}
-            onDocumentPreview={(document: any) => handleDocumentPreview(document.id)}
-            onDocumentDownload={(document: any) => handleDocumentDownload(document.id, document.fileName)}
+            onDocumentPreview={(document: any) => handleDocumentPreview(document)}
+            onDocumentDownload={(document: any) => handleDocumentDownload(document)}
             documents={documentsBySection['PURPOSE'] || []}
           />
         );
@@ -182,8 +182,8 @@ export default function ViewDealTabs({
           <CollateralSection
             collateralData={sectionsData.collateral}
             deal={deal as any}
-            onDocumentPreview={(document: any) => handleDocumentPreview(document.id)}
-            onDocumentDownload={(document: any) => handleDocumentDownload(document.id, document.fileName)}
+            onDocumentPreview={(document: any) => handleDocumentPreview(document)}
+            onDocumentDownload={(document: any) => handleDocumentDownload(document)}
             documents={documentsBySection['COLLATERAL'] || []}
           />
         );
@@ -192,8 +192,8 @@ export default function ViewDealTabs({
           <FinancialsSection
             financialsData={sectionsData.financials}
             deal={deal as any}
-            onDocumentPreview={(document: any) => handleDocumentPreview(document.id)}
-            onDocumentDownload={(document: any) => handleDocumentDownload(document.id, document.fileName)}
+            onDocumentPreview={(document: any) => handleDocumentPreview(document)}
+            onDocumentDownload={(document: any) => handleDocumentDownload(document)}
             documents={documentsBySection['FINANCIALS'] || []}
           />
         );
@@ -202,8 +202,8 @@ export default function ViewDealTabs({
           <NextStepsSection
             nextStepsData={sectionsData.nextSteps}
             deal={deal as any}
-            onDocumentPreview={(document: any) => handleDocumentPreview(document.id)}
-            onDocumentDownload={(document: any) => handleDocumentDownload(document.id, document.fileName)}
+            onDocumentPreview={(document: any) => handleDocumentPreview(document)}
+            onDocumentDownload={(document: any) => handleDocumentDownload(document)}
             documents={documentsBySection['NEXT_STEPS'] || []}
           />
         );

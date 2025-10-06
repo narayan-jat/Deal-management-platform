@@ -94,12 +94,8 @@ export default function ViewDealPage() {
         documentsBySection={documentsBySection}
         loadingDocuments={loadingDocuments}
         loadDocumentsBySection={loadDocumentsBySection}
-        handleDocumentDownload={async (document: any) => {
-          await handleDocumentDownload(document.id, document.fileName);
-        }}
-        handleDocumentPreview={async (document: any) => {
-          await handleDocumentPreview(document.id);
-        }}
+        handleDocumentDownload={handleDocumentDownload}
+        handleDocumentPreview={handleDocumentPreview}
         updateDealDocuments={updateDealDocuments}
         dealComments={dealComments}
         isFetchingDealComments={isFetchingDealComments}
