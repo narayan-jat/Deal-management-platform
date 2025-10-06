@@ -1,11 +1,9 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useAuth } from './AuthProvider';
 import { UserProfileContextType, UserProfileData, UserOrganization } from '@/types/UserProfile';
-import { ProfileData } from '@/types/Profile';
 import { ProfileService } from '@/services/ProfileService';
 import { OrganizationMemberService } from '@/services/organization/OrganizationMemberService';
 import { OrganizationService } from '@/services/organization/OrganizationService';
-import { Organization } from '@/types/organization/Organization.model';
 import { ErrorService } from '@/services/ErrorService';
 import camelcaseKeys from 'camelcase-keys';
 const UserProfileContext = createContext<UserProfileContextType | undefined>(undefined);

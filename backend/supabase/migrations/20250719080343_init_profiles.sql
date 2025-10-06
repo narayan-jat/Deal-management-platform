@@ -1,13 +1,5 @@
 
 -- =====================================================
--- DROP EXISTING TABLES (in reverse dependency order)
--- =====================================================
-
--- Note: Dropping of tables, types, and policies is only done because in
--- development, phase things changes but please remove these in production.
-DROP TABLE IF EXISTS profiles CASCADE;
-
--- =====================================================
 -- CREATE TABLE
 -- =====================================================
 CREATE TABLE profiles (
@@ -24,11 +16,6 @@ CREATE TABLE profiles (
 
 -- Enable RLS
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Authenticated users can view any profile" ON profiles;
-DROP POLICY IF EXISTS "Users can update their own profile" ON profiles;
-DROP POLICY IF EXISTS "Users can insert their own profile" ON profiles;
-DROP POLICY IF EXISTS "Users can delete their own profile" ON profiles;
 
 -- Allow all authenticated users to view profiles
 CREATE POLICY "Authenticated users can view any profile"
@@ -54,8 +41,6 @@ CREATE POLICY "Users can delete their own profile"
   ON profiles
   FOR DELETE
   USING (auth.uid() = id);
-
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 
 -- Function to create profile on signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()

@@ -1,5 +1,5 @@
 import supabase from "@/lib/supabase";
-import { DealModel, DealMemberModel, DealDocumentModel, UploadDocumentForm } from "@/types/deal";
+import { DealModel, DealMemberModel } from "@/types/deal";
 import { DealSectionName, CompleteDealForm } from "@/types/deal/Deal.sections";
 import { ErrorService } from "../ErrorService";
 import snakecaseKeys from 'snakecase-keys';

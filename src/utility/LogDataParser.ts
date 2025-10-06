@@ -2,26 +2,6 @@
 // LOG DATA PARSER UTILITY
 // =====================================================
 
-// Note: Log data format we follow is as follows:
-// logData: {
-//   deal: {
-//     [columns]: [values],
-//     action: "deal updated",
-//   },
-//   members: {
-//     [columns]: [values],
-//     action: "member added",
-//   },
-//   comments: {
-//     [columns]: [values],
-//     action: "comment added",
-//   },
-//   documents: {
-//     [columns]: [values],
-//     action: "document added",
-//   },
-// }
-
 
 /**
  * Parses log data and returns a descriptive keyword based on the action performed

@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { 
   Users, 
-  DollarSign, 
   Percent, 
-  Tag,
   Plus,
   X,
   Calculator,
@@ -12,16 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import CurrencyInput from 'react-currency-input-field';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { DocumentUploadButton } from '@/components/builder-dashboard/DocumentUploadButton';
 import { DealOverviewForm, PersonTag, PersonTagType, Rate } from '@/types/deal/Deal.sections';
-import { DealStatus } from '@/types/deal/Deal.enums';
 import { createPersonTag, createSingleRate, createRangeRate } from '@/utility/DealFormUtils';
 
 interface OverviewSectionProps {

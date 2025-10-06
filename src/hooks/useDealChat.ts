@@ -76,7 +76,7 @@ export function useDealChat() {
   const createDealRoom = useCallback(async (client: MatrixClient, deal: DealCardType): Promise<string | null> => {
     try {
       // Extract Matrix user IDs from deal members
-      const memberUserIds = deal.contributors
+      const memberUserIds = deal.members
         .map(member => member.id)
         .filter((userId) => userId !== user?.id); // Filter out any undefined/null values
 

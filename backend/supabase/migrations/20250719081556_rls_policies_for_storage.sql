@@ -1,14 +1,3 @@
--- =====================================================
--- DROP EXISTING POLICIES
--- =====================================================
-
--- Note: Dropping of tables, types, and policies is only done because in
--- development, phase things changes but please remove these in production.
-DROP POLICY IF EXISTS "Anyone can read profile images" ON storage.objects;
-DROP POLICY IF EXISTS "Owner can upload" ON storage.objects;
-DROP POLICY IF EXISTS "Owner can update" ON storage.objects;
-DROP POLICY IF EXISTS "Owner can delete" ON storage.objects;
-
 -- Anyone logged in can read profile images
 CREATE POLICY "Anyone can read profile images"
 ON storage.objects

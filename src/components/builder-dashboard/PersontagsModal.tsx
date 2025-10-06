@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, User, Mail, Crown, Edit, Eye, MessageSquare } from "lucide-react";
+import { Search, User, Mail, Crown, Edit, MessageSquare } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { PersonTag, PersonTagType } from "@/types/deal/Deal.sections";
 

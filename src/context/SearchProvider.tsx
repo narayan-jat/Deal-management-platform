@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { DealCardType } from '@/types/deal/DealCard';
-
 interface SearchContextType {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
@@ -48,14 +47,8 @@ export const SearchProvider: React.FC<SearchProviderProps> = ({ children }) => {
         return true;
       }
       
-      // Search by requested amount (convert to string for search)
-      const amountString = deal.requestedAmount.toString();
-      if (amountString.includes(query)) {
-        return true;
-      }
-      
       // search by contributors
-      if (deal.contributors.some((contributor) => contributor.name.toLowerCase().includes(query))) {
+      if (deal.members.some((member) => member.name.toLowerCase().includes(query))) {
         return true;
       }
 

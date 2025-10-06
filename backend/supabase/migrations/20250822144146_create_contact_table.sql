@@ -3,14 +3,6 @@
 -- =====================================================
 
 -- =====================================================
--- DROP EXISTING TABLES (in reverse dependency order)
--- =====================================================
-
--- Note: Dropping of tables, types, and policies is only done because in
--- development, phase things changes but please remove these in production.
-DROP TABLE IF EXISTS contacts CASCADE;
-
--- =====================================================
 -- CREATE TABLE
 -- =====================================================
 CREATE TABLE contacts (
@@ -23,11 +15,6 @@ CREATE TABLE contacts (
 -- =====================================================
 -- CREATE TABLE POLICIES
 -- =====================================================
-
-DROP POLICY IF EXISTS "Allow authenticated users to read anyone's contact" ON contacts;
-DROP POLICY IF EXISTS "Allow users to insert their own contact" ON contacts;
-DROP POLICY IF EXISTS "Allow users to update their own contact" ON contacts;
-DROP POLICY IF EXISTS "Allow users to delete their own contact" ON contacts;
 
 ALTER TABLE contacts ENABLE ROW LEVEL SECURITY;
 

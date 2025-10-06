@@ -1,7 +1,5 @@
 import {
-  Calendar,
   Users,
-  DollarSign,
   Building2,
   Edit,
   UserPlus,
@@ -56,8 +54,6 @@ export default function DealCard(props: DealCardProps) {
     handleCollaboratorsClick,
     handleBorrowersClick,
     handleInviteClick,
-    handleInviteCollaborators,
-    handleCollaboratorRemoved,
     handleCardClick,
     handleCardDoubleClick,
     handleEditClick,
@@ -65,7 +61,6 @@ export default function DealCard(props: DealCardProps) {
     closeCollaboratorsModal,
     closeInviteModal,
     formatMeetingDate,
-    createDealContent,
     closeBorrowersModal,
     refreshDealContent,
   } = useDealCard({
@@ -119,8 +114,7 @@ export default function DealCard(props: DealCardProps) {
             <>
               <button
                 onClick={handleChatClick}
-                className="absolute top-0  p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
-                style={{ right: "4.2rem" }}
+                className="absolute top-0 right-10 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
                 title="Chat"
                 data-dnd-kit-disabled-draggable
               >
@@ -139,7 +133,7 @@ export default function DealCard(props: DealCardProps) {
             <>
               <button
                 onClick={handleChatClick}
-                className="absolute top-0 right-10 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
+                className="absolute top-0 right-3 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
                 title="Chat"
                 data-dnd-kit-disabled-draggable
               >

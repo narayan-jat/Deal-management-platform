@@ -1,11 +1,8 @@
 import { ErrorService } from "@/services/ErrorService";
-import { MatrixUserService } from "@/services/MatrixUserService";
 import { useEffect, useState, useRef, useMemo, useCallback } from "react";
-import { useAuth } from "@/context/AuthProvider";
-import { useNavigate } from "react-router-dom";
 import { MatrixClient } from "matrix-js-sdk";
 import { toast } from "sonner";
-import { MatrixCreateRoomOptions, MatrixRoom, MatrixMessage } from "@/types/Matrix";
+import { MatrixRoom, MatrixMessage } from "@/types/Matrix";
 import { MatrixService } from "@/services/MatrixService";
 import { useDirectChats } from "./useDirectChats";
 
@@ -14,7 +11,6 @@ import { useDirectChats } from "./useDirectChats";
 // - Subscribe to Room.timeline for new messages
 // - Get unread counts from Matrix API
 export function useMessages() {
-  const { user } = useAuth();
   const { rooms } = useDirectChats();
   const [currentRoomId, setCurrentRoomId] = useState<string | null>(null);
   const [roomMessagesMap, setRoomMessagesMap] = useState<Map<string, MatrixMessage[]>>(new Map());

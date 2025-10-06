@@ -1,14 +1,6 @@
 --================================
 -- create table for organizations
 --================================
--- Note: Dropping of tables, types, and policies is only done because in
--- development, phase things changes but please remove these in production.
--- Drop table if it exists
-DROP TABLE IF EXISTS organizations CASCADE;
-DROP TYPE IF EXISTS organization_role CASCADE;
-DROP TABLE IF EXISTS organization_members CASCADE;
-DROP TYPE IF EXISTS organization_role CASCADE;
-
 -- Create enum for organization roles
 CREATE TYPE organization_role AS ENUM ('LEADER', 'ADMIN', 'MEMBER');
 
@@ -35,17 +27,6 @@ CREATE TABLE organization_members (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (organization_id, member_id)
 );
-
--- Drop policies if they exist
-DROP POLICY IF EXISTS "Users can view their own organisations" ON organizations;
-DROP POLICY IF EXISTS "Users can insert their own organisations" ON organizations;
-DROP POLICY IF EXISTS "Only Leaders and Admins can update their own organisations" ON organizations;
-DROP POLICY IF EXISTS "Only Leaders and Admins can delete their own organisations" ON organizations;
-
-DROP POLICY IF EXISTS "Users can view their own organisation members" ON organization_members;
-DROP POLICY IF EXISTS "Only Leaders and Admins can insert members" ON organization_members;
-DROP POLICY IF EXISTS "Only Leaders and Admins can update members" ON organization_members;
-DROP POLICY IF EXISTS "Only Leaders and Admins can delete members" ON organization_members;
 
 --================================
 -- Policies for table organisation

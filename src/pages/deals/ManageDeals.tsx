@@ -14,13 +14,9 @@ import {
   Plus, 
   Search, 
   Eye, 
-  Calendar, 
-  DollarSign, 
   Building2,
   LocateIcon,
-  Locate
 } from "lucide-react";
-import { formatDate } from "@/utility/Utility";
 import { useNavigate } from "react-router-dom";
 import { useManageDeals } from "@/hooks/useManageDeals";
 import DotLoader from "@/components/ui/loader";
@@ -197,7 +193,6 @@ export default function ManageDeals() {
           </div>
         </div>
       </div>
-
     </div>
   );
 }

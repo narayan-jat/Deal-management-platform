@@ -1,15 +1,9 @@
 import { useState, useEffect } from 'react';
-import { DealCardType } from '@/types/deal/DealCard';
 import { DealStatus } from '@/types/deal/Deal.enums';
 import { DealService } from '@/services/deals/DealService';
-import { DealMemberService } from '@/services/deals/DealMemberService';
-import { ProfileService } from '@/services/ProfileService';
 import { ErrorService } from '@/services/ErrorService';
 import { useAuth } from '@/context/AuthProvider';
-import { useUserProfile } from '@/context/UserProfileProvider';
-import { useDocumentUpload } from './useDocumentUpload';
 import camelcaseKeys from 'camelcase-keys';
-import { getSignedProfileImageUrl } from '@/utility/Utility';
 import { DealModel } from '@/types/deal';
 
 export const useManageDeals = () => {

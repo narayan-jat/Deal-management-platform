@@ -3,17 +3,6 @@
 -- =====================================================
 
 -- =====================================================
--- DROP EXISTING TABLES (in reverse dependency order)
--- =====================================================
-
-DROP TABLE IF EXISTS deal_sections CASCADE;
-DROP TABLE IF EXISTS deal_overview CASCADE;
-DROP TABLE IF EXISTS deal_purpose CASCADE;
-DROP TABLE IF EXISTS deal_collateral CASCADE;
-DROP TABLE IF EXISTS deal_financials CASCADE;
-DROP TABLE IF EXISTS deal_next_steps CASCADE;
-
--- =====================================================
 -- CREATE DEAL SECTIONS TABLE
 -- =====================================================
 

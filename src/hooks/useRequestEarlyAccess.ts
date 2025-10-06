@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { EarlyAccessModel } from "@/types/EarlyAccess";
 import { toast } from "sonner";
 import axios from "axios";

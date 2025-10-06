@@ -1,5 +1,4 @@
 import supabase from "@/lib/supabase";
-import { ProfileEditFormType } from "@/types/Profile";
 import { ErrorService } from "./ErrorService";
 import snakecaseKeys from "snakecase-keys";
 import { MatrixUserModel } from "@/types/Matrix";

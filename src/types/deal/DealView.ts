@@ -2,9 +2,7 @@
 // Deal View Types
 //==========================
 
-import { DealModel } from "./Deal.model";
 import { DealDocument } from "./Deal.documents";
-import { DealMemberModel } from "./Deal.model";
 import { DealSectionModel } from "./Deal.sections";
 import { Contributor } from "./Deal.members";
 

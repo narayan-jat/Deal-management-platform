@@ -1,15 +1,12 @@
 import React from 'react';
 import { 
   Calendar, 
-  FileText,
-  Upload
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { CustomDatePicker } from '@/components/ui/DatePicker';
 import { DealNextStepsForm } from '@/types/deal/Deal.sections';
-import { DocumentUploadButton } from '@/components/builder-dashboard/DocumentUploadButton';
 
 interface NextStepsSectionProps {
   data: DealNextStepsForm;

@@ -9,7 +9,6 @@ import camelcaseKeys from 'camelcase-keys';
 import { DealMemberModel } from '@/types/deal/Deal.model';
 import { DealMemberService } from '@/services/deals/DealMemberService';
 import {debounce} from 'lodash';
-import { UserProfileData } from '@/types/UserProfile';
 import axios from 'axios';
 type TabType = "search" | "email" | "link";
 

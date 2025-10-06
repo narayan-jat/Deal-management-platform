@@ -82,7 +82,6 @@ export default function Dashboard() {
 
   const handleViewDeal = (deal: DealCardType) => {
     // Store the deal data temporarily so ViewDealPage can access it
-    sessionStorage.setItem('viewDealData', JSON.stringify(deal));
     navigate(`${ROUTES.DEALS}/${deal.id}`);
   };
 

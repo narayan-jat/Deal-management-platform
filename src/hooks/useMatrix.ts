@@ -3,7 +3,6 @@ import { MatrixUserService } from "@/services/MatrixUserService";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthProvider";
 import { useNavigate } from "react-router-dom";
-import { MatrixClient } from "matrix-js-sdk";
 import { toast } from "sonner";
 import { MatrixService } from "@/services/MatrixService";
 

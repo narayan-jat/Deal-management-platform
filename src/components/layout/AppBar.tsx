@@ -4,7 +4,6 @@ import {
   Search,
   Plus,
   Bell,
-  Heart,
   User,
   Lock,
   X,
@@ -13,7 +12,6 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthProvider';
 import { useSearch } from '@/context/SearchProvider';
-import { useCreateDeal } from '@/context/CreateDealProvider';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/config/routes';
 import logo from '@/assets/godex-logo.png';
@@ -25,7 +23,7 @@ interface AppBarProps {
 }
 
 export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
-  const { user, signOut } = useAuth();
+  const { signOut } = useAuth();
   const navigate = useNavigate();
   const { 
     searchQuery, 
@@ -34,7 +32,6 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
     setIsSearchActive 
   } = useSearch();
   const { unreadCount } = useNotifications();
-  const { openCreateDealModal } = useCreateDeal();
   
   // Profile dropdown state
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);

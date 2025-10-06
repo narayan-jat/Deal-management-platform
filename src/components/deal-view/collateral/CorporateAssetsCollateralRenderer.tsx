@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Building2, Users, FileText } from 'lucide-react';
+import { Shield, Users, FileText } from 'lucide-react';
 import { formatCurrency } from '@/utility/Utility';
 import { CorporateAssetsCollateralItem, DebtDetails } from '@/types/deal/Deal.sections';
 

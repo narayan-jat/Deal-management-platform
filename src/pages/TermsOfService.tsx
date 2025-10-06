@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import Header from "@/components/landing/Header";
 import { OtherExternalPageNavigationConfig } from "@/config/navigation";
 export default function TermsOfService() {

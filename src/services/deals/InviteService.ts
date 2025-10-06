@@ -1,10 +1,7 @@
 import supabase from "@/lib/supabase";
-import { DealMemberRole } from "@/types/deal/Deal.enums";
 import { ErrorService } from "../ErrorService";
 import snakecaseKeys from 'snakecase-keys';
-import { InviteForm, SharedLinkForm, SharedLink, UserSearchResult } from "@/types/deal/Deal.invites";
-import { DealService } from "./DealService";
-import { DealMemberModel } from "@/types/deal";
+import { InviteForm, SharedLinkForm, SharedLink } from "@/types/deal/Deal.invites";
 import { DealMemberService } from "./DealMemberService";
 import { DealLogService } from "./DealLogService";
 import { LogType } from "@/types/deal/Deal.enums";

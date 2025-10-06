@@ -3,14 +3,6 @@
 -- =====================================================
 
 -- =====================================================
--- DROP EXISTING TABLES (in reverse dependency order)
--- =====================================================
-
--- Note: Dropping of tables, types, and policies is only done because in
--- development, phase things changes but please remove these in production.
-DROP TABLE IF EXISTS notifications CASCADE;
-
--- =====================================================
 -- CREATE TABLE
 -- =====================================================
 CREATE TABLE notifications (
@@ -25,11 +17,6 @@ CREATE TABLE notifications (
 -- =====================================================
 -- CREATE TABLE POLICIES
 -- =====================================================
-
-DROP POLICY IF EXISTS "Allow authenticated users to read their own notifications" ON notifications;
-DROP POLICY IF EXISTS "Allow users to insert their own notifications" ON notifications;
-DROP POLICY IF EXISTS "Allow users to update their own notifications" ON notifications;
-DROP POLICY IF EXISTS "Allow users to delete their own notifications" ON notifications;
 
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 

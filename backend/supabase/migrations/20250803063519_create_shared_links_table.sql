@@ -3,14 +3,6 @@
 -- =====================================================
 
 -- =====================================================
--- DROP EXISTING TABLES (in reverse dependency order)
--- =====================================================
-
--- Note: Dropping of tables, types, and policies is only done because in
--- development, phase things changes but please remove these in production.
-DROP TABLE IF EXISTS shared_links CASCADE;
-
--- =====================================================
 -- CREATE TABLE
 -- =====================================================
 CREATE TABLE shared_links (
@@ -27,11 +19,6 @@ CREATE TABLE shared_links (
 -- =====================================================
 -- CREATE TABLE POLICIES
 -- =====================================================
-
-DROP POLICY IF EXISTS "Allow deal members to read their own shared links" ON shared_links;
-DROP POLICY IF EXISTS "Allow deal members with elevated roles to insert their own shared links" ON shared_links;
-DROP POLICY IF EXISTS "Allow deal members with elevated roles to update their own shared links" ON shared_links;
-DROP POLICY IF EXISTS "Allow deal members with elevated roles to delete their own shared links" ON shared_links;
 
 ALTER TABLE shared_links ENABLE ROW LEVEL SECURITY;
 

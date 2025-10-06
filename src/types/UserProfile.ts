@@ -1,5 +1,5 @@
 import { ProfileData } from './Profile';
-import { Organization, OrganizationMember, OrganizationRole } from './organization/Organization.model';
+import { Organization, OrganizationMember } from './organization/Organization.model';
 
 export interface UserProfileData extends ProfileData {
   // Extended profile information

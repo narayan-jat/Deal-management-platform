@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { DealModel, DealStatus } from '@/types/deal';
+import { DealModel } from '@/types/deal';
 import { DealService } from '@/services/deals/DealService';
 import { KanbanBoardColumns } from '@/types/KanbanBoard';
 import { DealMemberService } from '@/services/deals/DealMemberService';
@@ -13,7 +13,6 @@ import { useSearch } from '@/context/SearchProvider';
 import { createDealLogs } from './utils';
 import { LogType } from '@/types/deal/Deal.enums';
 import { getSignedProfileImageUrl } from '@/utility/Utility';
-import { DealSectionName } from '@/types/deal/Deal.sections';
 
 export const useDashboard = () => {
   const [initialDeals, setInitialDeals] = useState<KanbanBoardColumns>({

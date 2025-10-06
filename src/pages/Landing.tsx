@@ -7,7 +7,6 @@ import RequestAccessPopup from "@/components/landing/RequestAccessPopup";
 import Footer from "@/components/landing/Footer";
 import { homeNavigationConfig } from "@/config/navigation";
 import { toast } from "sonner";
-import { EarlyAccessModel } from "@/types/EarlyAccess";
 import { Contact } from "@/types/Contact";
 import useRequestEarlyAccess from "@/hooks/useRequestEarlyAccess";
 import axios from "axios";

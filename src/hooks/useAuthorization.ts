@@ -1,13 +1,7 @@
 import { useState } from "react";
-import supabase from "@/lib/supabase";
 import { SignUpFormType, SignInFormType } from "@/types/auth/Signup";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthProvider";
-import { ProfileService } from "@/services/ProfileService";
-import { OrganizationService } from "@/services/organization/OrganizationService";
-import { getUniqueOrgCode } from "./utils";
-import { OrganizationMemberService } from "@/services/organization/OrganizationMemberService";
-import { OrganizationRole } from "@/types/organization/Organization.model";
 import axios from "axios";
 import { useSearchParams } from "react-router-dom";
 import { ROUTES } from "@/config/routes";

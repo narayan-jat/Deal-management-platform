@@ -1,4 +1,4 @@
-import { X, Mail, Search, Copy, Link, Users, UserPlus, Share2, Clock, Trash2 } from "lucide-react";
+import { X, Mail, Search, Copy, Users, UserPlus, Share2, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,7 +28,6 @@ function AddCollaboratorsModal({ isOpen, onClose, dealId }: AddCollaboratorsModa
     activeTab,
     searchQuery,
     searchResults,
-    isSearching,
     selectedUsers,
     emails,
     emailRole,
@@ -309,29 +308,6 @@ function AddCollaboratorsModal({ isOpen, onClose, dealId }: AddCollaboratorsModa
                         </SelectContent>
                       </Select>
                     </div>
-
-                    {/* <div className="space-y-2">
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="allowEditing"
-                          checked={allowEditing}
-                          onCheckedChange={(checked) => setAllowEditing(checked as boolean)}
-                        />
-                        <label htmlFor="allowEditing" className="text-sm">
-                          Allow editing
-                        </label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="allowCommenting"
-                          checked={allowCommenting}
-                          onCheckedChange={(checked) => setAllowCommenting(checked as boolean)}
-                        />
-                        <label htmlFor="allowCommenting" className="text-sm">
-                          Allow commenting
-                        </label>
-                      </div>
-                    </div> */}
 
                     <Button
                       onClick={handleGenerateLink}

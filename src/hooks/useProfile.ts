@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { ProfileData, ProfileEditFormType } from "@/types/Profile";
+import { ProfileEditFormType } from "@/types/Profile";
 import { useAuth } from "@/context/AuthProvider";
 import { ProfileService, ProfileStorageService, ErrorService } from "@/services";
-import camelcaseKeys from "camelcase-keys";
 import { useUserProfile } from "@/context/UserProfileProvider";
 import { getSignedProfileImageUrl } from "@/utility/Utility";
 

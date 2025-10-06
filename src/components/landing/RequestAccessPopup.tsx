@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { EarlyAccessModel, EarlyAccessAccountType, EarlyAccessAccountTypeLabels } from "@/types/EarlyAccess";
+import { EarlyAccessModel, EarlyAccessAccountTypeLabels } from "@/types/EarlyAccess";
 
 interface RequestAccessPopupProps {
   isOpen: boolean;
@@ -181,4 +181,4 @@ export default function RequestAccessPopup({
       </DialogContent>
     </Dialog>
   );
-} 
+}

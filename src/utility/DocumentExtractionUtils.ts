@@ -1,6 +1,5 @@
-import { DealSectionName, CollateralItem, CollateralType } from '@/types/deal/Deal.sections';
+import { DealSectionName, CollateralItem } from '@/types/deal/Deal.sections';
 import { UploadDocumentForm } from '@/types/deal/Deal.documents';
-import { FinancialFormCategory } from '@/constants/DealFormConstants';
 
 export interface ExtractedDocument {
   document: UploadDocumentForm;

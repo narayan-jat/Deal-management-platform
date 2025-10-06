@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, Send } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { MatrixMessage } from "@/types/Matrix";
@@ -256,14 +255,6 @@ export default function ChatWindow({ currentUserId, title, avatar, messages, onS
         className="flex-1 overflow-y-auto bg-gray-50 px-4 py-4 space-y-4 min-h-0"
       >
         {renderMessages()}
-        
-        {/* Loading state
-        {messages.length === 0 && (
-          <div className="text-center text-gray-500 py-8">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-400 mx-auto mb-2"></div>
-            <p className="text-sm">Loading messages...</p>
-          </div>
-        )} */}
       </div>
 
       {/* Input Area - Fixed */}

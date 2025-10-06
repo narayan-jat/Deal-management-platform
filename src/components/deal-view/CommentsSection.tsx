@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { MessageCircle, Send, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';

@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { DealStatus } from '@/types/deal/Deal.enums';
 
 interface CreateDealContextType {
   isCreateDealModalOpen: boolean;

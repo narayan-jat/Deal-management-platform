@@ -1,4 +1,3 @@
-import { DealStatus } from './Deal.enums';
 import { InviteMemberForm } from './Deal.members';
 import { UploadDocumentForm } from './Deal.documents';
 import { CommentForm } from './Deal.comments';

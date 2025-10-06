@@ -4,8 +4,6 @@ import { Button } from "../ui/button";
 import { useState } from "react";
 import ProfileEditForm from "./ProfileForm";
 import defaultProfile from "@/assets/default-profile.png";
-import { UserProfileData } from "@/types/UserProfile";
-import { getSignedProfileImageUrl } from "@/utility/Utility";
 
 interface ProfileDisplayProps {
   data: ProfileEditFormType;

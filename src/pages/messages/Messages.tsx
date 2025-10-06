@@ -8,9 +8,7 @@ import { useMessages } from "@/hooks/useMessages";
 import { useDirectChats } from "@/hooks/useDirectChats";
 import { useMatrix } from "@/hooks/useMatrix";
 import { MatrixRoom } from "@/types/Matrix";
-import { MatrixService } from "@/services/MatrixService";
 import { MatrixRegistrationPopup } from "@/components/messages/MatrixRegistrationPopup";
-import { toast } from "sonner";
 
 export default function Messages() {
   const [isNewOpen, setIsNewOpen] = useState(false);
@@ -19,18 +17,14 @@ export default function Messages() {
   // useMessages hook provides all room/message state and actions
   const {
     rooms,
-    currentRoom,
     currentRoomId,
     setCurrentRoomId,
     currentMessages,
-    isLoadingMessages,
     getUnreadCount,
     clearUnread,
     sendMessage,
     getSenderName,
   } = useMessages();
-
-  const { startDirectChat } = useDirectChats();
 
   // Matrix registration and login flow
   const { 

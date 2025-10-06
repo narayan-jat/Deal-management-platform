@@ -6,27 +6,6 @@
 -- =====================================================
 
 -- =====================================================
--- DROP EXISTING TABLES (in reverse dependency order)
--- =====================================================
-
--- Note: Dropping of tables, types, and policies is only done because in
--- development, phase things changes but please remove these in production.
-DROP TABLE IF EXISTS deal_documents CASCADE;
-DROP TABLE IF EXISTS deal_comments CASCADE;
-DROP TABLE IF EXISTS deal_logs CASCADE;
-DROP TABLE IF EXISTS deal_permissions CASCADE;
-DROP TABLE IF EXISTS deal_members CASCADE;
-DROP TABLE IF EXISTS deals CASCADE;
-
--- =====================================================
--- DROP EXISTING ENUMS
--- =====================================================
-DROP TYPE IF EXISTS signature_status CASCADE;
-DROP TYPE IF EXISTS log_type CASCADE;
-DROP TYPE IF EXISTS deal_member_role CASCADE;
-DROP TYPE IF EXISTS deal_status CASCADE;
-
--- =====================================================
 -- ENUM DEFINITIONS
 -- =====================================================
 

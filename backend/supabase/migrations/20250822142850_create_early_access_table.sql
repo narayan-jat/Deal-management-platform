@@ -3,14 +3,6 @@
 -- =====================================================
 
 -- =====================================================
--- DROP EXISTING TABLES (in reverse dependency order)
--- =====================================================
-
--- Note: Dropping of tables, types, and policies is only done because in
--- development, phase things changes but please remove these in production.
-DROP TABLE IF EXISTS early_access CASCADE;
-
--- =====================================================
 -- CREATE TYPE
 -- =====================================================
 CREATE TYPE EarlyAccessAccountType AS ENUM ('LENDER', 'BORROWER', 'BROKER', 'OTHER');
@@ -32,12 +24,6 @@ CREATE TABLE early_access (
 -- =====================================================
 -- CREATE TABLE POLICIES
 -- =====================================================
-
-DROP POLICY IF EXISTS "Allow authenticated users to read anyone's early access" ON early_access;
-DROP POLICY IF EXISTS "Allow users to insert their own early access" ON early_access;
-DROP POLICY IF EXISTS "Allow users to update their own early access" ON early_access;
-DROP POLICY IF EXISTS "Allow users to delete their own early access" ON early_access;
-
 ALTER TABLE early_access ENABLE ROW LEVEL SECURITY;
 
 -- Create read policy.

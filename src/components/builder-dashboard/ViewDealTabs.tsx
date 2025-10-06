@@ -24,7 +24,6 @@ import { ActivityLogSection } from "@/components/deal-view/ActivityLogSection";
 import { CollaboratorsSection } from "@/components/deal-view/CollaboratorsSection";
 import { formatDate } from "@/utility/Utility";
 import { Separator } from "@radix-ui/react-select";
-import { Contributor } from "@/types/deal/Deal.members";
 
 interface ViewDealTabsProps {
   deal: DealViewType;

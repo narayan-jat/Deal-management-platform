@@ -1,4 +1,3 @@
-import { DealDocumentModel, DealMemberModel, DealModel } from "@/types/deal/Deal.model";
 import { DealLogService } from "@/services/deals/DealLogService";
 import { ErrorService } from "@/services/ErrorService";
 import { LogType } from "@/types/deal/Deal.enums";

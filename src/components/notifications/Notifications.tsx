@@ -2,7 +2,7 @@ import React from "react";
 import { useNotifications } from "@/hooks/useNotifications";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Bell, Check } from "lucide-react";
+import { Bell } from "lucide-react";
 
 export default function Notifications() {
   const { unreadCount, markAllAsRead } = useNotifications();

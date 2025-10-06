@@ -3,14 +3,6 @@
 -- =====================================================
 
 -- =====================================================
--- DROP EXISTING TABLES (in reverse dependency order)
--- =====================================================
-
--- Note: Dropping of tables, types, and policies is only done because in
--- development, phase things changes but please remove these in production.
-DROP TABLE IF EXISTS matrix_users CASCADE;
-
--- =====================================================
 -- CREATE TABLE
 -- =====================================================
 CREATE TABLE matrix_users (
@@ -26,12 +18,6 @@ CREATE TABLE matrix_users (
 -- =====================================================
 -- CREATE TABLE POLICIES
 -- =====================================================
-
-DROP POLICY IF EXISTS "Allow authenticated users to read anyone's matrix users" ON matrix_users;
-DROP POLICY IF EXISTS "Allow users to insert their own matrix users" ON matrix_users;
-DROP POLICY IF EXISTS "Allow users to update their own matrix users" ON matrix_users;
-DROP POLICY IF EXISTS "Allow users to delete their own matrix users" ON matrix_users;
-
 ALTER TABLE matrix_users ENABLE ROW LEVEL SECURITY;
 
 -- Create read policy.

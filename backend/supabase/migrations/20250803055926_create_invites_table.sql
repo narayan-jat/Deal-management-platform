@@ -2,15 +2,6 @@
 -- INVITES TABLE
 -- =====================================================
 
--- =====================================================
--- DROP EXISTING TABLES (in reverse dependency order)
--- =====================================================
-
--- Note: Dropping of tables, types, and policies is only done because in
--- development, phase things changes but please remove these in production.
-DROP TABLE IF EXISTS invites CASCADE;
-DROP TYPE IF EXISTS invite_status CASCADE;
-
 -- Create enum for invite status.
 CREATE TYPE invite_status AS ENUM ('PENDING', 'ACCEPTED', 'REJECTED');
 
@@ -32,12 +23,6 @@ CREATE TABLE invites (
 -- =====================================================
 -- CREATE TABLE POLICIES
 -- =====================================================
-
-DROP POLICY IF EXISTS "Allow invited users and deal members to read their own invites" ON invites;
-DROP POLICY IF EXISTS "Allow invited users and deal members with elevated roles to insert their own invites" ON invites;
-DROP POLICY IF EXISTS "Invited user can accept their own invite" ON invites;
-DROP POLICY IF EXISTS "Allow invited users and deal members with elevated roles to delete their own invites" ON invites;
-
 ALTER TABLE invites ENABLE ROW LEVEL SECURITY;
 
 -- Create read policy.

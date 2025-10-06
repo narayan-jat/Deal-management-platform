@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   DndContext,
   closestCenter,
@@ -26,7 +26,6 @@ import { useCreateDeal } from "@/context/CreateDealProvider";
 import { getPlural } from "./utils";
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/config/routes';
-import { DebtDetails } from '@/types/deal/Deal.sections';
 
 
 const columnNames = {
@@ -86,7 +85,7 @@ export default function KanbanBoard({
 }: KanbanBoardProps) {
   const navigate = useNavigate();
   const [dropPosition, setDropPosition] = useState<{ columnId: string; index: number } | null>(null);
-  const { setSelectedColumn, openCreateDealModal } = useCreateDeal();
+  const { setSelectedColumn } = useCreateDeal();
 
   // Configure sensors with proper activation constraints
   const sensors = useSensors(
@@ -208,13 +207,6 @@ export default function KanbanBoard({
                   ));
                 })()}
               </SortableContext>
-
-              {/* Show drop indicator at the end if column is empty or we're dropping at the end
-              {dropPosition?.columnId === key && dropPosition.index === cards.length && cards.length > 0 && (
-                <div className="text-sm italic text-blue-600 text-center py-2 border-2 border-dashed border-blue-400 rounded-lg bg-blue-50 mt-3">
-                  Drop here
-                </div>
-              )} */}
 
               {/* Empty state - only show when no deals and not being dragged over */}
               {cards.length === 0 && overId !== key && (
