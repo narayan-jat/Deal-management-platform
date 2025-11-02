@@ -167,11 +167,7 @@ export const DealFormPage: React.FC<DealFormPageProps> = ({ mode }) => {
     }
 
     const sectionData = formData[getSectionFormKey(activeTab)];
-    console.log('sectionData', sectionData);
-    console.log("formData", formData);
     const isEnabled = formData.sectionsEnabled[activeTab];
-    console.log('type of isEnabled', typeof isEnabled);
-    console.log('isEnabled', isEnabled);
 
     const documents = formData.documents[activeTab];
 

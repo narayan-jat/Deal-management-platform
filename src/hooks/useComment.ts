@@ -175,7 +175,6 @@ export const useComment = (deal: DealViewType) => {
         },
         type: "mentions",
       });
-      console.log("Notification sent")
     } catch (error) {
       setApiError(error.message);
       ErrorService.handleApiError(error, "useComment.handleMentionMember");
@@ -274,10 +273,8 @@ export const useComment = (deal: DealViewType) => {
       const createdComment = await handleCreateComment(newComment.trim());
       
       // Extract and process mentions from the comment text
-      console.log("createdComment", createdComment);
       if (createdComment) {
         const extractedMentions = extractMentions(newComment.trim(), deal.members || []);
-        console.log("extracted mentions", extractMentions)
         if (extractedMentions.length > 0) {
           for (const mention of extractedMentions) {
             await handleMentionMember(mention.memberId);

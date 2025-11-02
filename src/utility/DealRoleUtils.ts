@@ -15,7 +15,6 @@ import { editAccessRoles } from '@/Constants';
 export const canUserEditDeal = (userId: string, contributors: Contributor[]): boolean => {
   const userContributor = contributors.find(contributor => contributor.id === userId);
   
-  console.log('userContributor', userContributor);
   if (!userContributor) {
     return false;
   }
