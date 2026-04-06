@@ -18,7 +18,7 @@ export default function FeaturesSection({
   return (
     <div id="features">
       {/* Hero Banner */}
-      <div className="relative overflow-hidden bg-godex-primary py-20 sm:py-24 lg:py-32 w-full">
+      <div className="relative overflow-hidden bg-brand-primary py-20 sm:py-24 lg:py-32 w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-center text-3xl font-inter font-semibold text-white leading-tight sm:text-4xl lg:text-5xl">
             <p className="mb-4">Stop Chasing Emails.</p>
@@ -34,7 +34,7 @@ export default function FeaturesSection({
             Streamline your private credit workflow
           </h2>
           <p className="mb-12 text-lg font-inter leading-relaxed text-gray-600 lg:mb-16">
-            GoDex is the all-in-one platform for private credit professionals.
+            Deal Management is the all-in-one platform for private credit professionals.
             From deal creation to collaboration, we've got you covered
           </p>
           
@@ -72,7 +72,7 @@ export default function FeaturesSection({
           {/* Beta Section */}
           <div className="mb-12">
             <h2 className="mb-6 text-3xl font-inter font-semibold text-black sm:text-4xl lg:text-5xl">
-              Be Among the First to Use GoDex — Join the Beta
+              Be among the first to use Deal Management — join the beta
             </h2>
             <p className="text-lg font-inter leading-relaxed text-gray-600">
               A simpler way to manage your deals. Built for borrowers, brokers,
@@ -104,7 +104,7 @@ export default function FeaturesSection({
                   <Input
                     id="email-input"
                     type="email"
-                    className="w-full border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20 font-inter"
+                    className="w-full border-gray-300 focus:border-brand-primary focus:ring-brand-primary/20 font-inter"
                     required
                     value={formData.email}
                     onChange={(event) =>
@@ -122,7 +122,7 @@ export default function FeaturesSection({
                   <Input
                     id="company-input"
                     type="text"
-                    className="w-full border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20 font-inter"
+                    className="w-full border-gray-300 focus:border-brand-primary focus:ring-brand-primary/20 font-inter"
                     required
                     value={formData.company}
                     onChange={(event) =>
@@ -143,7 +143,7 @@ export default function FeaturesSection({
                   <Input
                     id="firstName-input"
                     type="text"
-                    className="w-full border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20 font-inter"
+                    className="w-full border-gray-300 focus:border-brand-primary focus:ring-brand-primary/20 font-inter"
                     required
                     value={formData.firstName}
                     onChange={(event) =>
@@ -161,7 +161,7 @@ export default function FeaturesSection({
                   <Input
                     id="lastName-input"
                     type="text"
-                    className="w-full border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20 font-inter"
+                    className="w-full border-gray-300 focus:border-brand-primary focus:ring-brand-primary/20 font-inter"
                     required
                     value={formData.lastName}
                     onChange={(event) =>
@@ -182,7 +182,7 @@ export default function FeaturesSection({
                   <Input
                     id="phone-input"
                     type="tel"
-                    className="w-full border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20 font-inter"
+                    className="w-full border-gray-300 focus:border-brand-primary focus:ring-brand-primary/20 font-inter"
                     value={formData.phone}
                     onChange={(event) =>
                       updateFormField("phone", event.target.value)
@@ -200,7 +200,7 @@ export default function FeaturesSection({
                     value={formData.accountType}
                     onValueChange={(value) => updateFormField("accountType", value)}
                   >
-                    <SelectTrigger className="w-full border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20 font-inter">
+                    <SelectTrigger className="w-full border-gray-300 focus:border-brand-primary focus:ring-brand-primary/20 font-inter">
                       <SelectValue placeholder="Select account type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -214,7 +214,7 @@ export default function FeaturesSection({
               </div>
 
               <Button
-                className="w-[90%] mx-auto block bg-godex-secondary text-black hover:bg-godex-secondary/90 font-inter"
+                className="w-[90%] mx-auto block bg-brand-secondary text-black hover:bg-brand-secondary/90 font-inter"
                 type="submit"
               >
                 Submit

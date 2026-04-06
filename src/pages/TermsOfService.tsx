@@ -23,7 +23,7 @@ export default function TermsOfService() {
                 1. Acceptance of Terms
               </h2>
               <p className="text-gray-700 mb-4">
-                By accessing and using GoDex ("the Service"), you accept and agree to be bound by the 
+                By accessing and using Deal Management ("the Service"), you accept and agree to be bound by the 
                 terms and provision of this agreement. If you do not agree to abide by the above, 
                 please do not use this service.
               </p>
@@ -34,7 +34,7 @@ export default function TermsOfService() {
                 2. Description of Service
               </h2>
               <p className="text-gray-700 mb-4">
-                GoDex is a deal management platform designed for private credit professionals, 
+                Deal Management is a platform designed for private credit professionals, 
                 including borrowers, brokers, and lenders. Our services include:
               </p>
               <ul className="list-disc pl-6 text-gray-700 mb-4 space-y-2">
@@ -84,7 +84,7 @@ export default function TermsOfService() {
                 5. Intellectual Property
               </h2>
               <p className="text-gray-700 mb-4">
-                The Service and its original content, features, and functionality are owned by GoDex 
+                The Service and its original content, features, and functionality are owned by the operator of Deal Management 
                 and are protected by international copyright, trademark, patent, trade secret, and 
                 other intellectual property laws.
               </p>
@@ -121,7 +121,7 @@ export default function TermsOfService() {
                 8. Limitation of Liability
               </h2>
               <p className="text-gray-700 mb-4">
-                In no event shall GoDex, nor its directors, employees, partners, agents, suppliers, 
+                In no event shall the operator of Deal Management, nor its directors, employees, partners, agents, suppliers, 
                 or affiliates, be liable for any indirect, incidental, special, consequential, or 
                 punitive damages, including without limitation, loss of profits, data, use, goodwill, 
                 or other intangible losses, resulting from your use of the Service.
@@ -133,7 +133,7 @@ export default function TermsOfService() {
                 9. Disclaimers
               </h2>
               <p className="text-gray-700 mb-4">
-                The Service is provided on an "AS IS" and "AS AVAILABLE" basis. GoDex makes no 
+                The Service is provided on an "AS IS" and "AS AVAILABLE" basis. The operator of Deal Management makes no 
                 warranties, expressed or implied, and hereby disclaims all warranties, including 
                 without limitation, implied warranties of merchantability, fitness for a particular 
                 purpose, and non-infringement.
@@ -180,7 +180,7 @@ export default function TermsOfService() {
               </p>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="text-gray-700">
-                  <strong>Email:</strong> legal@godex.com<br />
+                  <strong>Email:</strong> legal@example.com<br />
                   <strong>Address:</strong> [Company Address]<br />
                   <strong>Phone:</strong> [Phone Number]
                 </p>

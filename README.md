@@ -1,143 +1,171 @@
-# GoDex
+# Deal Management Platform
 
-**🌐 Live Demo:** [https://godex.vercel.app](https://godex.vercel.app)
+**Deal intelligence for private lenders** — one place to run the pipeline from first touch to close: structured deal data, documents, collaboration, and messaging, backed by Supabase with row-level security.
 
-A modern deal management platform for private lenders, GoDex allows those in the private lending space to quickly organize their files, communications and deal flows.
+---
 
-## 🚀 Quick Start
+## Why reviewers should care
+
+This app is a full-stack TypeScript product, not a toy UI: a Vite + React client talks to a real PostgreSQL schema (migrations in-repo), Supabase Auth and Storage, optional Matrix-powered chat, and RLS-shaped access for deals, files, and invites. The codebase is organized around services, hooks, and typed deal models so features stay traceable from UI to policy.
+
+---
+
+## What ships today
+
+| Area | Capabilities |
+|------|----------------|
+| **Identity & profile** | Email/password auth, profile fields (name, title, photo, bio), org context, password reset / change flows |
+| **Deal workspace** | Kanban (New → Negotiation → In Progress → Completed, plus Rejected), create/edit deals with rich sections (overview, financials, collateral, purpose, next steps) |
+| **Movement & visibility** | Drag-and-drop between stages; cards scoped to creators and invited members |
+| **Files** | Uploads via Supabase Storage, `deal_documents`, access aligned with deal membership |
+| **Collaboration** | Comments, activity logging (`deal_logs`), email invites, shareable links, collaborator management |
+| **Comms** | In-app messaging built on **Matrix** (`matrix-js-sdk`), wired to deal-side chat patterns |
+| **Notifications** | In-app notification surface for deal-relevant events |
+| **Backend** | SQL migrations, RLS policies, storage policies, edge functions (e.g. user bootstrap, email invites) — see [`backend/README.md`](./backend/README.md) |
+
+---
+
+## Tech stack
+
+- **Frontend:** React 18, TypeScript, Vite  
+- **UI:** Tailwind CSS, Radix UI, shadcn-style components  
+- **Data & auth:** Supabase (PostgreSQL, Auth, Storage, Edge Functions)  
+- **Realtime chat:** Matrix (Synapse-compatible) via `matrix-js-sdk`  
+- **Deployment:** Vercel (demo)
+
+---
+
+## Quick start
 
 ### Prerequisites
 
-- **Node.js** (v20 or higher) - [Download here](https://nodejs.org/)
+- **Node.js** v20+ — [nodejs.org](https://nodejs.org/)
 - **npm**
-- **Git** for version control
+- **Git**
 
-### Local Development Setup
+### Security note (credentials)
 
-1. **Clone the repository**
+- **`.env` and `backend/.env` are gitignored** — they should never be committed. This repository does not include real API keys or service-role secrets in tracked files; the app reads `VITE_SUPABASE_*` from the environment at build/runtime.
+- Copy [`.env.example`](./.env.example) to `.env` and fill in your own values. Keep **Supabase service role keys and Resend keys** only in Supabase Dashboard (Edge Function secrets) or local CLI config — not in the frontend repo.
 
-2. **Install dependencies**
+### 1. Clone and install
 
-3. **Environment Configuration**
-   
-   Create a `.env` file in the root directory with the following variables:
-   ```env
-   # Supabase Configuration
-   VITE_SUPABASE_URL=your_supabase_project_url
-   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-   VITE_EMAIL_REDIRECT_TO=http://localhost:5173/dashboard
-   ```
+```bash
+git clone <your-fork-or-remote-url>
+cd project-learning
+npm install
+```
 
-   > **Note:** You'll need to set up your own Supabase project and replace the placeholder values. See the [Supabase Setup](#supabase-setup) section below.
+### 2. Environment
 
-4. **Start the development server**
-   ```bash
-   npm run dev
-   ```
+Copy the example file and edit:
 
-5. **Open your browser**
-   
-   Navigate to [http://localhost:5173](http://localhost:5173) to view the application.
+```bash
+cp .env.example .env
+```
 
-### Supabase Setup
+Then set variables in `.env` in the **repository root**:
 
-1. **Create a Supabase Project**
-   - Go to [supabase.com](https://supabase.com) and create a new project
-   - Note down your project URL and anon key
+```env
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_EMAIL_REDIRECT_TO=http://localhost:5173/dashboard
+```
 
-2. **Database Schema**
-   
-   Download the Supabase CLI and install it.
-   ```cd godex/backend```
-   Run the command ```supabase db push```
+Replace values with your Supabase project (or local Supabase — see backend docs).
 
-3. **Authentication Setup**
-   - In your Supabase dashboard, go to Authentication > Settings
-   - Configure your site URL and redirect URLs
-   - Set up email templates if needed
+### 3. Database & backend
 
-### Available Scripts
+From the repo root:
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build locally
+```bash
+cd backend
+supabase db push
+```
 
-## 🏗️ Project Structure
+For a full local stack (Docker), CLI commands, and production notes, start with **[`backend/README.md`](./backend/README.md)** → [`backend/SETUP.md`](./backend/SETUP.md). Architecture and schema: [`backend/ARCHITECTURE.md`](./backend/ARCHITECTURE.md).
+
+### 4. Run the app
+
+```bash
+cd ..   # back to repo root if you were in backend/
+npm run dev
+```
+
+Open [http://localhost:5173](http://localhost:5173).
+
+### Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Dev server |
+| `npm run build` | Production build |
+| `npm run preview` | Preview production build locally |
+
+---
+
+## Project layout
 
 ```
-godex-frontend/
+project-learning/          # clone name may differ
+├── backend/               # Supabase: migrations, functions, config
+│   ├── supabase/
+│   └── README.md          # primary backend entrypoint
 ├── public/
 ├── src/
-│   ├── assets/
-│   ├── components/
-│   ├── constants/
-│   ├── context/
-│   ├── hooks/
-│   ├── lib/
-│   ├── pages/
-│   ├── routes/
-│   ├── services/
+│   ├── components/        # UI (layout, deal builder, forms, auth, …)
+│   ├── config/            # routes and app config
+│   ├── context/           # React context providers
+│   ├── hooks/             # data and UI hooks
+│   ├── lib/               # e.g. Supabase client helpers
+│   ├── pages/             # route-level screens
+│   ├── services/          # API / Supabase service layer
 │   ├── styles/
-│   ├── types/
-│   ├── utils/
-│   └── main.tsx or index.tsx
-├── .env
+│   ├── types/             # TypeScript models (deals, profile, Matrix, …)
+│   ├── utility/
+│   ├── App.tsx
+│   └── main.tsx
+├── .env                   # you create this (not committed)
+├── package.json
 ├── tailwind.config.js
-├── postcss.config.js
 ├── tsconfig.json
-└── package.json
+└── vite.config.ts
 ```
 
-## 🛠️ Tech Stack
+---
 
-- **Frontend:** React 18, TypeScript, Vite
-- **Styling:** Tailwind CSS, Radix UI, ShadeCN
-- **Authentication:** Supabase Auth
-- **Database:** Supabase PostgreSQL
-- **Storage:** Supabase Storage
-- **Deployment:** Vercel
+## Development milestones (complete)
 
-## 📋 Development Milestones
+### Milestone 1 — Static site, auth, profile
 
-### ✅ Milestone 1: Static Site, Authentication, and Profile Setup
-**Status: COMPLETED** ✅
+- Landing, sign up / sign in, Supabase Auth (email/password)
+- Editable profiles (name, title, photo, bio), org tags for MVP
+- User/profile tables and RLS for user-level data
+- Vercel deploy with post-login redirect to the app
 
-- ✅ Deploy static landing page with signup/login (using Supabase Auth)
-- ✅ Enable email/password authentication
-- ✅ Implement user profile creation with editable fields (name, title, profile photo, bio)
-- ✅ Organizational tags (cosmetic only in MVP)
-- ✅ Setup Supabase tables for users and profiles
-- ✅ Ensure Supabase RLS is in place for user-level access
-- ✅ Deploy to Vercel with working login → dashboard redirect
+### Milestone 2 — Kanban and deal core
 
-### 🔄 Milestone 2: Kanban Dashboard and Deal Card Core
-**Status: IN PROGRESS** 🔄
+- Kanban columns: New, Negotiation, In Progress, Completed, and Rejected
+- Create/edit deals with structured fields, uploads, and notes where applicable
+- Drag-and-drop between stages
+- Card summary vs full deal view
+- Deals visible only to creators and invited members
+- Schema: `deals`, `deal_members`, `deal_permissions`, related enums and policies
 
-- ⏳ Build Kanban dashboard with 4 visible columns (New, Negotiation, In Progress, Completed) + 1 hidden (Rejected)
-- ⏳ Implement "Add New Deal" modal with required fields (title, status, dates, file uploads and notes)
-- ⏳ Enable drag-and-drop functionality for cards between stages
-- ⏳ Card preview shows basic info; full view reveals full deal data
-- ⏳ Cards scoped to user's access (only deals created or shared with them)
-- ⏳ Deal schema established in Supabase (deals, deal_members, deal_permissions)
+### Milestone 3 — Files, collaboration, messaging
 
-### ⏳ Milestone 3: File Handling, Collaboration, and Messaging
-**Status: PENDING** ⏳
+- Document upload to Supabase Storage and `deal_documents`
+- Paths organized by organization/deal semantics; access via authenticated client and policies
+- `deal_logs` for auditable actions (status, uploads, comments, etc.)
+- Matrix-based messaging and deal-attached chat flows
+- Invites and shared links; accepting access grants deal permissions as designed
 
-- ⏳ Implement file upload with Supabase Storage (deal_documents table)
-- ⏳ Organized by organization_id/deal_id
-- ⏳ Signed URL access only
-- ⏳ Create deal_logs table and log every action: status changes, uploads, comments
-- ⏳ Build lightweight Instant Messenger system (Matrix or similar open source)
-- ⏳ Enable messaging by name/org/email
-- ⏳ Deal sharing via link (email, network, in app messenger)
-- ⏳ Accepting a link adds user to deal at appropriate permission level determined by card owner
+### Milestone 4 — Security, RLS, docs, production readiness
 
-### ⏳ Milestone 4: Security, RLS Policies, and Deployment
-**Status: PENDING** ⏳
+- RLS across deals, documents, permissions, and related entities
+- Logging and access rules aligned with product behavior
+- Inter-user visibility via minimal shared profile patterns where needed
+- Setup guides, SQL migrations, and backend documentation for operators and contributors
+- Modular frontend/backend layout suitable for ongoing production work
 
-- ⏳ Full Supabase RLS enforcement across deals, documents, permissions
-- ⏳ Implement logging policies and access restrictions
-- ⏳ Finalize minimal public profiles with inter-user visibility
-- ⏳ Write setup instructions, Supabase SQL schema migration, and walkthrough doc
-- ⏳ Confirm all frontend and backend code is modular, documented, and production-grade
-  
+---

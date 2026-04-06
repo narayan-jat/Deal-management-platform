@@ -64,7 +64,7 @@ export default function SignUp() {
         isOrganizationApproved ? (
           <AuthLayout
             title="Create your account"
-            subtitle="Join GoDex to manage your deals efficiently"
+            subtitle="Join Deal Management to run your deal pipeline efficiently"
           >
             <AuthForm
               type="signup"

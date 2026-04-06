@@ -5,8 +5,9 @@ import { Resend } from 'npm:resend';
 
 // ⬇️ Your API key from Resend or your provider
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"))
-const APP_URL = Deno.env.get("APP_URL") || "https://godex.cloud"
-const DOMAIN = Deno.env.get("DOMAIN") || "godex.cloud"
+// Set APP_URL and DOMAIN in Supabase Edge Function secrets for production email.
+const APP_URL = Deno.env.get("APP_URL") ?? "http://localhost:5173"
+const DOMAIN = Deno.env.get("DOMAIN") ?? "example.com"
 
 // CORS headers
 const corsHeaders = {
@@ -42,11 +43,11 @@ serve(async (req) => {
     const inviteUrl = `${APP_URL}/deals/deal-email-invite/${token}`;
 
     const { error: emailError } = await resend.emails.send({
-      from: `GoDex <noreply@${DOMAIN}>`,
+      from: `Deal Management <noreply@${DOMAIN}>`,
       to: [invite.email],
       subject: "You're invited to collaborate on a deal",
       html: `
-        <p>You've been invited to a deal on GoDex as <strong>${invite.role}</strong>.</p>
+        <p>You've been invited to a deal on Deal Management as <strong>${invite.role}</strong>.</p>
         <p><a href="${inviteUrl}">Click here to accept the invite</a></p>
         <p>This link is unique and valid for one-time use.</p>
       `

@@ -47,22 +47,22 @@ export const PROTECTED_ROUTES = {
 export const ROUTE_METADATA = {
   [ROUTES.HOME]: {
     title: 'Home',
-    description: 'GoDex - Deal Management Platform',
+    description: 'Deal Management — private lending deal platform',
     requiresAuth: false,
   },
   [ROUTES.SIGNIN]: {
     title: 'Sign In',
-    description: 'Sign in to your GoDex account',
+    description: 'Sign in to Deal Management',
     requiresAuth: false,
   },
   [ROUTES.SIGNUP]: {
     title: 'Sign Up',
-    description: 'Create your GoDex account',
+    description: 'Create your Deal Management account',
     requiresAuth: false,
   },
   [ROUTES.RESET_PASSWORD]: {
     title: 'Reset Password',
-    description: 'Reset your GoDex account password',
+    description: 'Reset your Deal Management account password',
     requiresAuth: false,
   },
   [ROUTES.CHANGE_PASSWORD]: {
@@ -77,7 +77,7 @@ export const ROUTE_METADATA = {
   },
   [ROUTES.DASHBOARD]: {
     title: 'Dashboard',
-    description: 'Your GoDex dashboard',
+    description: 'Your Deal Management dashboard',
     requiresAuth: true,
   },
   [ROUTES.DEALS]: {

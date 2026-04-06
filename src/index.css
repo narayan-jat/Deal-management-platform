@@ -70,22 +70,6 @@ html {
 
 /* Custom utility classes */
 @layer utilities {
-  .bg-godex-primary {
-    background-color: var(--color-primary);
-  }
-  
-  .text-godex-primary {
-    color: var(--color-primary);
-  }
-  
-  .bg-godex-secondary {
-    background-color: var(--color-secondary);
-  }
-  
-  .text-godex-secondary {
-    color: var(--color-secondary);
-  }
-  
   .font-inter {
     font-family: var(--font-primary);
   }

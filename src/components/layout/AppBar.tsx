@@ -14,7 +14,7 @@ import { useAuth } from '@/context/AuthProvider';
 import { useSearch } from '@/context/SearchProvider';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/config/routes';
-import logo from '@/assets/godex-logo.png';
+import { BrandWordmark } from '@/components/brand/BrandWordmark';
 import { useNotifications } from '@/hooks/useNotifications';
 
 interface AppBarProps {
@@ -137,12 +137,7 @@ export default function AppBar({ onMenuClick, isSidebarOpen }: AppBarProps) {
         </button>
 
         <div className="flex items-center gap-2">
-          <img
-            src={logo}
-            alt="Godex Logo"
-            className="h-8 w-auto"
-            style={{ maxHeight: 32 }}
-          />
+          <BrandWordmark className="!text-base sm:!text-lg" />
         </div>
       </div>
 

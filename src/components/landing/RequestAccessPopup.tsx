@@ -49,7 +49,7 @@ export default function RequestAccessPopup({
                 <Input
                   id="popup-email-input"
                   type="email"
-                  className="w-full border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20 font-inter"
+                  className="w-full border-gray-300 focus:border-brand-primary focus:ring-brand-primary/20 font-inter"
                   required
                   value={formData.email}
                   onChange={(event) =>
@@ -67,7 +67,7 @@ export default function RequestAccessPopup({
                 <Input
                   id="popup-company-input"
                   type="text"
-                  className="w-full border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20 font-inter"
+                  className="w-full border-gray-300 focus:border-brand-primary focus:ring-brand-primary/20 font-inter"
                   required
                   value={formData.company}
                   onChange={(event) =>
@@ -88,7 +88,7 @@ export default function RequestAccessPopup({
                 <Input
                   id="popup-firstName-input"
                   type="text"
-                  className="w-full border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20 font-inter"
+                  className="w-full border-gray-300 focus:border-brand-primary focus:ring-brand-primary/20 font-inter"
                   required
                   value={formData.firstName}
                   onChange={(event) =>
@@ -106,7 +106,7 @@ export default function RequestAccessPopup({
                 <Input
                   id="popup-lastName-input"
                   type="text"
-                  className="w-full border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20 font-inter"
+                  className="w-full border-gray-300 focus:border-brand-primary focus:ring-brand-primary/20 font-inter"
                   required
                   value={formData.lastName}
                   onChange={(event) =>
@@ -127,7 +127,7 @@ export default function RequestAccessPopup({
                 <Input
                   id="popup-phone-input"
                   type="tel"
-                  className="w-full border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20 font-inter"
+                  className="w-full border-gray-300 focus:border-brand-primary focus:ring-brand-primary/20 font-inter"
                   value={formData.phone}
                   onChange={(event) =>
                     updateFormField("phone", event.target.value)
@@ -145,7 +145,7 @@ export default function RequestAccessPopup({
                   value={formData.accountType}
                   onValueChange={(value) => updateFormField("accountType", value)}
                 >
-                  <SelectTrigger className="w-full border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20 font-inter">
+                  <SelectTrigger className="w-full border-gray-300 focus:border-brand-primary focus:ring-brand-primary/20 font-inter">
                     <SelectValue placeholder="Select account type" />
                   </SelectTrigger>
                   <SelectContent>
@@ -171,7 +171,7 @@ export default function RequestAccessPopup({
               </Button>
               <Button
                 type="submit"
-                className="flex-1 bg-godex-secondary text-black hover:bg-godex-secondary/90 font-inter order-1 sm:order-2"
+                className="flex-1 bg-brand-secondary text-black hover:bg-brand-secondary/90 font-inter order-1 sm:order-2"
               >
                 Submit Request
               </Button>

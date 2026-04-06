@@ -116,7 +116,7 @@ export default function Sidebar({ isOpen, isCollapsed, onToggle }: SidebarProps)
             {/* Logo */}
             {!isCollapsed && (
               <div className="flex items-center gap-2 mb-6">
-                <span className="font-semibold text-gray-900">Godex</span>
+                <span className="font-semibold text-gray-900">Deal Management</span>
               </div>
             )}
 

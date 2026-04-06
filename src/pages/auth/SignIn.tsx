@@ -41,7 +41,7 @@ export default function SignIn() {
   return (
     <AuthLayout
       title="Welcome back"
-      subtitle="Sign in to your GoDex account"
+      subtitle="Sign in to Deal Management"
     >
       <AuthForm
         type="signin"

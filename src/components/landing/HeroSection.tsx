@@ -6,7 +6,7 @@ interface HeroSectionProps {
 
 export default function HeroSection({ openPopup }: HeroSectionProps) {
   return (
-    <section id="hero" className="relative overflow-hidden bg-godex-primary px-4 py-16 sm:px-8 lg:px-16 lg:py-32">
+    <section id="hero" className="relative overflow-hidden bg-brand-primary px-4 py-16 sm:px-8 lg:px-16 lg:py-32">
       <div className="mx-auto max-w-7xl">
         <div className="grid gap-8 lg:gap-20 lg:grid-cols-2 lg:items-center">
           {/* Dashboard Preview Card */}
@@ -17,7 +17,7 @@ export default function HeroSection({ openPopup }: HeroSectionProps) {
               <div className="rounded-xl bg-white p-4 shadow-[0_20px_40px_rgba(0,0,0,0.1)] sm:p-6">
                 <div className="flex items-center justify-between border-b border-zinc-100 pb-4 mb-5">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-godex-primary text-sm font-semibold text-white">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-primary text-sm font-semibold text-white">
                       ▶
                     </div>
                     <div>
@@ -120,7 +120,7 @@ export default function HeroSection({ openPopup }: HeroSectionProps) {
           {/* Hero Content */}
           <div className="order-1 text-center text-white lg:order-2 lg:text-left">
             <h1 className="mb-6 text-3xl font-inter font-semibold leading-tight tracking-normal sm:text-4xl lg:text-5xl xl:text-6xl">
-              Try the GoDex Beta
+              Try the beta
             </h1>
             <p className="mb-8 text-lg font-inter text-white/90 sm:text-xl lg:max-w-lg">
               A simpler way to manage your deals. Built for borrowers, brokers, and

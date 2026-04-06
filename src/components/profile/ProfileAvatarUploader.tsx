@@ -48,7 +48,7 @@ export default function ProfileAvatarUploader({ originalProfileFilePath, imageUr
         <img
           src={preview || defaultProfile}
           alt="Profile Avatar"
-          className="w-32 h-32 rounded-full object-cover border-4 border-gray-100 shadow-lg group-hover:border-godex-primary/30 transition-colors"
+          className="w-32 h-32 rounded-full object-cover border-4 border-gray-100 shadow-lg group-hover:border-brand-primary/30 transition-colors"
         />
         <div className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
           <Camera className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -58,7 +58,7 @@ export default function ProfileAvatarUploader({ originalProfileFilePath, imageUr
       <div className="space-y-2">
         <Label 
           htmlFor="avatar-upload" 
-          className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-godex-primary hover:bg-godex-primary/90 text-white rounded-lg font-inter text-sm transition-colors"
+          className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-brand-primary hover:bg-brand-primary/90 text-white rounded-lg font-inter text-sm transition-colors"
         >
           <Upload className="w-4 h-4" />
           Change Photo

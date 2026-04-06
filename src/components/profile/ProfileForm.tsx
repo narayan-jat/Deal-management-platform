@@ -74,7 +74,7 @@ export default function ProfileEditForm({ data, open, onOpenChange, handleUpload
                 value={form.firstName}
                 onChange={handleChange}
                 placeholder="Enter your first name"
-                className="border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20 font-inter"
+                className="border-gray-300 focus:border-brand-primary focus:ring-brand-primary/20 font-inter"
               />
             </div>
 
@@ -89,7 +89,7 @@ export default function ProfileEditForm({ data, open, onOpenChange, handleUpload
                 value={form.lastName}
                 onChange={handleChange}
                 placeholder="Enter your last name"
-                className="border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20 font-inter"
+                className="border-gray-300 focus:border-brand-primary focus:ring-brand-primary/20 font-inter"
               />
             </div>
           </div>
@@ -137,7 +137,7 @@ export default function ProfileEditForm({ data, open, onOpenChange, handleUpload
               name="location"
               value={form.location || ""}
               onChange={handleChange}
-              className="border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20 font-inter"
+              className="border-gray-300 focus:border-brand-primary focus:ring-brand-primary/20 font-inter"
             />
           </div>
 
@@ -151,7 +151,7 @@ export default function ProfileEditForm({ data, open, onOpenChange, handleUpload
               value={form.bio || ""}
               onChange={handleChange}
               placeholder="Tell us about yourself and your professional background..."
-              className="min-h-[120px] border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20 font-inter resize-none"
+              className="min-h-[120px] border-gray-300 focus:border-brand-primary focus:ring-brand-primary/20 font-inter resize-none"
             />
           </div>
 
@@ -166,7 +166,7 @@ export default function ProfileEditForm({ data, open, onOpenChange, handleUpload
             <Button
               onClick={handleSubmit}
               disabled={loading}
-              className="bg-godex-primary hover:bg-godex-primary/90 text-white font-inter px-6"
+              className="bg-brand-primary hover:bg-brand-primary/90 text-white font-inter px-6"
             >
               {loading ? "Saving..." : "Save Profile"}
             </Button>

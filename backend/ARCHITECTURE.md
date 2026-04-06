@@ -2,7 +2,7 @@
 
 ## Overview
 
-The GoDex backend is built on Supabase, providing authentication, database, storage, and edge functions in a single platform.
+The Deal Management backend is built on Supabase, providing authentication, database, storage, and edge functions in a single platform.
 
 ## System Components
 

@@ -1,6 +1,6 @@
 # Backend Documentation Index
 
-Welcome to the GoDex Supabase backend documentation! This index helps you find the right document for your needs.
+Welcome to the Deal Management Supabase backend documentation! This index helps you find the right document for your needs.
 
 ## 📚 Documentation Overview
 

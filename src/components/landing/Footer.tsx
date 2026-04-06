@@ -18,7 +18,7 @@ export default function Footer({
 }: FooterProps) {
 
   return (
-    <footer id="contact" className="bg-godex-primary px-4 py-16 text-white sm:px-6 lg:px-16 lg:py-20">
+    <footer id="contact" className="bg-brand-primary px-4 py-16 text-white sm:px-6 lg:px-16 lg:py-20">
       <div className="mx-auto max-w-4xl text-center">
         <h2 className="mb-8 text-3xl font-inter leading-tight text-white sm:text-4xl lg:text-5xl">
           Got questions? Let's get in touch
@@ -67,7 +67,7 @@ export default function Footer({
             />
           </div>
           <Button
-            className="w-[80%] mx-auto block bg-godex-secondary text-black hover:bg-godex-secondary/90 font-inter"
+            className="w-[80%] mx-auto block bg-brand-secondary text-black hover:bg-brand-secondary/90 font-inter"
             type="submit"
             onKeyDown={(event) => {
               if (event.key === "Enter" || event.key === " ") {
@@ -80,7 +80,7 @@ export default function Footer({
           </Button>
         </form>
         <div className="flex flex-col items-center gap-6 border-t border-white/20 pt-8 sm:flex-row sm:justify-between">
-          <p className="text-sm text-stone-300 font-inter">© 2025 GoDex</p>
+          <p className="text-sm text-stone-300 font-inter">© 2026 Deal Management</p>
           <div className="flex flex-wrap gap-6">
             <Link
               to="/terms-of-service"

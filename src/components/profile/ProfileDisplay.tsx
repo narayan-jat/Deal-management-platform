@@ -34,8 +34,8 @@ export default function ProfileDisplay({ data, isOwner, handleUpdateProfile, han
           <h2 className="text-2xl font-bold text-black font-inter mb-1">
             {data.firstName + " " + data.lastName || "No name provided"}
           </h2>
-          <p className="text-lg text-godex-primary font-medium font-inter mb-2">
-            {data.title || "Engineer(default)"} @ {data.primaryOrganization.organization.name || "Godex(default)"}
+          <p className="text-lg text-brand-primary font-medium font-inter mb-2">
+            {data.title || "Engineer(default)"} @ {data.primaryOrganization.organization.name || "Organization (default)"}
           </p>
           <p className="text-gray-600 font-inter">
             {data.email || "No email provided"}

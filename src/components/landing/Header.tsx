@@ -1,7 +1,7 @@
 import { GoldButton } from "@/components/ui/button"
 import { Link } from "react-router-dom";
 import { NavigationConfig, NavigationItem } from "@/config/navigation";
-import logo from '@/assets/godex-logo.png';
+import { BrandWordmark } from "@/components/brand/BrandWordmark";
 interface HeaderProps {
   isMenuOpen: boolean;
   toggleMenu: () => void;
@@ -30,7 +30,7 @@ export default function Header({ isMenuOpen, toggleMenu, navigationConfig }: Hea
   };
 
   const renderNavItem = (item: NavigationItem, isMobile = false) => {
-    const baseClasses = "text-base font-medium no-underline text-neutral-600 hover:text-godex-primary transition-colors";
+    const baseClasses = "text-base font-medium no-underline text-neutral-600 hover:text-brand-primary transition-colors";
     const mobileClasses = isMobile ? "px-0 py-3 text-center w-full" : "";
 
     if (item.type === 'route' && item.path) {
@@ -67,14 +67,7 @@ export default function Header({ isMenuOpen, toggleMenu, navigationConfig }: Hea
           <div className="flex justify-between items-center">
             {/* Logo - Left */}
             <div className="flex items-center">
-              <Link to="/" className="text-2xl font-bold text-godex-primary font-inter">
-                <img
-                  src={logo}
-                  alt="Godex Logo"
-                  className="h-8 w-auto"
-                  style={{ maxHeight: 32 }}
-                />
-              </Link>
+              <BrandWordmark />
             </div>
 
             {/* Desktop Auth Navigation - Right */}
@@ -90,7 +83,7 @@ export default function Header({ isMenuOpen, toggleMenu, navigationConfig }: Hea
                     </Link>
                   ) : (
                     <Link to={item.path!}>
-                      <button className="px-6 py-2 text-base font-medium bg-gray-50 text-godex-primary rounded-full border border-gray-200 hover:bg-gray-100 transition-colors">
+                      <button className="px-6 py-2 text-base font-medium bg-gray-50 text-brand-primary rounded-full border border-gray-200 hover:bg-gray-100 transition-colors">
                         {item.title}
                       </button>
                     </Link>
@@ -101,7 +94,7 @@ export default function Header({ isMenuOpen, toggleMenu, navigationConfig }: Hea
 
             {/* Mobile Menu Button */}
             <button
-              className="md:hidden p-2 rounded-md text-gray-600 hover:text-godex-primary hover:bg-gray-100 transition-colors"
+              className="md:hidden p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors"
               onClick={toggleMenu}
               aria-label="Open menu"
             >
@@ -133,7 +126,7 @@ export default function Header({ isMenuOpen, toggleMenu, navigationConfig }: Hea
                   <div key={item.title} className="w-full">
                     {item.title === "Sign Up" || item.title === "Sign in" ? (
                       <Link to={item.path!} className="block">
-                        <button className="w-full px-4 py-3 text-base font-medium bg-godex-secondary text-black rounded-lg hover:bg-godex-secondary/90 transition-colors">
+                        <button className="w-full px-4 py-3 text-base font-medium bg-brand-secondary text-black rounded-lg hover:bg-brand-secondary/90 transition-colors">
                           {item.title}
                         </button>
                       </Link>

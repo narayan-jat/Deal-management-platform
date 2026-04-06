@@ -1,6 +1,6 @@
 # Supabase Backend Setup Guide
 
-This guide will help you set up and connect the GoDex project to Supabase, both for local development and production deployment.
+This guide will help you set up and connect the Deal Management project to Supabase, both for local development and production deployment.
 
 ## Table of Contents
 - [Prerequisites](#prerequisites)
@@ -194,7 +194,7 @@ For self-hosting, refer to the [Supabase Self-Hosted Documentation](https://supa
 The database is configured in `backend/supabase/config.toml`. Key settings:
 
 ```toml
-project_id = "godex"
+project_id = "deal-management"
 
 [api]
 port = 54321

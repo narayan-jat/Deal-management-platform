@@ -72,7 +72,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
                 value={formData.firstName || ""}
                 onChange={(e) => onInputChange("firstName", e.target.value)}
                 placeholder="Enter your first name"
-                className="w-full border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20"
+                className="w-full border-gray-300 focus:border-brand-primary focus:ring-brand-primary/20"
                 required={isSignup}
               />
             </div>
@@ -88,7 +88,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
                 value={formData.email}
                 onChange={(e) => onInputChange("email", e.target.value)}
                 placeholder="Enter your email"
-                className="w-full border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20"
+                className="w-full border-gray-300 focus:border-brand-primary focus:ring-brand-primary/20"
                 required
               />
             </div>
@@ -112,7 +112,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
                 value={formData.location || ""}
                 onChange={(e) => onInputChange("location", e.target.value)}
                 placeholder="Enter your location"
-                className="w-full border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20"
+                className="w-full border-gray-300 focus:border-brand-primary focus:ring-brand-primary/20"
               />
             </div>
           </div>
@@ -130,7 +130,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
                 value={formData.lastName || ""}
                 onChange={(e) => onInputChange("lastName", e.target.value)}
                 placeholder="Enter your last name"
-                className="w-full border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20"
+                className="w-full border-gray-300 focus:border-brand-primary focus:ring-brand-primary/20"
                 required={isSignup}
               />
             </div>
@@ -150,7 +150,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
                   Organization
                 </Label>
                 <Select value={formData.organizationType || "create"} onValueChange={(value: "create" | "join") => onInputChange("organizationType", value)}>
-                  <SelectTrigger className="w-full border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20">
+                  <SelectTrigger className="w-full border-gray-300 focus:border-brand-primary focus:ring-brand-primary/20">
                     <SelectValue placeholder="Select organization option" />
                   </SelectTrigger>
                   <SelectContent>
@@ -171,7 +171,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
                     value={formData.organizationName || ""}
                     onChange={(e) => onInputChange("organizationName", e.target.value)}
                     placeholder="Enter organization name"
-                    className="w-full border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20"
+                    className="w-full border-gray-300 focus:border-brand-primary focus:ring-brand-primary/20"
                     required={isSignup}
                   />
                   <p className="text-sm text-gray-500">Please fill N/A if you don't have an organization</p>
@@ -187,7 +187,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
                     value={formData.organizationCode || ""}
                     onChange={(e) => onInputChange("organizationCode", e.target.value)}
                     placeholder="Enter organization code"
-                    className="w-full border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20"
+                    className="w-full border-gray-300 focus:border-brand-primary focus:ring-brand-primary/20"
                     required={isSignup}
                   />
                 </div>
@@ -209,7 +209,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
               value={formData.email}
               onChange={(e) => onInputChange("email", e.target.value)}
               placeholder="Enter your email"
-              className="w-full border-gray-300 focus:border-godex-primary focus:ring-godex-primary/20"
+              className="w-full border-gray-300 focus:border-brand-primary focus:ring-brand-primary/20"
               required
             />
           </div>
@@ -227,7 +227,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
             <div className="text-right">
               <Link 
                 to="/reset-password" 
-                className="text-sm text-godex-primary hover:text-godex-primary/80 font-medium"
+                className="text-sm text-brand-primary hover:text-brand-primary/80 font-medium"
               >
                 Forgot your password?
               </Link>
@@ -245,7 +245,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
 
       <Button
         type="submit"
-        className="w-full bg-godex-primary hover:bg-godex-primary/90 text-white"
+        className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white"
         disabled={loading || !isFormValid}
       >
         {loading ? (type === "signup" ? "Creating account..." : "Signing in...") : submitLabel}
@@ -253,7 +253,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
 
       <div className="mt-8 text-center text-sm">
         <span className="text-gray-600">{bottomText} </span>
-        <Link to={bottomLinkTo} className="text-godex-primary hover:text-godex-primary/80 font-medium">
+        <Link to={bottomLinkTo} className="text-brand-primary hover:text-brand-primary/80 font-medium">
           {bottomLinkText}
         </Link>
       </div>
